@@ -1,8 +1,13 @@
-import pytest
 import numpy as np
-from lamatrix import lnGaussian2DGenerator, dlnGaussian2DGenerator, CombinedGenerator, Polynomial1DGenerator
+import pytest
 
-
+from lamatrix import (
+    Polynomial1DGenerator,
+    Spline1DGenerator,
+    VStackedGenerator,
+    dlnGaussian2DGenerator,
+    lnGaussian2DGenerator,
+)
 
 
 def test_lngauss():
@@ -49,23 +54,23 @@ def test_lngauss():
         rho=g.rho[0],
         data_shape=data.shape,
     )
-    assert np.isclose(-0.01, dg.shift_x[0], atol=dg.shift_x[1]*2)
-    assert np.isclose(0.02, dg.shift_y[0], atol=dg.shift_y[1]*2)
+    assert np.isclose(-0.01, dg.shift_x[0], atol=dg.shift_x[1] * 2)
+    assert np.isclose(0.02, dg.shift_y[0], atol=dg.shift_y[1] * 2)
 
-    c = CombinedGenerator(g, dg)
+    c = VStackedGenerator(g, dg)
     c.fit(column=column, row=row, data=data, errors=errors)
     assert np.isclose(sigma_x, c[0].stddev_x[0], atol=c[0].stddev_x[1] * 2)
     assert np.isclose(sigma_y, c[0].stddev_y[0], atol=c[0].stddev_y[1] * 2)
     assert np.isclose(rho, c[0].rho[0], atol=c[0].rho[1] * 2)
-    assert np.isclose(-0.01, c[1].shift_x[0], atol=c[1].shift_x[1]*2)
-    assert np.isclose(0.02, c[1].shift_y[0], atol=c[1].shift_y[1]*2)
+    assert np.isclose(-0.01, c[1].shift_x[0], atol=c[1].shift_x[1] * 2)
+    assert np.isclose(0.02, c[1].shift_y[0], atol=c[1].shift_y[1] * 2)
 
 
 def test_poly1d():
-    x = (np.arange(200) - 200)/200
-    x2 = (np.arange(-300, 300, 10) - 200)/200
+    x = (np.arange(200) - 200) / 200
+    x2 = (np.arange(-300, 300, 10) - 200) / 200
 
-    data = (3*x + 0.3) + np.random.normal(0, 0.1, size=200)
+    data = (3 * x + 0.3) + np.random.normal(0, 0.1, size=200)
     s = np.random.choice(np.arange(200), size=5)
     data[s] += np.random.normal(0, 3, size=5)
     errors = np.ones_like(x) * 0.1
@@ -73,7 +78,40 @@ def test_poly1d():
     g = Polynomial1DGenerator(polyorder=1)
     g.fit(x=x, data=data, errors=errors)
 
-    outlier_mask = np.abs(data - g.evaluate(x=x))/errors < 3
+    outlier_mask = np.abs(data - g.evaluate(x=x)) / errors < 3
     g.fit(x=x, data=data, errors=errors, mask=outlier_mask)
-    assert np.allclose([0.3, 3], g.mu, atol=g.sigma*2)
+    assert np.allclose([0.3, 3], g.mu, atol=g.sigma * 2)
     g.evaluate(x=x2)
+
+
+def test_polycombine():
+    c, r = np.meshgrid(np.arange(-10, 10, 0.2), np.arange(-10, 10, 0.2), indexing="ij")
+
+    p1 = Polynomial1DGenerator("r", data_shape=c.shape)
+    p2 = Polynomial1DGenerator("c", data_shape=c.shape)
+    for p in [VStackedGenerator(p1, p2), (p1 + p2)]:
+        true_w = np.random.normal(0, 1, size=(p.width))
+        data = p.design_matrix(c=c, r=r).dot(true_w).reshape(r.shape)
+        errors = np.ones_like(r) + 10
+        data += np.random.normal(0, 10, size=r.shape)
+        p.fit(c=c, r=r, data=data, errors=errors)
+
+        a = list(set(list(np.arange(8))) - set([0, 4]))
+        np.allclose(true_w[a], p.mu[a], atol=p.sigma[a])
+        np.isclose((true_w[0] + true_w[4]), p.mu[0], atol=p.sigma[0] * 2)
+
+
+def test_spline():
+    x = np.linspace(0, 10, 100)  # Independent variable
+    y = np.random.normal(0, 0.1, 100) + np.sin(2*(x))  # Dependent variable, replace with your time-series data
+    ye = np.ones(100) * 0.1
+    k = 4
+    model = Spline1DGenerator(knots=np.linspace(x.min(), x.max(), 20), offset_prior=(0, 0.01), splineorder=k)
+    model.fit(x=x, data=y, errors=ye)
+    model(x=np.linspace(-3, 13, 310))
+
+    y2 = np.random.normal(0, 0.01, 100) + np.sin(2*(x + 0.2))
+    dmodel = model.derivative()
+    dmodel.fit(x=x, data=y2 - model.evaluate(x=x), errors=ye)
+
+    assert np.abs((dmodel.shift_x[0] -  0.2))/dmodel.shift_x[1] < 10

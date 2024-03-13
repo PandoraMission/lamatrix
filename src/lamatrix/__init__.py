@@ -14,4 +14,8 @@ from rich.logging import RichHandler  # noqa: E402
 log = logging.getLogger("tesswcs")
 log.addHandler(RichHandler(markup=True))
 
-from .generator import *  # noqa: E402, F401
+from .combined import *  # noqa: E402, F401
+from .models.astrophysical import *  # noqa: E402, F401
+from .models.gaussian import *  # noqa: E402, F401
+from .models.simple import *  # noqa: E402, F401
+from .models.spline import *  # noqa: E402, F401
