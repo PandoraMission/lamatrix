@@ -103,15 +103,31 @@ def test_polycombine():
 
 def test_spline():
     x = np.linspace(0, 10, 100)  # Independent variable
-    y = np.random.normal(0, 0.1, 100) + np.sin(2*(x))  # Dependent variable, replace with your time-series data
+    y = np.random.normal(0, 0.1, 100) + np.sin(
+        2 * (x)
+    )  # Dependent variable, replace with your time-series data
     ye = np.ones(100) * 0.1
     k = 4
-    model = Spline1DGenerator(knots=np.linspace(x.min(), x.max(), 20), offset_prior=(0, 0.01), splineorder=k)
+    model = Spline1DGenerator(
+        knots=np.linspace(x.min(), x.max(), 20), offset_prior=(0, 0.01), splineorder=k
+    )
     model.fit(x=x, data=y, errors=ye)
     model(x=np.linspace(-3, 13, 310))
 
-    y2 = np.random.normal(0, 0.01, 100) + np.sin(2*(x + 0.2))
+    y2 = np.random.normal(0, 0.01, 100) + np.sin(2 * (x + 0.2))
     dmodel = model.derivative()
     dmodel.fit(x=x, data=y2 - model.evaluate(x=x), errors=ye)
 
-    assert np.abs((dmodel.shift_x[0] -  0.2))/dmodel.shift_x[1] < 10
+    assert np.abs((dmodel.shift_x[0] - 0.2)) / dmodel.shift_x[1] < 10
+
+    s1 = Spline1DGenerator(knots=np.arange(-10, 10, 3), x_name="x")
+    s2 = Spline1DGenerator(knots=np.arange(-10, 10, 3), x_name="y")
+    model = s1 * s2
+
+    x, y = np.mgrid[-10:10, -10:10]
+
+    true_w = np.random.normal(0, 1, size=model.width)
+    data = model.design_matrix(x=x, y=y).dot(true_w).reshape(x.shape)
+    model.fit(x=x, y=y, data=data)
+
+    assert np.allclose(true_w, model.mu)

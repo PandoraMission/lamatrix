@@ -174,7 +174,15 @@ class lnGaussian2DGenerator(MathMixins, Generator):
         )
 
     def derivative(self):
-        return dlnGaussian2DGenerator(stddev_x=self.stddev_x[0], stddev_y=self.stddev_y[0], rho=self.rho[0], x_name=self.x_name, y_name=self.y_name, data_shape=self.data_shape)
+        return dlnGaussian2DGenerator(
+            stddev_x=self.stddev_x[0],
+            stddev_y=self.stddev_y[0],
+            rho=self.rho[0],
+            x_name=self.x_name,
+            y_name=self.y_name,
+            data_shape=self.data_shape,
+        )
+
     # @property
     # def equation(self):
     #     eq1 = "$\\ln(G(x, y)) = a + bx^2 + cy^2 + 2dxy$"
@@ -279,14 +287,3 @@ class dlnGaussian2DGenerator(MathMixins, Generator):
         dfdx = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_x^2}} - \\rho\\frac{{(y-\\mu_y)}}{{\\sigma_x\\sigma_y}}\\right)\\right)"
         dfdy = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_x^2}} - \\rho\\frac{{(y-\\mu_y)}}{{\\sigma_x\\sigma_y}}\\right)\\right)"
         return ["", dfdx, dfdy]
-
-    # @property
-    # def equation(self):
-    #     dgdx = "$\\frac{\\partial}{\\partial x} \\ln(G(x, y)) = -\\frac{1}{1-\\rho^2}\\left(\\frac{(x-\\mu_x)}{\\sigma_x^2} - \\rho\\frac{(y-\\mu_y)}{\\sigma_x\\sigma_y}\\right)$"
-    #     dgdx = "$\\frac{\\partial}{\\partial y} \\ln(G(x, y)) = -\\frac{1}{1-\\rho^2}\\left(\\frac{(y-\\mu_y)}{\\sigma_y^2} - \\rho\\frac{(x-\\mu_x)}{\\sigma_x\\sigma_y}\\right)$"
-
-    #     return [
-    #         dgdx,
-    #         dgdx,
-    #         "$f(x, y) = s_x\\frac{\\partial}{\\partial x} \\ln(G(x, y)) + s_y\\frac{\\partial}{\\partial y} \\ln(G(x, y))$",
-    #     ]

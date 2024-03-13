@@ -17,7 +17,40 @@ def combine_equations(*equations):
     if len(equations) > 2:
         return combine_equations(combined, *equations[2:])
     else:
-        return combined
+        return np.asarray(combined)
+
+
+def combine_sigmas(*sigmas):
+    # Base case: if there's only one equation, just return it
+    if len(sigmas) == 1:
+        return sigmas[0]
+
+    # Step case: combine the first two equations and recursively call the function with the result
+    combined = [(f**2 + e**2) ** 0.5 for f in sigmas[1] for e in sigmas[0]]
+
+    # If there are more equations left, combine further
+    if len(sigmas) > 2:
+        return combine_sigmas(combined, *sigmas[2:])
+    else:
+        return np.asarray(combined)
+
+
+def combine_mus(*mus):
+    return combine_equations(*mus)
+
+
+def combine_matrices(*matrices):
+    # Base case: if there's only one equation, just return it
+    if len(matrices) == 1:
+        return matrices[0]
+    # Step case: combine the first two equations and recursively call the function with the result
+    combined = [matrices[0] * f[:, None] for f in matrices[1].T]
+
+    # If there are more equations left, combine further
+    if len(matrices) > 2:
+        return np.hstack(combine_matrices(combined, *matrices[2:]))
+    else:
+        return np.hstack(combined)
 
 
 class VStackedGenerator(Generator):
@@ -70,7 +103,10 @@ class VStackedGenerator(Generator):
             if idx != 0:
                 pm[0] = 0
             else:
-                pm[0] = np.sum(np.asarray([g.prior_sigma[0] for g in self.generators])**2)**0.5
+                pm[0] = (
+                    np.sum(np.asarray([g.prior_sigma[0] for g in self.generators]) ** 2)
+                    ** 0.5
+                )
             prior_sigma.append(pm)
         return np.hstack(prior_sigma)
 
@@ -121,15 +157,48 @@ class VStackedGenerator(Generator):
         return np.unique(np.hstack([list(g.arg_names) for g in self.generators]))
 
 
-class CombinedGenerator(VStackedGenerator):
+class CombinedGenerator(Generator):
+    def __init__(self, *args, **kwargs):
+        if (
+            not len(np.unique([a.data_shape for a in args if a.data_shape is not None]))
+            <= 1
+        ):
+            raise ValueError("Can not have different `data_shape`.")
+        self.generators = [a.copy() for a in args]
+        self.data_shape = self.generators[0].data_shape
 
     @property
     def width(self):
         return np.prod([g.width for g in self.generators])
 
-    # def design_matrix(self, *args, **kwargs):
-    #     return np.hstack([g.design_matrix(*args, **kwargs) for g in self.generators])
+    def design_matrix(self, *args, **kwargs):
+        return combine_matrices(
+            *[g.design_matrix(*args, **kwargs) for g in self.generators]
+        )
 
     @property
     def _equation(self):
-        return combine_equations(*[g._equation for g in self])
+        return combine_equations(*[g._equation for g in self.generators])
+
+    @property
+    def arg_names(self):
+        return np.unique(np.hstack([list(g.arg_names) for g in self.generators]))
+
+    @property
+    def nvectors(self):
+        return len(self.arg_names)
+
+    @property
+    def width(self):
+        return np.prod([g.width for g in self.generators])
+
+    @property
+    def prior_sigma(self):
+        return combine_sigmas(*[g.prior_sigma for g in self.generators])
+
+    @property
+    def prior_mu(self):
+        return combine_mus(*[g.prior_mu for g in self.generators])
+
+    def fit(self, *args, **kwargs):
+        self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)

@@ -10,7 +10,7 @@ class MathMixins:
             return VStackedGenerator(self, other)
         else:
             raise ValueError("Can only combine `Generator` objects.")
-        
+
     def __mul__(self, other):
         if isinstance(other, Generator):
             return CombinedGenerator(self, other)

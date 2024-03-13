@@ -58,7 +58,9 @@ class Generator(ABC):
         return deepcopy(self)
 
     def __repr__(self):
-        return f"{type(self).__name__}[n, {self.width}]"
+        return (
+            f"{type(self).__name__}({', '.join(list(self.arg_names))})[n, {self.width}]"
+        )
 
     # def __add__(self, other):
     #     if isinstance(other, Generator):
