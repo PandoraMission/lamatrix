@@ -10,7 +10,6 @@ __all__ = [
     "dlnGaussian2DGenerator",
 ]
 
-
 class lnGaussian2DGenerator(MathMixins, Generator):
     def __init__(
         self,
@@ -18,6 +17,7 @@ class lnGaussian2DGenerator(MathMixins, Generator):
         y_name: str = "y",
         prior_mu=None,
         prior_sigma=None,
+        offset_prior=None,
         stddev_x_prior=None,
         stddev_y_prior=None,
         data_shape=None,
@@ -26,7 +26,7 @@ class lnGaussian2DGenerator(MathMixins, Generator):
         self.y_name = y_name
         self._validate_arg_names()
         self.data_shape = data_shape
-        self._validate_priors(prior_mu, prior_sigma)
+        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
         self.fit_mu = None
         self.fit_sigma = None
         self.stddev_x_prior, self.stddev_y_prior = stddev_x_prior, stddev_y_prior
@@ -206,6 +206,7 @@ class dlnGaussian2DGenerator(MathMixins, Generator):
         y_name: str = "y",
         prior_mu=None,
         prior_sigma=None,
+        offset_prior=None,
         data_shape=None,
     ):
         self.stddev_x = stddev_x
@@ -215,7 +216,7 @@ class dlnGaussian2DGenerator(MathMixins, Generator):
         self.y_name = y_name
         self._validate_arg_names()
         self.data_shape = data_shape
-        self._validate_priors(prior_mu, prior_sigma)
+        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
         self.fit_mu = None
         self.fit_sigma = None
 
@@ -284,6 +285,6 @@ class dlnGaussian2DGenerator(MathMixins, Generator):
 
     @property
     def _equation(self):
-        dfdx = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_x^2}} - \\rho\\frac{{(y-\\mu_y)}}{{\\sigma_x\\sigma_y}}\\right)\\right)"
-        dfdy = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_x^2}} - \\rho\\frac{{(y-\\mu_y)}}{{\\sigma_x\\sigma_y}}\\right)\\right)"
+        dfdx = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_x^2}} - \\rho\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_x\\sigma_y}}\\right)\\right)"
+        dfdy = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_x^2}} - \\rho\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_x\\sigma_y}}\\right)\\right)"
         return ["", dfdx, dfdy]

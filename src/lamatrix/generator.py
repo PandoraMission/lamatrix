@@ -3,11 +3,12 @@
 import math
 from abc import ABC, abstractmethod
 from copy import deepcopy
+import json
 
 import numpy as np
 
 __all__ = [
-    "Generator",
+    "Generator"
 ]
 
 
@@ -17,7 +18,7 @@ class Generator(ABC):
             if not isinstance(arg, str):
                 raise ValueError("Argument names must be strings.")
 
-    def _validate_priors(self, prior_mu, prior_sigma):
+    def _validate_priors(self, prior_mu, prior_sigma, offset_prior=None):
         if prior_mu is None:
             self.prior_mu = np.zeros(self.width)
         else:
@@ -39,6 +40,17 @@ class Generator(ABC):
                     self.prior_sigma = prior_sigma
             else:
                 raise ValueError("Can not parse `prior_sigma`.")
+            
+        
+        if offset_prior is not None:
+            if not hasattr(self.offset_prior, "__iter__"):
+                raise AttributeError("Pass offset prior as a tuple with (mu, sigma)")
+            if not len(self.offset_prior) == 2:
+                raise AttributeError("Pass offset prior as a tuple with (mu, sigma)")
+
+            self.prior_mu[0] = self.offset_prior[0]
+            self.prior_sigma[0] = self.offset_prior[1]
+        self.offset_prior = offset_prior
 
     # def update_priors(self):
     #     if self.fit_mu is None:
@@ -49,10 +61,35 @@ class Generator(ABC):
     #     return new
 
     def save(self, filename: str):
-        raise NotImplementedError
+        def process(arg):
+            if arg is None:
+                return None
+            elif isinstance(arg, (str, int, float, list, tuple)):
+                if arg is np.inf:
+                    return "Infinity"
+                return arg
+            elif isinstance(arg, np.ndarray):
+                arg = arg.tolist()
+                arg = [a if a != np.inf else "Infinity" for a in arg]
+                return arg
+            
+                
+        
+        results = {attr:process(getattr(self, attr)) for attr in ["fit_mu", "fit_sigma"]}
+        kwargs = {attr:process(getattr(self, attr)) for attr in self._INIT_ATTRS}
+        type_name = type(self).__name__
 
-    def load(self, filename: str):
-        raise NotImplementedError
+        data_to_store = {
+            "object_type": type_name,
+            "initializing_kwargs": kwargs,
+            "fit_results": results,
+            "equation": self.equation,
+        }
+        if not filename.endswith(".json"):
+            filename = filename + ".json"
+        # Write to a JSON file
+        with open(filename, "w") as json_file:
+            json.dump(data_to_store, json_file, indent=4)
 
     def copy(self):
         return deepcopy(self)

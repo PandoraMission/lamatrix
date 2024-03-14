@@ -25,18 +25,9 @@ class Polynomial1DGenerator(MathMixins, Generator):
         self._validate_arg_names()
         self.polyorder = polyorder
         self.data_shape = data_shape
-        self._validate_priors(prior_mu, prior_sigma)
+        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
         self.fit_mu = None
         self.fit_sigma = None
-
-        if offset_prior is not None:
-            if not hasattr(offset_prior, "__iter__"):
-                raise AttributeError("Pass offset prior as a tuple with (mu, sigma)")
-            if not len(offset_prior) == 2:
-                raise AttributeError("Pass offset prior as a tuple with (mu, sigma)")
-
-            self.prior_mu[0] = offset_prior[0]
-            self.prior_sigma[0] = offset_prior[1]
 
     @property
     def width(self):
@@ -49,6 +40,10 @@ class Polynomial1DGenerator(MathMixins, Generator):
     @property
     def arg_names(self):
         return {self.x_name}
+
+    @property
+    def _INIT_ATTRS(self):
+        return ["x_name", "prior_mu", "prior_sigma", "offset_prior", "data_shape", "polyorder"]
 
     def design_matrix(self, *args, **kwargs):
         """Build a 1D polynomial in x
@@ -91,13 +86,14 @@ class SinusoidGenerator(MathMixins, Generator):
         nterms: int = 1,
         prior_mu=None,
         prior_sigma=None,
+        offset_prior=None,
         data_shape=None,
     ):
         self.nterms = nterms
         self.data_shape = data_shape
         self.x_name = x_name
         self._validate_arg_names()
-        self._validate_priors(prior_mu, prior_sigma)
+        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
         self.fit_mu = None
         self.fit_sigma = None
 
@@ -112,6 +108,10 @@ class SinusoidGenerator(MathMixins, Generator):
     @property
     def arg_names(self):
         return {self.x_name}
+
+    @property
+    def _INIT_ATTRS(self):
+        return ["x_name", "prior_mu", "prior_sigma", "offset_prior", "data_shape", "polyorder"]
 
     def design_matrix(self, *args, **kwargs):
         """Build a 1D polynomial in x

@@ -86,18 +86,9 @@ class Spline1DGenerator(MathMixins, SplineMixins, Generator):
         self._validate_arg_names()
         self.splineorder = splineorder
         self.data_shape = data_shape
-        self._validate_priors(prior_mu, prior_sigma)
+        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
         self.fit_mu = None
         self.fit_sigma = None
-
-        if offset_prior is not None:
-            if not hasattr(offset_prior, "__iter__"):
-                raise AttributeError("Pass offset prior as a tuple with (mu, sigma)")
-            if not len(offset_prior) == 2:
-                raise AttributeError("Pass offset prior as a tuple with (mu, sigma)")
-
-            self.prior_mu[0] = offset_prior[0]
-            self.prior_sigma[0] = offset_prior[1]
 
     @property
     def width(self):
@@ -187,7 +178,6 @@ class dSpline1DGenerator(MathMixins, SplineMixins, Generator):
         splineorder: int = 3,
         prior_mu=None,
         prior_sigma=None,
-        offset_prior=None,
         data_shape=None,
     ):
         # Check if knots are padded
@@ -203,18 +193,9 @@ class dSpline1DGenerator(MathMixins, SplineMixins, Generator):
         self._validate_arg_names()
         self.splineorder = splineorder
         self.data_shape = data_shape
-        self._validate_priors(prior_mu, prior_sigma)
+        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
         self.fit_mu = None
         self.fit_sigma = None
-
-        if offset_prior is not None:
-            if not hasattr(offset_prior, "__iter__"):
-                raise AttributeError("Pass offset prior as a tuple with (mu, sigma)")
-            if not len(offset_prior) == 2:
-                raise AttributeError("Pass offset prior as a tuple with (mu, sigma)")
-
-            self.prior_mu[0] = offset_prior[0]
-            self.prior_sigma[0] = offset_prior[1]
 
     @property
     def width(self):
