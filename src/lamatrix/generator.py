@@ -41,8 +41,8 @@ class Generator(ABC):
             else:
                 raise ValueError("Can not parse `prior_sigma`.")
             
-        
-        if offset_prior is not None:
+        self.offset_prior = offset_prior
+        if self.offset_prior is not None:
             if not hasattr(self.offset_prior, "__iter__"):
                 raise AttributeError("Pass offset prior as a tuple with (mu, sigma)")
             if not len(self.offset_prior) == 2:
@@ -50,7 +50,6 @@ class Generator(ABC):
 
             self.prior_mu[0] = self.offset_prior[0]
             self.prior_sigma[0] = self.offset_prior[1]
-        self.offset_prior = offset_prior
 
     # def update_priors(self):
     #     if self.fit_mu is None:
@@ -60,7 +59,7 @@ class Generator(ABC):
     #     new.prior_sigma = new.fit_sigma.copy()
     #     return new
 
-    def save(self, filename: str):
+    def _create_save_data(self):
         def process(arg):
             if arg is None:
                 return None
@@ -85,8 +84,13 @@ class Generator(ABC):
             "fit_results": results,
             "equation": self.equation,
         }
+        return data_to_store
+
+    def save(self, filename: str):
+        data_to_store = self._create_save_data()
         if not filename.endswith(".json"):
             filename = filename + ".json"
+
         # Write to a JSON file
         with open(filename, "w") as json_file:
             json.dump(data_to_store, json_file, indent=4)
@@ -259,4 +263,10 @@ class Generator(ABC):
     @abstractmethod
     def fit(self):
         """Fits the design matrix, given input vectors and data"""
+        pass
+
+    @property
+    @abstractmethod
+    def _INIT_ATTRS(self):
+        """Defines the variables needed to initialize self, so that they can be stored when saved."""
         pass

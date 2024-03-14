@@ -102,6 +102,10 @@ class Spline1DGenerator(MathMixins, SplineMixins, Generator):
     def arg_names(self):
         return {self.x_name}
 
+    @property
+    def _INIT_ATTRS(self):
+        return ["x_name", "knots", "splineorder", "prior_mu", "prior_sigma", "offset_prior", "data_shape"]
+
     def design_matrix(self, *args, **kwargs):
         """Build a 1D spline in x
 
@@ -169,13 +173,13 @@ class Spline1DGenerator(MathMixins, SplineMixins, Generator):
 
 
 class dSpline1DGenerator(MathMixins, SplineMixins, Generator):
-
     def __init__(
         self,
         weights: np.ndarray,
         knots: np.ndarray,
         x_name: str = "x",
         splineorder: int = 3,
+        offset_prior=None,
         prior_mu=None,
         prior_sigma=None,
         data_shape=None,
@@ -208,6 +212,10 @@ class dSpline1DGenerator(MathMixins, SplineMixins, Generator):
     @property
     def arg_names(self):
         return {self.x_name}
+
+    @property
+    def _INIT_ATTRS(self):
+        return ["x_name", "weights", "knots", "splineorder", "prior_mu", "prior_sigma", "offset_prior", "data_shape"]
 
     def design_matrix(self, *args, **kwargs):
         if not self.arg_names.issubset(set(kwargs.keys())):

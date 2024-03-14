@@ -1,12 +1,12 @@
 import numpy as np
-import pytest
 
 from lamatrix import (
     Polynomial1DGenerator,
     Spline1DGenerator,
-    VStackedGenerator,
+    StackedIndependentGenerator,
     dlnGaussian2DGenerator,
     lnGaussian2DGenerator,
+    load,
 )
 
 
@@ -57,7 +57,7 @@ def test_lngauss():
     assert np.isclose(-0.01, dg.shift_x[0], atol=dg.shift_x[1] * 2)
     assert np.isclose(0.02, dg.shift_y[0], atol=dg.shift_y[1] * 2)
 
-    c = VStackedGenerator(g, dg)
+    c = StackedIndependentGenerator(g, dg)
     c.fit(column=column, row=row, data=data, errors=errors)
     assert np.isclose(sigma_x, c[0].stddev_x[0], atol=c[0].stddev_x[1] * 2)
     assert np.isclose(sigma_y, c[0].stddev_y[0], atol=c[0].stddev_y[1] * 2)
@@ -89,7 +89,7 @@ def test_polycombine():
 
     p1 = Polynomial1DGenerator("r", data_shape=c.shape)
     p2 = Polynomial1DGenerator("c", data_shape=c.shape)
-    for p in [VStackedGenerator(p1, p2), (p1 + p2)]:
+    for p in [StackedIndependentGenerator(p1, p2), (p1 + p2)]:
         true_w = np.random.normal(0, 1, size=(p.width))
         data = p.design_matrix(c=c, r=r).dot(true_w).reshape(r.shape)
         errors = np.ones_like(r) + 10
@@ -131,3 +131,13 @@ def test_spline():
     model.fit(x=x, y=y, data=data)
 
     assert np.allclose(true_w, model.mu)
+
+def test_save():
+    p1 = Polynomial1DGenerator('c', polyorder=2)
+    p2 = Polynomial1DGenerator('r')
+    p = p1 + p2
+    p.save('test.json')
+    p = load('test.json')
+    assert p[0].x_name == 'c'
+    assert p[1].x_name == 'r'
+    assert p[0].polyorder == 2

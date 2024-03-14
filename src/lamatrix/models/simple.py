@@ -111,7 +111,7 @@ class SinusoidGenerator(MathMixins, Generator):
 
     @property
     def _INIT_ATTRS(self):
-        return ["x_name", "prior_mu", "prior_sigma", "offset_prior", "data_shape", "polyorder"]
+        return ["x_name", "prior_mu", "prior_sigma", "offset_prior", "data_shape", "nterms"]
 
     def design_matrix(self, *args, **kwargs):
         """Build a 1D polynomial in x

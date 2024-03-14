@@ -1,8 +1,8 @@
 import numpy as np
-
+import json
 from .generator import Generator
 
-__all__ = ["VStackedGenerator"]
+__all__ = ["StackedIndependentGenerator", "StackedDependentGenerator"]
 
 
 def combine_equations(*equations):
@@ -53,7 +53,7 @@ def combine_matrices(*matrices):
         return np.hstack(combined)
 
 
-class VStackedGenerator(Generator):
+class StackedIndependentGenerator(Generator):
     def __init__(self, *args, **kwargs):
         if (
             not len(np.unique([a.data_shape for a in args if a.data_shape is not None]))
@@ -62,6 +62,8 @@ class VStackedGenerator(Generator):
             raise ValueError("Can not have different `data_shape`.")
         self.generators = [a.copy() for a in args]
         self.data_shape = self.generators[0].data_shape
+        self.fit_mu = None
+        self.fit_sigma = None
 
     def __getitem__(self, key):
         return self.generators[key]
@@ -156,16 +158,32 @@ class VStackedGenerator(Generator):
     def arg_names(self):
         return np.unique(np.hstack([list(g.arg_names) for g in self.generators]))
 
+    @property
+    def _INIT_ATTRS(self):
+        return []
 
-class CombinedGenerator(Generator):
-    def __init__(self, *args, **kwargs):
-        if (
-            not len(np.unique([a.data_shape for a in args if a.data_shape is not None]))
-            <= 1
-        ):
-            raise ValueError("Can not have different `data_shape`.")
-        self.generators = [a.copy() for a in args]
-        self.data_shape = self.generators[0].data_shape
+    def save(self, filename: str):
+        if not filename.endswith(".json"):
+            filename = filename + ".json"
+
+        # Write to a JSON file
+        with open(filename, "w") as json_file:
+            data_to_store = self._create_save_data()
+            generators_to_store = {f"generator{idx+1}":g._create_save_data() for idx, g in enumerate(self.generators)}
+            data_to_store["generators"] = generators_to_store
+            json.dump(data_to_store, json_file, indent=4)
+
+class StackedDependentGenerator(StackedIndependentGenerator):
+    # def __init__(self, *args, **kwargs):
+    #     if (
+    #         not len(np.unique([a.data_shape for a in args if a.data_shape is not None]))
+    #         <= 1
+    #     ):
+    #         raise ValueError("Can not have different `data_shape`.")
+    #     self.generators = [a.copy() for a in args]
+    #     self.data_shape = self.generators[0].data_shape
+    #     self.fit_mu = None
+    #     self.fit_sigma = None
 
     @property
     def width(self):
@@ -202,3 +220,19 @@ class CombinedGenerator(Generator):
 
     def fit(self, *args, **kwargs):
         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+
+    # @property
+    # def _INIT_ATTRS(self):
+    #     return []
+
+    # def save(self, filename: str):
+    #     if not filename.endswith(".json"):
+    #         filename = filename + ".json"
+
+    #     # Write to a JSON file
+    #     with open(filename, "w") as json_file:
+    #         data_to_store = self._create_save_data()
+    #         json.dump(data_to_store, json_file, indent=4)
+    #         for g in self.generators:
+    #             data_to_store = g._create_save_data()
+    #             json.dump(data_to_store, json_file, indent=4)

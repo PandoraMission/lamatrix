@@ -64,6 +64,10 @@ class lnGaussian2DGenerator(MathMixins, Generator):
     def arg_names(self):
         return {self.x_name, self.y_name}
 
+    @property
+    def _INIT_ATTRS(self):
+        return ["x_name", "y_name", "stddev_x_prior", "stddev_y_prior", "prior_mu", "prior_sigma", "offset_prior", "data_shape", "nterms"]
+
     def design_matrix(self, *args, **kwargs):
         """Build a 1D polynomial in x
 
@@ -231,6 +235,10 @@ class dlnGaussian2DGenerator(MathMixins, Generator):
     @property
     def arg_names(self):
         return {self.x_name, self.y_name}
+
+    @property
+    def _INIT_ATTRS(self):
+        return ["x_name", "y_name", "stddev_x", "stddev_y", "prior_mu", "rho", "prior_sigma", "offset_prior", "data_shape", "nterms"]
 
     def design_matrix(self, *args, **kwargs):
         """Build a 1D polynomial in x
