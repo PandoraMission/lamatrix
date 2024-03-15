@@ -10,6 +10,7 @@ __all__ = [
     "dlnGaussian2DGenerator",
 ]
 
+
 class lnGaussian2DGenerator(MathMixins, Generator):
     def __init__(
         self,
@@ -66,7 +67,17 @@ class lnGaussian2DGenerator(MathMixins, Generator):
 
     @property
     def _INIT_ATTRS(self):
-        return ["x_name", "y_name", "stddev_x_prior", "stddev_y_prior", "prior_mu", "prior_sigma", "offset_prior", "data_shape", "nterms"]
+        return [
+            "x_name",
+            "y_name",
+            "stddev_x_prior",
+            "stddev_y_prior",
+            "prior_mu",
+            "prior_sigma",
+            "offset_prior",
+            "data_shape",
+            "nterms",
+        ]
 
     def design_matrix(self, *args, **kwargs):
         """Build a 1D polynomial in x
@@ -177,6 +188,7 @@ class lnGaussian2DGenerator(MathMixins, Generator):
             [eq1, eq2, eq3, eq4, eq5, eq6, eq7, eq8, self._to_latex_table()]
         )
 
+    @property
     def derivative(self):
         return dlnGaussian2DGenerator(
             stddev_x=self.stddev_x[0],
@@ -186,18 +198,6 @@ class lnGaussian2DGenerator(MathMixins, Generator):
             y_name=self.y_name,
             data_shape=self.data_shape,
         )
-
-    # @property
-    # def equation(self):
-    #     eq1 = "$\\ln(G(x, y)) = a + bx^2 + cy^2 + 2dxy$"
-    #     eq2 = "$ a = -\\ln(2\\pi\\sigma_x\\sigma_y\\sqrt{1-\\rho^2}) $"
-    #     eq3 = "$ b = \\frac{1}{2(1-\\rho^2)\\sigma_x^2}$"
-    #     eq4 = "$ c = \\frac{1}{2(1-\\rho^2)\\sigma_y^2}$"
-    #     eq5 = "$ d = \\frac{\\rho}{2(1-\\rho^2)\\sigma_x\\sigma_y}$"
-    #     eq6 = "$\\sigma_x = \\sqrt{-\\frac{1}{2b(1-\\rho^2)}}$"
-    #     eq7 = "$\\sigma_y = \\sqrt{-\\frac{1}{2c(1-\\rho^2)}}$"
-    #     eq8 = "$\\rho = \\sqrt{\\frac{d^2}{bc}}$"
-    #     return [eq1, eq2, eq3, eq4, eq5, eq6, eq7, eq8]
 
 
 class dlnGaussian2DGenerator(MathMixins, Generator):
@@ -238,7 +238,18 @@ class dlnGaussian2DGenerator(MathMixins, Generator):
 
     @property
     def _INIT_ATTRS(self):
-        return ["x_name", "y_name", "stddev_x", "stddev_y", "prior_mu", "rho", "prior_sigma", "offset_prior", "data_shape", "nterms"]
+        return [
+            "x_name",
+            "y_name",
+            "stddev_x",
+            "stddev_y",
+            "prior_mu",
+            "rho",
+            "prior_sigma",
+            "offset_prior",
+            "data_shape",
+            "nterms",
+        ]
 
     def design_matrix(self, *args, **kwargs):
         """Build a 1D polynomial in x

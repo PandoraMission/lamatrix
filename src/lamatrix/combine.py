@@ -1,5 +1,8 @@
-import numpy as np
 import json
+
+import numpy as np
+
+from . import _META_DATA
 from .generator import Generator
 
 __all__ = ["StackedIndependentGenerator", "StackedDependentGenerator"]
@@ -65,6 +68,14 @@ class StackedIndependentGenerator(Generator):
         self.fit_mu = None
         self.fit_sigma = None
 
+    def __repr__(self):
+        str1 = (
+            f"{type(self).__name__}({', '.join(list(self.arg_names))})[n, {self.width}]"
+        )
+        str2 = [f"\t{g.__repr__()}" for g in self.generators]
+
+        return "\n".join([str1, *str2])
+
     def __getitem__(self, key):
         return self.generators[key]
 
@@ -76,6 +87,10 @@ class StackedIndependentGenerator(Generator):
 
     def design_matrix(self, *args, **kwargs):
         return np.hstack([g.design_matrix(*args, **kwargs) for g in self.generators])
+
+    @property
+    def gradient(self):
+        return StackedIndependentGenerator(*[g.gradient for g in self.generators])
 
     @property
     def width(self):
@@ -146,10 +161,6 @@ class StackedIndependentGenerator(Generator):
     def __len__(self):
         return len(self.generators)
 
-    # @property
-    # def _equation(self):
-    #     return combine_equations(*[g._equation for g in self])
-
     @property
     def _equation(self):
         return np.hstack([g._equation for g in self.generators])
@@ -169,21 +180,15 @@ class StackedIndependentGenerator(Generator):
         # Write to a JSON file
         with open(filename, "w") as json_file:
             data_to_store = self._create_save_data()
-            generators_to_store = {f"generator{idx+1}":g._create_save_data() for idx, g in enumerate(self.generators)}
+            generators_to_store = {
+                f"generator{idx+1}": g._create_save_data()
+                for idx, g in enumerate(self.generators)
+            }
             data_to_store["generators"] = generators_to_store
+            data_to_store["metadata"] = _META_DATA()
             json.dump(data_to_store, json_file, indent=4)
 
 class StackedDependentGenerator(StackedIndependentGenerator):
-    # def __init__(self, *args, **kwargs):
-    #     if (
-    #         not len(np.unique([a.data_shape for a in args if a.data_shape is not None]))
-    #         <= 1
-    #     ):
-    #         raise ValueError("Can not have different `data_shape`.")
-    #     self.generators = [a.copy() for a in args]
-    #     self.data_shape = self.generators[0].data_shape
-    #     self.fit_mu = None
-    #     self.fit_sigma = None
 
     @property
     def width(self):
@@ -221,18 +226,18 @@ class StackedDependentGenerator(StackedIndependentGenerator):
     def fit(self, *args, **kwargs):
         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
 
-    # @property
-    # def _INIT_ATTRS(self):
-    #     return []
+    @property
+    def mu(self):
+        return self.prior_mu if self.fit_mu is None else self.fit_mu
 
-    # def save(self, filename: str):
-    #     if not filename.endswith(".json"):
-    #         filename = filename + ".json"
+    @property
+    def sigma(self):
+        return self.prior_sigma if self.fit_sigma is None else self.fit_sigma
 
-    #     # Write to a JSON file
-    #     with open(filename, "w") as json_file:
-    #         data_to_store = self._create_save_data()
-    #         json.dump(data_to_store, json_file, indent=4)
-    #         for g in self.generators:
-    #             data_to_store = g._create_save_data()
-    #             json.dump(data_to_store, json_file, indent=4)
+    def __getitem__(self, key):
+        raise AttributeError(
+            "Can not extract individual generators from a dependent stacked generator."
+        )
+    @property 
+    def gradient(self):
+        raise AttributeError("Can not create a gradient for a dependent stacked generator.")

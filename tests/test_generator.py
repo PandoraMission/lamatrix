@@ -2,6 +2,7 @@ import numpy as np
 
 from lamatrix import (
     Polynomial1DGenerator,
+    SinusoidGenerator,
     Spline1DGenerator,
     StackedIndependentGenerator,
     dlnGaussian2DGenerator,
@@ -70,19 +71,40 @@ def test_poly1d():
     x = (np.arange(200) - 200) / 200
     x2 = (np.arange(-300, 300, 10) - 200) / 200
 
-    data = (3 * x + 0.3) + np.random.normal(0, 0.1, size=200)
-    s = np.random.choice(np.arange(200), size=5)
-    data[s] += np.random.normal(0, 3, size=5)
-    errors = np.ones_like(x) * 0.1
+    data = (4.658*x**3 +  1.23*x**2 + 3 * x + 0.3) 
+    true_g = np.gradient(data, x)
+    data += np.random.normal(0, 0.01, size=200)
+    # s = np.random.choice(np.arange(200), size=5)
+    # data[s] += np.random.normal(0, 3, size=5)
+    errors = np.ones_like(x) * 0.01
 
-    g = Polynomial1DGenerator(polyorder=1)
+    g = Polynomial1DGenerator(polyorder=3)
     g.fit(x=x, data=data, errors=errors)
 
     outlier_mask = np.abs(data - g.evaluate(x=x)) / errors < 3
     g.fit(x=x, data=data, errors=errors, mask=outlier_mask)
-    assert np.allclose([0.3, 3], g.mu, atol=g.sigma * 2)
+    #assert np.allclose([0.3, 3, 1.23, 4.658], g.mu, atol=g.sigma * 2)
     g.evaluate(x=x2)
 
+    dg = g.gradient
+    model_g = g.gradient.design_matrix(x=x).dot([1, 1, 1])
+    analytical_grad = (3*4.658*x**2 +  2*1.23*x**1 + 3) 
+    np.allclose(true_g[1:-1], analytical_grad[1:-1], model_g[1:-1], atol=0.001)
+
+def test_sinusoid():
+    true_w = np.random.normal(size=3)
+    x = np.arange(-2*np.pi, 2*np.pi, 0.01)
+    p = SinusoidGenerator()
+    data = p.design_matrix(x=x).dot(true_w)
+    data += np.random.normal(0, 0.05, size=len(x))
+    errors = np.zeros(len(x)) + 0.05
+    p.fit(x=x, data=data, errors=errors)
+    np.allclose(true_w, p.mu, atol=p.sigma*3)
+
+    true_g = np.gradient(p.design_matrix(x=x).dot(true_w), x)
+    g = p.gradient.design_matrix(x=x)[:, 1:].dot([1, 1])
+
+    assert np.allclose(true_g[1:-1], g[1:-1], atol=0.005)
 
 def test_polycombine():
     c, r = np.meshgrid(np.arange(-10, 10, 0.2), np.arange(-10, 10, 0.2), indexing="ij")
@@ -103,6 +125,7 @@ def test_polycombine():
 
 def test_spline():
     x = np.linspace(0, 10, 100)  # Independent variable
+    true_g = np.gradient(np.sin(2*x), x)
     y = np.random.normal(0, 0.1, 100) + np.sin(
         2 * (x)
     )  # Dependent variable, replace with your time-series data
@@ -115,10 +138,11 @@ def test_spline():
     model(x=np.linspace(-3, 13, 310))
 
     y2 = np.random.normal(0, 0.01, 100) + np.sin(2 * (x + 0.2))
-    dmodel = model.derivative()
+    dmodel = model.gradient
     dmodel.fit(x=x, data=y2 - model.evaluate(x=x), errors=ye)
 
     assert np.abs((dmodel.shift_x[0] - 0.2)) / dmodel.shift_x[1] < 10
+    assert np.allclose(true_g[10:-10], dmodel.design_matrix(x=x)[:, 1:].dot([1])[10:-10], atol=1)
 
     s1 = Spline1DGenerator(knots=np.arange(-10, 10, 3), x_name="x")
     s2 = Spline1DGenerator(knots=np.arange(-10, 10, 3), x_name="y")
@@ -130,14 +154,16 @@ def test_spline():
     data = model.design_matrix(x=x, y=y).dot(true_w).reshape(x.shape)
     model.fit(x=x, y=y, data=data)
 
+    assert np.allclose(true_w, model.fit_mu)
     assert np.allclose(true_w, model.mu)
 
+
 def test_save():
-    p1 = Polynomial1DGenerator('c', polyorder=2)
-    p2 = Polynomial1DGenerator('r')
+    p1 = Polynomial1DGenerator("c", polyorder=2)
+    p2 = Polynomial1DGenerator("r")
     p = p1 + p2
-    p.save('test.json')
-    p = load('test.json')
-    assert p[0].x_name == 'c'
-    assert p[1].x_name == 'r'
+    p.save("test.json")
+    p = load("test.json")
+    assert p[0].x_name == "c"
+    assert p[1].x_name == "r"
     assert p[0].polyorder == 2

@@ -1,15 +1,15 @@
 """Abstract base class for a Generator object"""
 
+import json
 import math
 from abc import ABC, abstractmethod
 from copy import deepcopy
-import json
 
 import numpy as np
 
-__all__ = [
-    "Generator"
-]
+from . import _META_DATA
+
+__all__ = ["Generator"]
 
 
 class Generator(ABC):
@@ -40,7 +40,7 @@ class Generator(ABC):
                     self.prior_sigma = prior_sigma
             else:
                 raise ValueError("Can not parse `prior_sigma`.")
-            
+
         self.offset_prior = offset_prior
         if self.offset_prior is not None:
             if not hasattr(self.offset_prior, "__iter__"):
@@ -71,11 +71,11 @@ class Generator(ABC):
                 arg = arg.tolist()
                 arg = [a if a != np.inf else "Infinity" for a in arg]
                 return arg
-            
-                
-        
-        results = {attr:process(getattr(self, attr)) for attr in ["fit_mu", "fit_sigma"]}
-        kwargs = {attr:process(getattr(self, attr)) for attr in self._INIT_ATTRS}
+
+        results = {
+            attr: process(getattr(self, attr)) for attr in ["fit_mu", "fit_sigma"]
+        }
+        kwargs = {attr: process(getattr(self, attr)) for attr in self._INIT_ATTRS}
         type_name = type(self).__name__
 
         data_to_store = {
@@ -83,11 +83,13 @@ class Generator(ABC):
             "initializing_kwargs": kwargs,
             "fit_results": results,
             "equation": self.equation,
+            "latex": self.to_latex(),
         }
         return data_to_store
 
     def save(self, filename: str):
         data_to_store = self._create_save_data()
+        data_to_store["metadata"] = _META_DATA()
         if not filename.endswith(".json"):
             filename = filename + ".json"
 
@@ -99,8 +101,9 @@ class Generator(ABC):
         return deepcopy(self)
 
     def __repr__(self):
+        fit = "<fit>" if self.fit_mu is not None else ""
         return (
-            f"{type(self).__name__}({', '.join(list(self.arg_names))})[n, {self.width}]"
+            f"{type(self).__name__}({', '.join(list(self.arg_names))})[n, {self.width}] {fit}"
         )
 
     # def __add__(self, other):

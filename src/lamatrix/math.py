@@ -1,4 +1,4 @@
-from .combine import StackedIndependentGenerator, StackedDependentGenerator
+from .combine import StackedDependentGenerator, StackedIndependentGenerator
 from .generator import Generator
 
 __all__ = ["MathMixins"]

@@ -104,7 +104,15 @@ class Spline1DGenerator(MathMixins, SplineMixins, Generator):
 
     @property
     def _INIT_ATTRS(self):
-        return ["x_name", "knots", "splineorder", "prior_mu", "prior_sigma", "offset_prior", "data_shape"]
+        return [
+            "x_name",
+            "knots",
+            "splineorder",
+            "prior_mu",
+            "prior_sigma",
+            "offset_prior",
+            "data_shape",
+        ]
 
     def design_matrix(self, *args, **kwargs):
         """Build a 1D spline in x
@@ -162,7 +170,8 @@ class Spline1DGenerator(MathMixins, SplineMixins, Generator):
 
         return "\n".join([eqn1, eqn2, eqn3, eqn4, self._to_latex_table()])
 
-    def derivative(self):
+    @property
+    def gradient(self):
         return dSpline1DGenerator(
             weights=self.mu,
             knots=self.knots,
@@ -215,7 +224,16 @@ class dSpline1DGenerator(MathMixins, SplineMixins, Generator):
 
     @property
     def _INIT_ATTRS(self):
-        return ["x_name", "weights", "knots", "splineorder", "prior_mu", "prior_sigma", "offset_prior", "data_shape"]
+        return [
+            "x_name",
+            "weights",
+            "knots",
+            "splineorder",
+            "prior_mu",
+            "prior_sigma",
+            "offset_prior",
+            "data_shape",
+        ]
 
     def design_matrix(self, *args, **kwargs):
         if not self.arg_names.issubset(set(kwargs.keys())):
@@ -260,5 +278,5 @@ class dSpline1DGenerator(MathMixins, SplineMixins, Generator):
     def _equation(self):
         return [
             "",
-            f"\\frac{{\\partial \\left( \\sum_{{i=0}}^{{{len(self.knots) - self.splineorder - 1}}} v_i N_{{i,{self.splineorder}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
+            f"\\frac{{\\partial \\left( \\sum_{{i=1}}^{{{len(self.knots) - self.splineorder}}} v_{{\\textit{{spline}}, i}} N_{{i,{self.splineorder}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
         ]
