@@ -1,0 +1,72 @@
+{
+    "object_type": "StackedIndependentGenerator",
+    "initializing_kwargs": {},
+    "fit_results": {
+        "fit_mu": null,
+        "fit_sigma": null
+    },
+    "equation": "\\[f(\\mathbf{c}, \\mathbf{r}) = w_{0} \\mathbf{c}^{0} + w_{1} \\mathbf{c}^{1} + w_{2} \\mathbf{c}^{2} + w_{3} \\mathbf{r}^{0} + w_{4} \\mathbf{r}^{1} + w_{5} \\mathbf{r}^{2} + w_{6} \\mathbf{r}^{3}\\]",
+    "latex": "\\[f(\\mathbf{c}, \\mathbf{r}) = w_{0} \\mathbf{c}^{0} + w_{1} \\mathbf{c}^{1} + w_{2} \\mathbf{c}^{2} + w_{3} \\mathbf{r}^{0} + w_{4} \\mathbf{r}^{1} + w_{5} \\mathbf{r}^{2} + w_{6} \\mathbf{r}^{3}\\]\n\\begin{table}[h!]\n\\centering\n\\begin{tabular}{|c|c|c|}\n\\hline\nCoefficient & Best Fit & Prior \\\\\\hline\nw_0 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\nw_1 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\nw_2 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\nw_3 & $0 \\pm 0$  & $0 \\pm 0$ \\\\\\hline\nw_4 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\nw_5 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\nw_6 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\n\\end{tabular}\n\\end{table}",
+    "generators": {
+        "generator1": {
+            "object_type": "Polynomial1DGenerator",
+            "initializing_kwargs": {
+                "x_name": "c",
+                "prior_mu": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "prior_sigma": [
+                    "Infinity",
+                    "Infinity",
+                    "Infinity"
+                ],
+                "offset_prior": null,
+                "data_shape": null,
+                "polyorder": 2
+            },
+            "fit_results": {
+                "fit_mu": null,
+                "fit_sigma": null
+            },
+            "equation": "\\[f(\\mathbf{c}) = w_{0} \\mathbf{c}^{0} + w_{1} \\mathbf{c}^{1} + w_{2} \\mathbf{c}^{2}\\]",
+            "latex": "\\[f(\\mathbf{c}) = w_{0} \\mathbf{c}^{0} + w_{1} \\mathbf{c}^{1} + w_{2} \\mathbf{c}^{2}\\]\n\\begin{table}[h!]\n\\centering\n\\begin{tabular}{|c|c|c|}\n\\hline\nCoefficient & Best Fit & Prior \\\\\\hline\nw_0 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\nw_1 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\nw_2 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\n\\end{tabular}\n\\end{table}"
+        },
+        "generator2": {
+            "object_type": "Polynomial1DGenerator",
+            "initializing_kwargs": {
+                "x_name": "r",
+                "prior_mu": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "prior_sigma": [
+                    "Infinity",
+                    "Infinity",
+                    "Infinity",
+                    "Infinity"
+                ],
+                "offset_prior": null,
+                "data_shape": null,
+                "polyorder": 3
+            },
+            "fit_results": {
+                "fit_mu": null,
+                "fit_sigma": null
+            },
+            "equation": "\\[f(\\mathbf{r}) = w_{0} \\mathbf{r}^{0} + w_{1} \\mathbf{r}^{1} + w_{2} \\mathbf{r}^{2} + w_{3} \\mathbf{r}^{3}\\]",
+            "latex": "\\[f(\\mathbf{r}) = w_{0} \\mathbf{r}^{0} + w_{1} \\mathbf{r}^{1} + w_{2} \\mathbf{r}^{2} + w_{3} \\mathbf{r}^{3}\\]\n\\begin{table}[h!]\n\\centering\n\\begin{tabular}{|c|c|c|}\n\\hline\nCoefficient & Best Fit & Prior \\\\\\hline\nw_0 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\nw_1 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\nw_2 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\nw_3 & $0 \\pm \\infty$  & $0 \\pm \\infty$ \\\\\\hline\n\\end{tabular}\n\\end{table}"
+        }
+    },
+    "metadata": {
+        "creation_date": "2024-03-18 12:56:52",
+        "tool_name": "lamatrix",
+        "tool_version": "0.1.0",
+        "operating_system": "Darwin",
+        "os_version": "Darwin Kernel Version 22.6.0: Wed Jul  5 22:22:05 PDT 2023; root:xnu-8796.141.3~6/RELEASE_ARM64_T6000",
+        "python_version": "3.9.13"
+    }
+}

@@ -6,9 +6,223 @@ from ..generator import Generator
 from ..math import MathMixins
 
 __all__ = [
+    "lnGaussian1DGenerator",
+    "dlnGaussian1DGenerator",
     "lnGaussian2DGenerator",
     "dlnGaussian2DGenerator",
 ]
+
+class lnGaussian1DGenerator(MathMixins, Generator):
+    def __init__(
+        self,
+        x_name: str = "x",
+        prior_mu=None,
+        prior_sigma=None,
+        offset_prior=None,
+        stddev_prior=None,
+        data_shape=None,
+    ):
+        self.x_name = x_name
+        self._validate_arg_names()
+        self.data_shape = data_shape
+        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
+        self.fit_mu = None
+        self.fit_sigma = None
+        self.stddev_prior = stddev_prior
+        if self.stddev_prior is not None:
+            if not hasattr(self.stddev_prior, "__iter__"):
+                raise AttributeError("Pass stddev prior as a tuple with (mu, sigma)")
+            if not len(self.stddev_prior) == 2:
+                raise AttributeError("Pass stddev prior as a tuple with (mu, sigma)")
+
+            self.prior_mu[1] = -1 / (2 * self.stddev_prior[0] ** 2)
+            self.prior_sigma[1] = self.mu[1] - (
+                -1 / 2 * (self.stddev_prior[0] + self.stddev_prior[1]) ** 2
+            )
+
+    @property
+    def width(self):
+        return 2
+
+    @property
+    def nvectors(self):
+        return 1
+
+    @property
+    def arg_names(self):
+        return {self.x_name}
+
+    @property
+    def _INIT_ATTRS(self):
+        return [
+            "x_name",
+            "stddev_prior",
+            "prior_mu",
+            "prior_sigma",
+            "offset_prior",
+            "data_shape",
+        ]
+
+    def design_matrix(self, *args, **kwargs):
+        """
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Vector to create ln Gaussian of
+
+        Returns
+        -------
+        X : np.ndarray
+            Design matrix with shape (len(x), 2)
+        """
+        if not self.arg_names.issubset(set(kwargs.keys())):
+            raise ValueError(f"Expected {self.arg_names} to be passed.")
+        x = kwargs.get(self.x_name)
+        return np.vstack(
+            [
+                np.ones(np.prod(x.shape)),
+                x.ravel() ** 2,
+            ]
+        ).T
+
+    def fit(self, *args, **kwargs):
+        self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+
+    @property
+    def A(self):
+        return self.mu[0], self.sigma[0]
+
+    @property
+    def stddev(self):
+        stddev = np.sqrt(-(1 / (2 * self.mu[1])))
+        stddev_err = -(self.sigma[1])/(2 * np.sqrt(2) * self.mu[1] ** (3/2))
+        return stddev, stddev_err
+
+    @property
+    def table_properties(self):
+        return [
+            *[
+                (
+                    "w_{idx}",
+                    (self.mu[idx], self.sigma[idx]),
+                    (self.prior_mu[idx], self.prior_sigma[idx]),
+                )
+                for idx in range(self.width)
+            ],
+            ("A", self.A, None),
+            ("\\sigma", self.stddev, self.stddev_prior),
+        ]
+
+    @property
+    def _equation(self):
+        return [
+            f"\\mathbf{{{self.x_name}}}^0",
+            f"\mathbf{{{self.x_name}}}^{2}",
+        ]
+
+    def to_latex(self):
+        eq0 = f"\\begin{{equation}}\\label{{eq:lngauss}}\\ln(G(\\mathbf{{{self.x_name}}})) = -\\frac{{1}}{{2}} \\ln(2\\pi\\sigma^2) + \\frac{{\\mathbf{{{self.x_name}}}^2}}{{2 \\sigma^2}}\\end{{equation}}"
+        eq1 = f"\\begin{{equation}}\\label{{eq:lngauss}}\\ln(G(\\mathbf{{{self.x_name}}})) = w_0 + w_1\\mathbf{{{self.x_name}}}^2\\end{{equation}}"
+        eq2 = "\\[ w_0 = -\\frac{{1}}{{2}} \\ln(2\\pi\\sigma^2) \\]"
+        eq3 = "\\[ w_1 = \\frac{1}{2\\sigma^2}\\]"
+        eq4 = "\\[\\sigma = \\sqrt{-\\frac{1}{2w_1}}\\]"
+        return "\n".join(
+            [eq0, eq1, eq2, eq3, eq4, self._to_latex_table()]
+        )
+
+    @property
+    def gradient(self):
+        return dlnGaussian1DGenerator(
+            stddev=self.stddev[0],
+            x_name=self.x_name,
+            data_shape=self.data_shape,
+        )
+
+
+class dlnGaussian1DGenerator(MathMixins, Generator):
+    def __init__(
+        self,
+        stddev: float,
+        x_name: str = "x",
+        prior_mu=None,
+        prior_sigma=None,
+        offset_prior=None,
+        data_shape=None,
+    ):
+        self.stddev = stddev
+        self.x_name = x_name
+        self._validate_arg_names()
+        self.data_shape = data_shape
+        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
+        self.fit_mu = None
+        self.fit_sigma = None
+
+    @property
+    def width(self):
+        return 2
+
+    @property
+    def nvectors(self):
+        return 1
+
+    @property
+    def arg_names(self):
+        return {self.x_name}
+
+    @property
+    def _INIT_ATTRS(self):
+        return [
+            "x_name",
+            "stddev",
+            "prior_mu",
+            "prior_sigma",
+            "offset_prior",
+            "data_shape",
+        ]
+
+    def design_matrix(self, *args, **kwargs):
+        """Build a 1D polynomial in x
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Vector to create ln Gaussian of
+
+        Returns
+        -------
+        X : np.ndarray
+            Design matrix with shape (len(x), 2)
+        """
+        if not self.arg_names.issubset(set(kwargs.keys())):
+            raise ValueError(f"Expected {self.arg_names} to be passed.")
+        x = kwargs.get(self.x_name)
+
+        dfdx = (x / self.stddev**2)
+        return np.vstack([np.ones(np.prod(dfdx.shape)), dfdx.ravel()]).T
+
+    def fit(self, *args, **kwargs):
+        self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+
+    @property
+    def shift(self):
+        return self.mu[1], self.sigma[1]
+
+    @property
+    def table_properties(self):
+        return [
+            (
+                "w_0",
+                (self.mu[0], self.sigma[0]),
+                (self.prior_mu[0], self.prior_sigma[0]),
+            ),
+            ("s", self.shift, (self.prior_mu[1], self.prior_sigma[1])),
+        ]
+
+    @property
+    def _equation(self):
+        dfdx = f"\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_x^2}}"
+        return [f"\\mathbf{{{self.x_name}}}^0", dfdx]
 
 
 class lnGaussian2DGenerator(MathMixins, Generator):
@@ -76,7 +290,6 @@ class lnGaussian2DGenerator(MathMixins, Generator):
             "prior_sigma",
             "offset_prior",
             "data_shape",
-            "nterms",
         ]
 
     def design_matrix(self, *args, **kwargs):
@@ -248,7 +461,6 @@ class dlnGaussian2DGenerator(MathMixins, Generator):
             "prior_sigma",
             "offset_prior",
             "data_shape",
-            "nterms",
         ]
 
     def design_matrix(self, *args, **kwargs):
