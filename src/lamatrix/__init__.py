@@ -36,6 +36,7 @@ import json
 
 import numpy as np
 
+from .bound import *
 from .combine import *  # noqa: E402, F401
 from .models.astrophysical import *  # noqa: E402, F401
 from .models.gaussian import *  # noqa: E402, F401

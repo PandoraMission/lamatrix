@@ -83,13 +83,18 @@ class Polynomial1DGenerator(MathMixins, Generator):
         eqn = [
             f"\mathbf{{{self.x_name}}}^{{{idx}}}" for idx in range(self.polyorder + 1)
         ]
-        eqn[0] = ""
+        #        eqn[0] = ""
         return eqn
 
     @property
     def gradient(self):
-        return dPolynomial1DGenerator(weights=self.mu, x_name=self.x_name, polyorder=self.polyorder, data_shape=self.data_shape, offset_prior=(self.mu[1], self.sigma[1])
-)
+        return dPolynomial1DGenerator(
+            weights=self.mu,
+            x_name=self.x_name,
+            polyorder=self.polyorder,
+            data_shape=self.data_shape,
+            offset_prior=(self.mu[1], self.sigma[1]),
+        )
 
 
 class dPolynomial1DGenerator(MathMixins, Generator):
@@ -152,7 +157,12 @@ class dPolynomial1DGenerator(MathMixins, Generator):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name).ravel()
-        return np.vstack([(idx + 1) * w * x**idx for idx, w in zip(range(self.polyorder), self.weights[1:])]).T
+        return np.vstack(
+            [
+                (idx + 1) * w * x**idx
+                for idx, w in zip(range(self.polyorder), self.weights[1:])
+            ]
+        ).T
 
     def fit(self, *args, **kwargs):
         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
@@ -164,11 +174,11 @@ class dPolynomial1DGenerator(MathMixins, Generator):
     @property
     def _equation(self):
         eqn = [
-            f"({idx + 1}v_{{\\textit{{poly}}, {idx + 1}}}\mathbf{{{self.x_name}}}^{{{idx}}})" for idx in range(self.polyorder)
+            f"({idx + 1}v_{{\\textit{{poly}}, {idx + 1}}}\mathbf{{{self.x_name}}}^{{{idx}}})"
+            for idx in range(self.polyorder)
         ]
-        eqn[0] = ""
+        #        eqn[0] = ""
         return eqn
-
 
 
 class SinusoidGenerator(MathMixins, Generator):
@@ -248,7 +258,7 @@ class SinusoidGenerator(MathMixins, Generator):
 
         return np.hstack(
             [
-                "",
+                f"\\mathbf{{{self.x_name}}}^0",
                 *[
                     [
                         f"\sin({frq(idx)}\\mathbf{{{self.x_name}}})",
@@ -333,8 +343,12 @@ class dSinusoidGenerator(MathMixins, Generator):
             [
                 x**0,
                 *[
-                    [w1*np.cos(x * (idx + 1)), -w2*np.sin(x * (idx + 1))]
-                    for idx, w1, w2 in zip(range(self.nterms), self.weights[1:][::2], self.weights[1:][1::2])
+                    [w1 * np.cos(x * (idx + 1)), -w2 * np.sin(x * (idx + 1))]
+                    for idx, w1, w2 in zip(
+                        range(self.nterms),
+                        self.weights[1:][::2],
+                        self.weights[1:][1::2],
+                    )
                 ],
             ]
         ).T
@@ -349,7 +363,7 @@ class dSinusoidGenerator(MathMixins, Generator):
 
         return np.hstack(
             [
-                "",
+                f"\\mathbf{{{self.x_name}}}^0",
                 *[
                     [
                         f"v_{{\\textit{{sin}}, {idx * 2}}}\cos({frq(idx)}\\mathbf{{{self.x_name}}})",

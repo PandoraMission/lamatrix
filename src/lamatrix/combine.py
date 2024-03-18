@@ -188,6 +188,7 @@ class StackedIndependentGenerator(Generator):
             data_to_store["metadata"] = _META_DATA()
             json.dump(data_to_store, json_file, indent=4)
 
+
 class StackedDependentGenerator(StackedIndependentGenerator):
 
     @property
@@ -238,6 +239,9 @@ class StackedDependentGenerator(StackedIndependentGenerator):
         raise AttributeError(
             "Can not extract individual generators from a dependent stacked generator."
         )
-    @property 
+
+    @property
     def gradient(self):
-        raise AttributeError("Can not create a gradient for a dependent stacked generator.")
+        raise AttributeError(
+            "Can not create a gradient for a dependent stacked generator."
+        )

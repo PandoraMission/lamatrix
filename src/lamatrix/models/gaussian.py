@@ -169,7 +169,7 @@ class lnGaussian2DGenerator(MathMixins, Generator):
     @property
     def _equation(self):
         return [
-            f"",
+            f"\\mathbf{{{self.x_name}}}^0",
             f"\mathbf{{{self.x_name}}}^{2}",
             f"\mathbf{{{self.y_name}}}^{2}",
             f"\mathbf{{{self.x_name}}}\mathbf{{{self.y_name}}}",
@@ -189,7 +189,7 @@ class lnGaussian2DGenerator(MathMixins, Generator):
         )
 
     @property
-    def derivative(self):
+    def gradient(self):
         return dlnGaussian2DGenerator(
             stddev_x=self.stddev_x[0],
             stddev_y=self.stddev_y[0],
@@ -306,4 +306,4 @@ class dlnGaussian2DGenerator(MathMixins, Generator):
     def _equation(self):
         dfdx = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_x^2}} - \\rho\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_x\\sigma_y}}\\right)\\right)"
         dfdy = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_x^2}} - \\rho\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_x\\sigma_y}}\\right)\\right)"
-        return ["", dfdx, dfdy]
+        return [f"\\mathbf{{{self.x_name}}}^0", dfdx, dfdy]

@@ -101,10 +101,8 @@ class Generator(ABC):
         return deepcopy(self)
 
     def __repr__(self):
-        fit = "<fit>" if self.fit_mu is not None else ""
-        return (
-            f"{type(self).__name__}({', '.join(list(self.arg_names))})[n, {self.width}] {fit}"
-        )
+        fit = "fit" if self.fit_mu is not None else ""
+        return f"{type(self).__name__}({', '.join(list(self.arg_names))})[n, {self.width}] {fit}"
 
     # def __add__(self, other):
     #     if isinstance(other, Generator):
@@ -128,7 +126,7 @@ class Generator(ABC):
         if error == 0:
             sig_figures = 0
         else:
-            sig_figures = -int(math.floor(math.log10(abs(error))))
+            sig_figures = np.max([0, -int(math.floor(math.log10(abs(error))))])
 
         # Format mean and error to have the same number of decimal places
         formatted_mean = f"{mean:.{sig_figures}f}"
