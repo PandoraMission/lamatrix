@@ -1,6 +1,7 @@
 import json
 
 import numpy as np
+import re
 
 from . import _META_DATA
 from .generator import Generator
@@ -27,6 +28,13 @@ def combine_sigmas(*sigmas):
     # Base case: if there's only one equation, just return it
     if len(sigmas) == 1:
         return sigmas[0]
+
+    if (np.isfinite(sigmas[0])).any():
+        if sigmas[1][0] == np.inf:
+            sigmas[1][0] = 0
+    if (np.isfinite(sigmas[1])).any():
+        if sigmas[0][0] == np.inf:
+            sigmas[0][0] = 0
 
     # Step case: combine the first two equations and recursively call the function with the result
     combined = [(f**2 + e**2) ** 0.5 for f in sigmas[1] for e in sigmas[0]]
@@ -72,9 +80,26 @@ class StackedIndependentGenerator(Generator):
         str1 = (
             f"{type(self).__name__}({', '.join(list(self.arg_names))})[n, {self.width}]"
         )
-        str2 = [f"\t{g.__repr__()}" for g in self.generators]
+        def add_tab_to_runs_of_tabs(repr_str):
+            pattern = r'\t+'
+            replacement = lambda match: match.group(0) + '\t'
+            result_string = re.sub(pattern, replacement, repr_str)
+            return result_string
 
+        str2 = [f"\t{add_tab_to_runs_of_tabs(g.__repr__())}" for g in self.generators]
         return "\n".join([str1, *str2])
+
+    def __add__(self, other):
+        if isinstance(other, Generator):
+            return StackedIndependentGenerator(self, other)
+        else:
+            raise ValueError("Can only combine `Generator` objects.")
+
+    def __mul__(self, other):
+        if isinstance(other, Generator):
+            return StackedDependentGenerator(self, other)
+        else:
+            raise ValueError("Can only combine `Generator` objects.")
 
     def __getitem__(self, key):
         return self.generators[key]
@@ -121,31 +146,42 @@ class StackedIndependentGenerator(Generator):
                 pm[0] = 0
             else:
                 pm[0] = (
-                    np.sum(np.asarray([g.prior_sigma[0] for g in self.generators]) ** 2)
+                    np.nansum(np.asarray([g.prior_sigma[0] if g.prior_sigma[0] != np.inf else 0 for g in self.generators], dtype=float) ** 2)
                     ** 0.5
                 )
             prior_sigma.append(pm)
+        if (np.asarray([pm[0] for pm in prior_sigma]) == 0).all():
+            prior_sigma[0][0] = np.inf
         return np.hstack(prior_sigma)
 
-    @property
-    def mu(self):
-        mu = []
-        for idx, g in enumerate(self.generators):
-            pm = np.copy(g.mu)
-            if idx != 0:
-                pm[0] = 0
-            mu.append(pm)
-        return np.hstack(mu)
+    # @property
+    # def mu(self):
+    #     mu = []
+    #     for idx, g in enumerate(self.generators):
+    #         pm = np.copy(g.mu)
+    #         if idx != 0:
+    #             pm[0] = 0
+    #         mu.append(pm)
+    #     return np.hstack(mu)
 
-    @property
-    def sigma(self):
-        sigma = []
-        for idx, g in enumerate(self.generators):
-            pm = np.copy(g.sigma)
-            if idx != 0:
-                pm[0] = 0
-            sigma.append(pm)
-        return np.hstack(sigma)
+    # @property
+    # def sigma(self):
+    #     sigma = []
+    #     for idx, g in enumerate(self.generators):
+    #         pm = np.copy(g.sigma)
+    #         if idx != 0:
+    #             pm[0] = 0
+    #         sigma.append(pm)
+    #     return np.hstack(sigma)
+
+    def update_priors(self):
+        if self.fit_mu is None:
+            raise ValueError("Can not update priors before fitting.")
+        new = self.copy()
+        for idx in range(len(new)):
+            new[idx].prior_mu = new[idx].fit_mu.copy()
+            new[idx].prior_sigma = new[idx].fit_sigma.copy()
+        return new
 
     def fit(self, *args, **kwargs):
         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
@@ -157,6 +193,10 @@ class StackedIndependentGenerator(Generator):
         for idx, mu0, sigma0 in zip(np.arange(len(mu)), mu, sigma):
             self[idx].fit_mu = mu0
             self[idx].fit_sigma = sigma0
+
+        indices = np.cumsum([0, *[g.width for g in self.generators]])
+        for idx, a, b in zip(range(len(indices) - 1), indices[:-1], indices[1:]):
+            self[idx].cov = self.cov[a:b, a:b]
 
     def __len__(self):
         return len(self.generators)
@@ -191,6 +231,11 @@ class StackedIndependentGenerator(Generator):
 
 class StackedDependentGenerator(StackedIndependentGenerator):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._prior_mu = None
+        self._prior_sigma = None
+
     @property
     def width(self):
         return np.prod([g.width for g in self.generators])
@@ -218,22 +263,28 @@ class StackedDependentGenerator(StackedIndependentGenerator):
 
     @property
     def prior_sigma(self):
-        return combine_sigmas(*[g.prior_sigma for g in self.generators])
+        if self._prior_sigma is None:
+            return combine_sigmas(*[g.prior_sigma for g in self.generators])
+        else:
+            return self._prior_sigma
 
     @property
     def prior_mu(self):
-        return combine_mus(*[g.prior_mu for g in self.generators])
+        if self._prior_mu is None:
+            return combine_mus(*[g.prior_mu for g in self.generators])
+        else:
+            return self._prior_mu
 
     def fit(self, *args, **kwargs):
         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
 
-    @property
-    def mu(self):
-        return self.prior_mu if self.fit_mu is None else self.fit_mu
+    # @property
+    # def mu(self):
+    #     return self.prior_mu if self.fit_mu is None else self.fit_mu
 
-    @property
-    def sigma(self):
-        return self.prior_sigma if self.fit_sigma is None else self.fit_sigma
+    # @property
+    # def sigma(self):
+    #     return self.prior_sigma if self.fit_sigma is None else self.fit_sigma
 
     def __getitem__(self, key):
         raise AttributeError(
@@ -245,3 +296,11 @@ class StackedDependentGenerator(StackedIndependentGenerator):
         raise AttributeError(
             "Can not create a gradient for a dependent stacked generator."
         )
+
+    def update_priors(self):
+        if self.fit_mu is None:
+            raise ValueError("Can not update priors before fitting.")
+        new = self.copy()
+        new._prior_mu = new.fit_mu.copy()
+        new._prior_sigma = new.fit_sigma.copy()
+        return new

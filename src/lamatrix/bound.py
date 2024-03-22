@@ -1,14 +1,18 @@
 import numpy as np
 
 from .combine import StackedIndependentGenerator
+from .math import MathMixins
 
 __all__ = ["BoundedGenerator"]
 
 
-class BoundedGenerator(StackedIndependentGenerator):
-    def __init__(self, generator, bounds: list):
+class BoundedGenerator(MathMixins, StackedIndependentGenerator):
+    def __init__(self, generator, bounds: list, x_name=None):
         self.generator = generator
-        self.x_name = self.generator.x_name
+        if x_name is None:
+            self.x_name = self.generator.x_name
+        else:
+            self.x_name = x_name
         if isinstance(bounds, slice):
             self._latex_bounds = self._slice_bounds_to_latex(
                 bounds.start, bounds.stop, bounds.step
@@ -22,6 +26,7 @@ class BoundedGenerator(StackedIndependentGenerator):
         self.bounds = bounds
         self.fit_mu = None
         self.fit_sigma = None
+        self.data_shape = None
 
     def _bounds_to_latex(self, bounds):
         bound_latex = [
@@ -74,7 +79,7 @@ class BoundedGenerator(StackedIndependentGenerator):
 
     @property
     def arg_names(self):
-        return self.generator.arg_names
+        return {*np.unique([self.x_name, *list(self.generator.arg_names)])}
 
     @property
     def width(self):
@@ -118,7 +123,7 @@ class BoundedGenerator(StackedIndependentGenerator):
             bounds_list = self.bounds
         return np.hstack(
             [
-                self.generator.design_matrix(x=x) * ((x >= b[0]) & (x < b[1]))[:, None]
+                self.generator.design_matrix(*args, **kwargs) * ((x >= b[0]) & (x < b[1]))[:, None]
                 for b in bounds_list
             ]
         )
@@ -155,9 +160,9 @@ class BoundedGenerator(StackedIndependentGenerator):
         attrs = ["fit_mu", "fit_sigma"]
         for attr in attrs:
             setattr(
-                g, attr, getattr(self, attr).reshape((self.nbounds, len(self)))[key]
+                g, attr, getattr(self, attr).reshape((self.nbounds, self.width // self.nbounds))[key]
             )
         return g
 
     def __len__(self):
-        return self.width // self.nbounds
+        return self.nbounds

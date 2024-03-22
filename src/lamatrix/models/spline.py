@@ -278,5 +278,9 @@ class dSpline1DGenerator(MathMixins, SplineMixins, Generator):
     def _equation(self):
         return [
             f"\\mathbf{{{self.x_name}}}^0",
-            f"\\frac{{\\partial \\left( \\sum_{{i=1}}^{{{len(self.knots) - self.splineorder}}} v_{{\\textit{{spline}}, i}} N_{{i,{self.splineorder}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
+            f"\\frac{{\\partial \\left( \\sum_{{i=1}}^{{{len(self.knots) - self.splineorder}}} w_{{i}} N_{{i,{self.splineorder}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
         ]
+
+    @property
+    def _mu_letter(self):
+        return "v"

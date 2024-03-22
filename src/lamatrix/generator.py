@@ -51,13 +51,13 @@ class Generator(ABC):
             self.prior_mu[0] = self.offset_prior[0]
             self.prior_sigma[0] = self.offset_prior[1]
 
-    # def update_priors(self):
-    #     if self.fit_mu is None:
-    #         raise ValueError("Can not update priors before fitting.")
-    #     new = self.copy()
-    #     new.prior_mu = new.fit_mu.copy()
-    #     new.prior_sigma = new.fit_sigma.copy()
-    #     return new
+    def update_priors(self):
+        if self.fit_mu is None:
+            raise ValueError("Can not update priors before fitting.")
+        new = self.copy()
+        new.prior_mu = new.fit_mu.copy()
+        new.prior_sigma = new.fit_sigma.copy()
+        return new
 
     def _create_save_data(self):
         def process(arg):
@@ -239,10 +239,14 @@ class Generator(ABC):
         return (
             f"\\[f({func_signature}) = "
             + " + ".join(
-                [f"w_{{{coeff}}} {e}" for coeff, e in enumerate(self._equation)]
+                [f"{self._mu_letter}_{{{coeff}}} {e}" for coeff, e in enumerate(self._equation)]
             )
             + "\\]"
         )
+
+    @property
+    def _mu_letter(self):
+        return "w"
 
     @abstractmethod
     def design_matrix(self):

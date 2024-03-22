@@ -7,6 +7,8 @@ from ..math import MathMixins
 
 __all__ = [
     "Polynomial1DGenerator",
+    "dPolynomial1DGenerator",
+    "ConstantGenerator",
     "SinusoidGenerator",
     "dSinusoidGenerator",
 ]
@@ -172,14 +174,31 @@ class dPolynomial1DGenerator(MathMixins, Generator):
         return self.mu[0], self.sigma[0]
 
     @property
+    def _mu_letter(self):
+        return "v"
+
+    @property
     def _equation(self):
         eqn = [
-            f"({idx + 1}v_{{\\textit{{poly}}, {idx + 1}}}\mathbf{{{self.x_name}}}^{{{idx}}})"
+            f"({idx + 1}w_{{{idx + 1}}}\mathbf{{{self.x_name}}}^{{{idx}}})"
             for idx in range(self.polyorder)
         ]
         #        eqn[0] = ""
         return eqn
 
+
+class ConstantGenerator(Polynomial1DGenerator):
+    def __init__(
+            self,
+            x_name: str = "x",
+            prior_mu=None,
+            prior_sigma=None,
+            offset_prior=None,
+            data_shape=None,
+        ):
+    
+       return super().__init__(x_name=x_name, polyorder=0, prior_mu=prior_mu, prior_sigma=prior_sigma, offset_prior=offset_prior, data_shape=data_shape)
+        
 
 class SinusoidGenerator(MathMixins, Generator):
     def __init__(
@@ -366,10 +385,14 @@ class dSinusoidGenerator(MathMixins, Generator):
                 f"\\mathbf{{{self.x_name}}}^0",
                 *[
                     [
-                        f"v_{{\\textit{{sin}}, {idx * 2}}}\cos({frq(idx)}\\mathbf{{{self.x_name}}})",
-                        f"v_{{\\textit{{sin}}, {idx * 2 + 1}}}(-\sin({frq(idx)}\\mathbf{{{self.x_name}}}))",
+                        f"w_{{{idx * 2 + 1}}}\cos({frq(idx)}\\mathbf{{{self.x_name}}})",
+                        f"w_{{{idx * 2 + 2}}}(-\sin({frq(idx)}\\mathbf{{{self.x_name}}}))",
                     ]
                     for idx in range(self.nterms)
                 ],
             ]
         )
+    
+    @property
+    def _mu_letter(self):
+        return "v"

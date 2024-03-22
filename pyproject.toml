@@ -19,6 +19,10 @@ mypy = "^1.9.0"
 pytest = "^8.1.1"
 jupyterlab = "^4.1.4"
 matplotlib = "^3.8.3"
+mkdocs = "^1.5.3"
+mkdocs-material = "^9.5.14"
+mkdocstrings = "^0.24.1"
+pytkdocs = {version = "^0.16.1", extras = ["numpy-style"]}
 
 [build-system]
 requires = ["poetry-core"]

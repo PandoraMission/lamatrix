@@ -221,9 +221,12 @@ class dlnGaussian1DGenerator(MathMixins, Generator):
 
     @property
     def _equation(self):
-        dfdx = f"\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_x^2}}"
+        dfdx = f"\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma^2}}"
         return [f"\\mathbf{{{self.x_name}}}^0", dfdx]
 
+    @property
+    def _mu_letter(self):
+        return "v"
 
 class lnGaussian2DGenerator(MathMixins, Generator):
     def __init__(
@@ -374,8 +377,8 @@ class lnGaussian2DGenerator(MathMixins, Generator):
                 for idx in range(self.width)
             ],
             ("A", self.A, None),
-            ("\\sigma_x", self.stddev_x, self.stddev_x_prior),
-            ("\\sigma_y", self.stddev_y, self.stddev_y_prior),
+            (f"\\sigma_{{{self.x_name}}}", self.stddev_x, self.stddev_x_prior),
+            (f"\\sigma_{{{self.y_name}}}", self.stddev_y, self.stddev_y_prior),
             ("\\rho", self.rho, None),
         ]
 
@@ -390,12 +393,12 @@ class lnGaussian2DGenerator(MathMixins, Generator):
 
     def to_latex(self):
         eq1 = f"\\begin{{equation}}\\label{{eq:lngauss}}\\ln(G(\\mathbf{{{self.x_name}}}, \\mathbf{{{self.y_name}}})) = a + b\\mathbf{{{self.x_name}}}^2 + c\\mathbf{{{self.y_name}}}^2 + 2d\\mathbf{{{self.x_name}}}\\mathbf{{{self.y_name}}}\\end{{equation}}"
-        eq2 = "\\[ a = -\\ln(2\\pi\\sigma_x\\sigma_y\\sqrt{1-\\rho^2}) \\]"
-        eq3 = "\\[ b = \\frac{1}{2(1-\\rho^2)\\sigma_x^2}\\]"
-        eq4 = "\\[ c = \\frac{1}{2(1-\\rho^2)\\sigma_y^2}\\]"
-        eq5 = "\\[ d = \\frac{\\rho}{2(1-\\rho^2)\\sigma_x\\sigma_y}\\]"
-        eq6 = "\\[\\sigma_x = \\sqrt{-\\frac{1}{2b(1-\\rho^2)}}\\]"
-        eq7 = "\\[\\sigma_y = \\sqrt{-\\frac{1}{2c(1-\\rho^2)}}\\]"
+        eq2 = f"\\[ a = -\\ln(2\\pi\\sigma_{{{self.x_name}}}\\sigma_{{{self.y_name}}}\\sqrt{{1-\\rho^2}}) \\]"
+        eq3 = f"\\[ b = \\frac{{1}}{{2(1-\\rho^2)\\sigma_{{{self.x_name}}}^2}}\\]"
+        eq4 = f"\\[ c = \\frac{{1}}{{2(1-\\rho^2)\\sigma_{{{self.y_name}}}^2}}\\]"
+        eq5 = f"\\[ d = \\frac{{\\rho}}{{2(1-\\rho^2)\\sigma_{{{self.x_name}}}\\sigma_{{{self.y_name}}}}}\\]"
+        eq6 = f"\\[\\sigma_{{{self.x_name}}} = \\sqrt{{-\\frac{{1}}{{2b(1-\\rho^2)}}}}\\]"
+        eq7 = f"\\[\\sigma_{{{self.y_name}}} = \\sqrt{{-\\frac{{1}}{{2c(1-\\rho^2)}}}}\\]"
         eq8 = "\\[\\rho = \\sqrt{\\frac{d^2}{bc}}\\]"
         return "\n".join(
             [eq1, eq2, eq3, eq4, eq5, eq6, eq7, eq8, self._to_latex_table()]
@@ -516,6 +519,10 @@ class dlnGaussian2DGenerator(MathMixins, Generator):
 
     @property
     def _equation(self):
-        dfdx = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_x^2}} - \\rho\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_x\\sigma_y}}\\right)\\right)"
-        dfdy = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_x^2}} - \\rho\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_x\\sigma_y}}\\right)\\right)"
+        dfdx = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_{{{self.x_name}}}^2}} - \\rho\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_{{{self.x_name}}}\\sigma_{{{self.y_name}}}}}\\right)\\right)"
+        dfdy = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_{{{self.x_name}}}^2}} - \\rho\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_{{{self.x_name}}}\\sigma_{{{self.y_name}}}}}\\right)\\right)"
         return [f"\\mathbf{{{self.x_name}}}^0", dfdx, dfdy]
+
+    @property
+    def _mu_letter(self):
+        return "v"
