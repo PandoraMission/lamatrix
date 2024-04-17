@@ -54,10 +54,9 @@ class Generator(ABC):
     def update_priors(self):
         if self.fit_mu is None:
             raise ValueError("Can not update priors before fitting.")
-        new = self.copy()
-        new.prior_mu = new.fit_mu.copy()
-        new.prior_sigma = new.fit_sigma.copy()
-        return new
+        self.prior_mu = self.fit_mu.copy()
+        self.prior_sigma = self.fit_sigma.copy()
+        return
 
     def _create_save_data(self):
         def process(arg):

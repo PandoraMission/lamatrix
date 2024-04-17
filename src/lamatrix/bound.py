@@ -7,7 +7,7 @@ __all__ = ["BoundedGenerator"]
 
 
 class BoundedGenerator(MathMixins, StackedIndependentGenerator):
-    def __init__(self, generator, bounds: list, x_name=None):
+    def __init__(self, generator, bounds: list, x_name=None, fill_value=0):
         self.generator = generator
         if x_name is None:
             self.x_name = self.generator.x_name
@@ -24,6 +24,7 @@ class BoundedGenerator(MathMixins, StackedIndependentGenerator):
             self.nbounds = len(bounds)
 
         self.bounds = bounds
+        self.fill_value = fill_value
         self.fit_mu = None
         self.fit_sigma = None
         self.data_shape = None
@@ -121,9 +122,16 @@ class BoundedGenerator(MathMixins, StackedIndependentGenerator):
             ]
         else:
             bounds_list = self.bounds
+        if self.fill_value == 0:
+            return np.hstack(
+                [
+                    self.generator.design_matrix(*args, **kwargs) * ((x >= b[0]) & (x < b[1]))[:, None]
+                    for b in bounds_list
+                ]
+            )
         return np.hstack(
             [
-                self.generator.design_matrix(*args, **kwargs) * ((x >= b[0]) & (x < b[1]))[:, None]
+                self.generator.design_matrix(*args, **kwargs) * ((x >= b[0]) & (x < b[1]))[:, None] + (~(((x >= b[0]) & (x < b[1]))[:, None])).astype(float) * self.fill_value
                 for b in bounds_list
             ]
         )
