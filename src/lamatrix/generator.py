@@ -18,7 +18,10 @@ class Generator(ABC):
             if not isinstance(arg, str):
                 raise ValueError("Argument names must be strings.")
 
-    def _validate_priors(self, prior_mu, prior_sigma, offset_prior=None):
+    def hello_world(self):
+        print('Hello World! #4')
+
+    def _validate_priors(self, prior_mu, prior_sigma, sigma_mask=None, offset_prior=None):
         if prior_mu is None:
             self.prior_mu = np.zeros(self.width)
         else:
@@ -30,14 +33,23 @@ class Generator(ABC):
             else:
                 raise ValueError("Can not parse `prior_mu`.")
 
+        if sigma_mask is None:
+            self.sigma_mask = np.zeros(self.width).astype(bool)
+        else:
+            if isinstance(sigma_mask, (list, np.ndarray, tuple)):
+                if (len(sigma_mask) == self.width):
+                    self.sigma_mask = sigma_mask
+            else:
+                raise ValueError("Can not parse `sigma_mask`.")
+
         if prior_sigma is None:
-            self.prior_sigma = np.ones(self.width) * np.inf
+            self.prior_sigma_raw = np.ones(self.width) * np.inf
         else:
             if isinstance(prior_sigma, (float, int)):
-                self.prior_sigma = np.ones(self.width) * prior_sigma
+                self.prior_sigma_raw = np.ones(self.width) * prior_sigma
             elif isinstance(prior_sigma, (list, np.ndarray, tuple)):
                 if len(prior_sigma) == self.width:
-                    self.prior_sigma = prior_sigma
+                    self.prior_sigma_raw = prior_sigma
             else:
                 raise ValueError("Can not parse `prior_sigma`.")
 
@@ -192,6 +204,12 @@ class Generator(ABC):
     @property
     def sigma(self):
         return self.prior_sigma if self.fit_sigma is None else self.fit_sigma
+
+    @property
+    def prior_sigma(self):
+        ps = self.prior_sigma_raw.copy()
+        ps[self.sigma_mask] = 0.
+        return ps
 
     def evaluate(self, *args, **kwargs):
         X = self.design_matrix(*args, **kwargs)
