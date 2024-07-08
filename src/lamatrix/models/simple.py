@@ -13,6 +13,93 @@ __all__ = [
     "dSinusoidGenerator",
 ]
 
+class Polynomial1DGeneratorOdd(MathMixins, Generator):
+    def __init__(
+        self,
+        x_name: str = "x",
+        polyorder: int = 3,
+        prior_mu=None,
+        prior_sigma=None,
+        sigma_mask = None,
+        offset_prior=None,
+        data_shape=None,
+    ):
+        self.x_name = x_name
+        self._validate_arg_names()
+        self.polyorder = polyorder
+        self.data_shape = data_shape
+        self._validate_priors(prior_mu, prior_sigma, sigma_mask=sigma_mask, offset_prior=offset_prior)
+        self.fit_mu = None
+        self.fit_sigma = None
+
+    @property
+    def width(self):
+        return (self.polyorder + 1)//2 + 1
+
+    @property
+    def nvectors(self):
+        return 1
+
+    @property
+    def arg_names(self):
+        return {self.x_name}
+
+    @property
+    def _INIT_ATTRS(self):
+        return [
+            "x_name",
+            "prior_mu",
+            "prior_sigma",
+            "offset_prior",
+            "data_shape",
+            "polyorder",
+        ]
+
+    def design_matrix(self, *args, **kwargs):
+        """Build a 1D polynomial in x
+
+        Parameters
+        ----------
+        {} : np.ndarray
+            Vector to create polynomial of
+
+        Returns
+        -------
+        X : np.ndarray
+            Design matrix with shape (len(x), self.nvectors)
+        """
+        if not self.arg_names.issubset(set(kwargs.keys())):
+            raise ValueError(f"Expected {self.arg_names} to be passed.")
+        x = kwargs.get(self.x_name).ravel()
+        orders = np.hstack([0, np.arange(1, self.polyorder + 1, 2)])
+        return np.vstack([x**idx for idx in orders]).T
+
+    def fit(self, *args, **kwargs):
+        self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+
+    @property
+    def offset(self):
+        return self.mu[0], self.sigma[0]
+
+    @property
+    def _equation(self):
+        orders = np.hstack([0, np.arange(1, self.polyorder + 1, 2)])
+        eqn = [
+            f"\mathbf{{{self.x_name}}}^{{{idx}}}" for idx in orders
+        ]
+        #        eqn[0] = ""
+        return eqn
+
+    @property
+    def gradient(self):
+        return dPolynomial1DGenerator(
+            weights=self.mu,
+            x_name=self.x_name,
+            polyorder=self.polyorder,
+            data_shape=self.data_shape,
+            offset_prior=(self.mu[1], self.sigma[1]),
+        )
+
 
 class Polynomial1DGenerator(MathMixins, Generator):
     def __init__(
@@ -21,6 +108,7 @@ class Polynomial1DGenerator(MathMixins, Generator):
         polyorder: int = 3,
         prior_mu=None,
         prior_sigma=None,
+        sigma_mask = None,
         offset_prior=None,
         data_shape=None,
     ):
@@ -28,7 +116,7 @@ class Polynomial1DGenerator(MathMixins, Generator):
         self._validate_arg_names()
         self.polyorder = polyorder
         self.data_shape = data_shape
-        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
+        self._validate_priors(prior_mu, prior_sigma, sigma_mask=sigma_mask, offset_prior=offset_prior)
         self.fit_mu = None
         self.fit_sigma = None
 
@@ -50,6 +138,7 @@ class Polynomial1DGenerator(MathMixins, Generator):
             "x_name",
             "prior_mu",
             "prior_sigma",
+            "sigma_mask",
             "offset_prior",
             "data_shape",
             "polyorder",
@@ -107,6 +196,7 @@ class dPolynomial1DGenerator(MathMixins, Generator):
         polyorder: int = 3,
         prior_mu=None,
         prior_sigma=None,
+        sigma_mask = None,
         offset_prior=None,
         data_shape=None,
     ):
@@ -115,7 +205,7 @@ class dPolynomial1DGenerator(MathMixins, Generator):
         self._validate_arg_names()
         self.polyorder = polyorder
         self.data_shape = data_shape
-        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
+        self._validate_priors(prior_mu, prior_sigma, sigma_mask=sigma_mask, offset_prior=offset_prior)
         self.fit_mu = None
         self.fit_sigma = None
 
@@ -138,6 +228,7 @@ class dPolynomial1DGenerator(MathMixins, Generator):
             "x_name",
             "prior_mu",
             "prior_sigma",
+            "sigma_mask",
             "offset_prior",
             "data_shape",
             "polyorder",

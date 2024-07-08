@@ -45,6 +45,19 @@ def combine_sigmas(*sigmas):
     else:
         return np.asarray(combined)
 
+def combine_masks(*masks):
+    # Base case: if there's only one equation, just return it
+    if len(masks) == 1:
+        return masks[0]
+    
+    # Step case: combine the first two equations and recursively call the function with the result
+    combined = [(f | e) for f in masks[1] for e in masks[0]]
+
+    # If there are more equations left, combine further
+    if len(masks) > 2:
+        return combine_sigmas(combined, *masks[2:])
+    else:
+        return np.asarray(combined)
 
 def combine_mus(*mus):
     return combine_equations(*mus)
@@ -75,6 +88,11 @@ class StackedIndependentGenerator(Generator):
         self.data_shape = self.generators[0].data_shape
         self.fit_mu = None
         self.fit_sigma = None
+
+        self.sigma_mask = []
+        for idx, g in enumerate(self.generators):
+            self.sigma_mask.append(np.copy(g.sigma_mask))
+        self.sigma_mask = np.hstack(self.sigma_mask)
 
     def __repr__(self):
         str1 = (
@@ -138,21 +156,28 @@ class StackedIndependentGenerator(Generator):
         return np.hstack(prior_mu)
 
     @property
-    def prior_sigma(self):
-        prior_sigma = []
+    def prior_sigma_raw(self):
+        prior_sigma_raw = []
         for idx, g in enumerate(self.generators):
-            pm = np.copy(g.prior_sigma)
+            pm = np.copy(g.prior_sigma_raw)
             if idx != 0:
                 pm[0] = 0
             else:
                 pm[0] = (
-                    np.nansum(np.asarray([g.prior_sigma[0] if g.prior_sigma[0] != np.inf else 0 for g in self.generators], dtype=float) ** 2)
+                    np.nansum(np.asarray([g.prior_sigma_raw[0] if g.prior_sigma_raw[0] != np.inf else 0 for g in self.generators], dtype=float) ** 2)
                     ** 0.5
                 )
-            prior_sigma.append(pm)
-        if (np.asarray([pm[0] for pm in prior_sigma]) == 0).all():
-            prior_sigma[0][0] = np.inf
-        return np.hstack(prior_sigma)
+            prior_sigma_raw.append(pm)
+        if (np.asarray([pm[0] for pm in prior_sigma_raw]) == 0).all():
+            prior_sigma_raw[0][0] = np.inf
+        return np.hstack(prior_sigma_raw)
+    
+    # This may not be necessary, since it is identical to the one in Generator
+    # @property
+    # def prior_sigma(self):
+    #     ps = self.prior_sigma_raw.copy()
+    #     ps[self.sigma_mask] = 0.
+    #     return ps
 
     # @property
     # def mu(self):
@@ -235,6 +260,7 @@ class StackedDependentGenerator(StackedIndependentGenerator):
         super().__init__(*args, **kwargs)
         self._prior_mu = None
         self._prior_sigma = None
+        self.sigma_mask = combine_masks(*[g.sigma_mask for g in self.generators])
 
     @property
     def width(self):
@@ -264,9 +290,11 @@ class StackedDependentGenerator(StackedIndependentGenerator):
     @property
     def prior_sigma(self):
         if self._prior_sigma is None:
-            return combine_sigmas(*[g.prior_sigma for g in self.generators])
+            ps = combine_sigmas(*[g.prior_sigma_raw for g in self.generators])
         else:
-            return self._prior_sigma
+            ps = self._prior_sigma
+        ps[self.sigma_mask] = 0.
+        return ps
 
     @property
     def prior_mu(self):

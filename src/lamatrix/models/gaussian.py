@@ -332,7 +332,7 @@ class lnGaussian2DGenerator(MathMixins, Generator):
 
     @property
     def rho(self):
-        rho = np.sqrt(self.mu[3] ** 2 / (self.mu[1] * self.mu[2])) / 2
+        rho = np.sqrt(self.mu[3] ** 2 / np.abs(self.mu[1] * self.mu[2])) / 2
         err1 = np.abs((self.mu[3] ** 2) * 2 * self.sigma[3] / self.mu[3])
         rho_err = np.abs(rho) * np.sqrt(
             (err1 / self.mu[3]) ** 2
