@@ -1,13 +1,13 @@
-"""Generator objects for different types of models"""
-
+# """Generator objects for different types of models"""
+from typing import List
 import numpy as np
-
-from ..generator import Generator
+from ..model import Model
 from ..math import MathMixins
 
 __all__ = [
-    "Spline1DGenerator",
-    "dSpline1DGenerator",
+    "Spline",
+    "dSpline",
+#    "dSpline1DGenerator",
 ]
 
 
@@ -22,7 +22,8 @@ class SplineMixins:
         x : position where the basis function is evaluated
         """
         if k == 1:
-            return 1.0 if t[i] <= x < t[i + 1] else 0.0
+            #return 1.0 if t[i] <= x < t[i + 1] else 0.0
+            return ((x < t[i + 1]) & (t[i] <= x)).astype(float)
         else:
             div0 = t[i + k - 1] - t[i]
             div1 = t[i + k] - t[i + 1]
@@ -63,36 +64,28 @@ class SplineMixins:
             return 0  # The derivative of a constant (k=1) function is 0
 
 
-class Spline1DGenerator(MathMixins, SplineMixins, Generator):
+
+
+
+class Spline(MathMixins, SplineMixins, Model):
     def __init__(
         self,
-        knots: np.ndarray,
         x_name: str = "x",
+        knots:np.ndarray = np.arange(1, 1, 0.3),
         splineorder: int = 3,
-        prior_mu=None,
-        prior_sigma=None,
-        offset_prior=None,
-        data_shape=None,
-    ):
-        # Check if knots are padded
-        if not (len(np.unique(knots[:splineorder])) == 1) & (
-            len(np.unique(knots[-splineorder:])) == 1
-        ):
-            knots = np.concatenate(
-                ([knots[0]] * (splineorder - 1), knots, [knots[-1]] * (splineorder - 1))
-            )
-        self.knots = knots
+        prior_distributions=None,
+    ):        
+        if splineorder < 1:
+            raise ValueError("Must have splineorder >= 1.")
         self.x_name = x_name
         self._validate_arg_names()
         self.splineorder = splineorder
-        self.data_shape = data_shape
-        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
-        self.fit_mu = None
-        self.fit_sigma = None
+        self.knots = knots
+        super().__init__(prior_distributions=prior_distributions)
 
     @property
     def width(self):
-        return len(self.knots) - self.splineorder - 1 + 1
+        return len(self.knots) - self.splineorder - 1
 
     @property
     def nvectors(self):
@@ -100,21 +93,9 @@ class Spline1DGenerator(MathMixins, SplineMixins, Generator):
 
     @property
     def arg_names(self):
-        return {self.x_name}
+        return {self.x_name}    
 
-    @property
-    def _INIT_ATTRS(self):
-        return [
-            "x_name",
-            "knots",
-            "splineorder",
-            "prior_mu",
-            "prior_sigma",
-            "offset_prior",
-            "data_shape",
-        ]
-
-    def design_matrix(self, *args, **kwargs):
+    def design_matrix(self, **kwargs):
         """Build a 1D spline in x
 
         Parameters
@@ -132,87 +113,45 @@ class Spline1DGenerator(MathMixins, SplineMixins, Generator):
         x = kwargs.get(self.x_name).ravel()
 
         # Set up the least squares problem
-        X = np.zeros((len(x), self.width - 1))
-        for i in range(self.width - 1):
-            for j, xi in enumerate(x):
-                X[j, i] = self.bspline_basis(
-                    k=self.splineorder, i=i, t=self.knots, x=xi
-                )
-        return np.hstack([np.ones((len(x), 1)), X])
-
-    def fit(self, *args, **kwargs):
-        self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
-
-    @property
-    def offset(self):
-        return self.mu[0], self.sigma[0]
-
-    @property
-    def _equation(self):
-        return [
-            f"\\mathbf{{{self.x_name}}}^0",
-            *[
-                f"N_{{{idx},k}}(\\mathbf{{{self.x_name}}})"
-                for idx in np.arange(1, self.width)
-            ],
-        ]
-
-    def to_latex(self):
-        eqn1 = f"\\begin{{equation}}\\label{{eq:spline}}f(\\mathbf{{{self.x_name}}}) = \sum_{{i=0}}^{{n-1}} w_i N_{{i,k}}(\\mathbf{{{self.x_name}}}) \\]\\end{{equation}}"
-        eqn2 = f"\\[N_{{i,k}}(\\mathbf{{{self.x_name}}}) = \\frac{{\\mathbf{{{self.x_name}}} - t_i}}{{t_{{i+k-1}} - t_i}} N_{{i,k-1}}(\\mathbf{{{self.x_name}}}) + \\frac{{t_{{i+k}} - \\mathbf{{{self.x_name}}}}}{{t_{{i+k}} - t_{{i+1}}}} N_{{i+1,k-1}}(\\mathbf{{{self.x_name}}})\\]"
-        eqn3 = f"""\\[N_{{i,1}}(\\mathbf{{{self.x_name}}}) = 
-        \\begin{{cases}} 
-        1 & \\text{{if }} t_i \leq \\mathbf{{{self.x_name}}} < t_{{i+1}} \\\\
-        0 & \\text{{otherwise}} \\\\
-        \\end{{cases}}
-        \\]"""
-        eqn4 = "$t = [" + " , ".join([f"{k}" for k in self.knots]) + "]$"
-
-        return "\n".join([eqn1, eqn2, eqn3, eqn4, self._to_latex_table()])
-
-    @property
-    def gradient(self):
-        return dSpline1DGenerator(
-            weights=self.mu,
-            knots=self.knots,
-            splineorder=self.splineorder,
-            data_shape=self.data_shape,
-            x_name=self.x_name,
-        )
+        X = np.zeros((len(x), self.width))
+        for i in range(self.width):
+            X[:, i] = self.bspline_basis(
+                k=self.splineorder, i=i, t=self.knots, x=x
+            )
+        return X
 
 
-class dSpline1DGenerator(MathMixins, SplineMixins, Generator):
+    def to_gradient(self, prior_distributions=None):
+        weights = [fit if fit is not None else prior for fit, prior in zip(self.fit_mean, self.prior_mean)]
+        return dSpline(weights=weights,
+                        x_name=self.x_name,
+                        knots=self.knots,
+                        splineorder=self.splineorder,
+                        prior_distributions=prior_distributions)
+
+
+
+class dSpline(MathMixins, SplineMixins, Model):
     def __init__(
         self,
-        weights: np.ndarray,
-        knots: np.ndarray,
+        weights : List,
         x_name: str = "x",
+        knots:np.ndarray = np.arange(1, 1, 0.3),
         splineorder: int = 3,
-        offset_prior=None,
-        prior_mu=None,
-        prior_sigma=None,
-        data_shape=None,
-    ):
-        # Check if knots are padded
-        if not (len(np.unique(knots[:splineorder])) == 1) & (
-            len(np.unique(knots[-splineorder:])) == 1
-        ):
-            knots = np.concatenate(
-                ([knots[0]] * (splineorder - 1), knots, [knots[-1]] * (splineorder - 1))
-            )
-        self.knots = knots
-        self.weights = weights
+        prior_distributions=None,
+    ):        
+        if splineorder < 1:
+            raise ValueError("Must have splineorder >= 1.")
         self.x_name = x_name
         self._validate_arg_names()
         self.splineorder = splineorder
-        self.data_shape = data_shape
-        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
-        self.fit_mu = None
-        self.fit_sigma = None
+        self.knots = knots
+        self.weights = weights
+        super().__init__(prior_distributions=prior_distributions)
 
     @property
     def width(self):
-        return 2
+        return 1
 
     @property
     def nvectors(self):
@@ -220,67 +159,243 @@ class dSpline1DGenerator(MathMixins, SplineMixins, Generator):
 
     @property
     def arg_names(self):
-        return {self.x_name}
+        return {self.x_name}    
 
-    @property
-    def _INIT_ATTRS(self):
-        return [
-            "x_name",
-            "weights",
-            "knots",
-            "splineorder",
-            "prior_mu",
-            "prior_sigma",
-            "offset_prior",
-            "data_shape",
-        ]
-
-    def design_matrix(self, *args, **kwargs):
+    def design_matrix(self, **kwargs):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name).ravel()
-        n = len(self.weights) - 1
-        y_deriv = np.zeros_like(x)
-        for i in range(n):
-            for j, xi in enumerate(x):
-                y_deriv[j] += self.weights[i + 1] * self.bspline_basis_derivative(
-                    k=self.splineorder, i=i, t=self.knots, x=xi
-                )
-        return np.hstack([np.ones((len(x), 1)), y_deriv[:, None]])
 
-    def fit(self, *args, **kwargs):
-        self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+        # Set up the least squares problem
+        X = np.zeros((len(x), len(self.weights)))
+        for i in range(len(self.weights)):
+            X[:, i] = self.bspline_basis_derivative(
+                k=self.splineorder, i=i, t=self.knots, x=x
+            )
+        return X.dot(self.weights)[:, None]
 
-    @property
-    def offset(self):
-        return self.mu[0], self.sigma[0]
 
-    @property
-    def _equation(self):
-        raise NotImplementedError
 
-    @property
-    def shift_x(self):
-        return self.mu[1], self.sigma[1]
 
-    @property
-    def table_properties(self):
-        return [
-            (
-                "w_0",
-                (self.mu[0], self.sigma[0]),
-                (self.prior_mu[0], self.prior_sigma[0]),
-            ),
-            ("s_x", self.shift_x, (self.prior_mu[1], self.prior_sigma[1])),
-        ]
 
-    @property
-    def _equation(self):
-        return [
-            f"\\mathbf{{{self.x_name}}}^0",
-            f"\\frac{{\\partial \\left( \\sum_{{i=1}}^{{{len(self.knots) - self.splineorder}}} w_{{i}} N_{{i,{self.splineorder}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
-        ]
+# class Spline1DGenerator(MathMixins, SplineMixins, Generator):
+#     def __init__(
+#         self,
+#         knots: np.ndarray,
+#         x_name: str = "x",
+#         splineorder: int = 3,
+#         prior_mu=None,
+#         prior_sigma=None,
+#         offset_prior=None,
+#         data_shape=None,
+#     ):
+#         # Check if knots are padded
+#         if not (len(np.unique(knots[:splineorder])) == 1) & (
+#             len(np.unique(knots[-splineorder:])) == 1
+#         ):
+#             knots = np.concatenate(
+#                 ([knots[0]] * (splineorder - 1), knots, [knots[-1]] * (splineorder - 1))
+#             )
+#         self.knots = knots
+#         self.x_name = x_name
+#         self._validate_arg_names()
+#         self.splineorder = splineorder
+#         self.data_shape = data_shape
+#         self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
+#         self.fit_mu = None
+#         self.fit_sigma = None
 
-    @property
-    def _mu_letter(self):
-        return "v"
+#     @property
+#     def width(self):
+#         return len(self.knots) - self.splineorder - 1 + 1
+
+#     @property
+#     def nvectors(self):
+#         return 1
+
+#     @property
+#     def arg_names(self):
+#         return {self.x_name}
+
+#     @property
+#     def _INIT_ATTRS(self):
+#         return [
+#             "x_name",
+#             "knots",
+#             "splineorder",
+#             "prior_mu",
+#             "prior_sigma",
+#             "offset_prior",
+#             "data_shape",
+#         ]
+
+#     def design_matrix(self, *args, **kwargs):
+#         """Build a 1D spline in x
+
+#         Parameters
+#         ----------
+#         {} : np.ndarray
+#             Vector to create spline of
+
+#         Returns
+#         -------
+#         X : np.ndarray
+#             Design matrix with shape (len(x), self.nvectors)
+#         """
+#         if not self.arg_names.issubset(set(kwargs.keys())):
+#             raise ValueError(f"Expected {self.arg_names} to be passed.")
+#         x = kwargs.get(self.x_name).ravel()
+
+#         # Set up the least squares problem
+#         X = np.zeros((len(x), self.width - 1))
+#         for i in range(self.width - 1):
+#             for j, xi in enumerate(x):
+#                 X[j, i] = self.bspline_basis(
+#                     k=self.splineorder, i=i, t=self.knots, x=xi
+#                 )
+#         return np.hstack([np.ones((len(x), 1)), X])
+
+#     def fit(self, *args, **kwargs):
+#         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+
+#     @property
+#     def offset(self):
+#         return self.mu[0], self.sigma[0]
+
+#     @property
+#     def _equation(self):
+#         return [
+#             f"\\mathbf{{{self.x_name}}}^0",
+#             *[
+#                 f"N_{{{idx},k}}(\\mathbf{{{self.x_name}}})"
+#                 for idx in np.arange(1, self.width)
+#             ],
+#         ]
+
+#     def to_latex(self):
+#         eqn1 = f"\\begin{{equation}}\\label{{eq:spline}}f(\\mathbf{{{self.x_name}}}) = \sum_{{i=0}}^{{n-1}} w_i N_{{i,k}}(\\mathbf{{{self.x_name}}}) \\]\\end{{equation}}"
+#         eqn2 = f"\\[N_{{i,k}}(\\mathbf{{{self.x_name}}}) = \\frac{{\\mathbf{{{self.x_name}}} - t_i}}{{t_{{i+k-1}} - t_i}} N_{{i,k-1}}(\\mathbf{{{self.x_name}}}) + \\frac{{t_{{i+k}} - \\mathbf{{{self.x_name}}}}}{{t_{{i+k}} - t_{{i+1}}}} N_{{i+1,k-1}}(\\mathbf{{{self.x_name}}})\\]"
+#         eqn3 = f"""\\[N_{{i,1}}(\\mathbf{{{self.x_name}}}) = 
+#         \\begin{{cases}} 
+#         1 & \\text{{if }} t_i \leq \\mathbf{{{self.x_name}}} < t_{{i+1}} \\\\
+#         0 & \\text{{otherwise}} \\\\
+#         \\end{{cases}}
+#         \\]"""
+#         eqn4 = "$t = [" + " , ".join([f"{k}" for k in self.knots]) + "]$"
+
+#         return "\n".join([eqn1, eqn2, eqn3, eqn4, self._to_latex_table()])
+
+#     @property
+#     def gradient(self):
+#         return dSpline1DGenerator(
+#             weights=self.mu,
+#             knots=self.knots,
+#             splineorder=self.splineorder,
+#             data_shape=self.data_shape,
+#             x_name=self.x_name,
+#         )
+
+
+# class dSpline1DGenerator(MathMixins, SplineMixins, Generator):
+#     def __init__(
+#         self,
+#         weights: np.ndarray,
+#         knots: np.ndarray,
+#         x_name: str = "x",
+#         splineorder: int = 3,
+#         offset_prior=None,
+#         prior_mu=None,
+#         prior_sigma=None,
+#         data_shape=None,
+#     ):
+#         # Check if knots are padded
+#         if not (len(np.unique(knots[:splineorder])) == 1) & (
+#             len(np.unique(knots[-splineorder:])) == 1
+#         ):
+#             knots = np.concatenate(
+#                 ([knots[0]] * (splineorder - 1), knots, [knots[-1]] * (splineorder - 1))
+#             )
+#         self.knots = knots
+#         self.weights = weights
+#         self.x_name = x_name
+#         self._validate_arg_names()
+#         self.splineorder = splineorder
+#         self.data_shape = data_shape
+#         self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
+#         self.fit_mu = None
+#         self.fit_sigma = None
+
+#     @property
+#     def width(self):
+#         return 2
+
+#     @property
+#     def nvectors(self):
+#         return 1
+
+#     @property
+#     def arg_names(self):
+#         return {self.x_name}
+
+#     @property
+#     def _INIT_ATTRS(self):
+#         return [
+#             "x_name",
+#             "weights",
+#             "knots",
+#             "splineorder",
+#             "prior_mu",
+#             "prior_sigma",
+#             "offset_prior",
+#             "data_shape",
+#         ]
+
+#     def design_matrix(self, *args, **kwargs):
+#         if not self.arg_names.issubset(set(kwargs.keys())):
+#             raise ValueError(f"Expected {self.arg_names} to be passed.")
+#         x = kwargs.get(self.x_name).ravel()
+#         n = len(self.weights) - 1
+#         y_deriv = np.zeros_like(x)
+#         for i in range(n):
+#             for j, xi in enumerate(x):
+#                 y_deriv[j] += self.weights[i + 1] * self.bspline_basis_derivative(
+#                     k=self.splineorder, i=i, t=self.knots, x=xi
+#                 )
+#         return np.hstack([np.ones((len(x), 1)), y_deriv[:, None]])
+
+#     def fit(self, *args, **kwargs):
+#         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+
+#     @property
+#     def offset(self):
+#         return self.mu[0], self.sigma[0]
+
+#     @property
+#     def _equation(self):
+#         raise NotImplementedError
+
+#     @property
+#     def shift_x(self):
+#         return self.mu[1], self.sigma[1]
+
+#     @property
+#     def table_properties(self):
+#         return [
+#             (
+#                 "w_0",
+#                 (self.mu[0], self.sigma[0]),
+#                 (self.prior_mu[0], self.prior_sigma[0]),
+#             ),
+#             ("s_x", self.shift_x, (self.prior_mu[1], self.prior_sigma[1])),
+#         ]
+
+#     @property
+#     def _equation(self):
+#         return [
+#             f"\\mathbf{{{self.x_name}}}^0",
+#             f"\\frac{{\\partial \\left( \\sum_{{i=1}}^{{{len(self.knots) - self.splineorder}}} w_{{i}} N_{{i,{self.splineorder}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
+#         ]
+
+#     @property
+#     def _mu_letter(self):
+#         return "v"

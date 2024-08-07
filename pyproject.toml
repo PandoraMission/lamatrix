@@ -11,6 +11,8 @@ python = "^3.9"
 numpy = "^1.26.4"
 rich = "^13.7.1"
 
+[tool.poetry.group.dev]
+optional = true
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"
@@ -23,14 +25,6 @@ mkdocs = "^1.5.3"
 mkdocs-material = "^9.5.14"
 mkdocstrings = "^0.24.1"
 pytkdocs = {version = "^0.16.1", extras = ["numpy-style"]}
-
-
-
-[tool.poetry.group.docs.dependencies]
-tesswcs = "^1.1.2"
-pandas = "^2.2.1"
-astroquery = "^0.4.7"
-scipy = "^1.13.0"
 
 [build-system]
 requires = ["poetry-core"]

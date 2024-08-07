@@ -1,123 +1,31 @@
 """Generator objects for simple types of models"""
 
 import numpy as np
-
-from ..generator import Generator
+from typing import List
+from ..model import Model
 from ..math import MathMixins
 
 __all__ = [
-    "Polynomial1DGenerator",
-    "dPolynomial1DGenerator",
-    "ConstantGenerator",
-    "SinusoidGenerator",
-    "dSinusoidGenerator",
+    "Polynomial",
+    "Constant",
+    "Sinusoid",
+    "dPolynomial",
+    "dSinusoid",
 ]
 
-
-class Polynomial1DGenerator(MathMixins, Generator):
+class Polynomial(MathMixins, Model):
     def __init__(
         self,
         x_name: str = "x",
         polyorder: int = 3,
-        prior_mu=None,
-        prior_sigma=None,
-        offset_prior=None,
-        data_shape=None,
-    ):
+        prior_distributions=None,
+    ):        
+        if polyorder < 1:
+            raise ValueError("Must have polyorder >= 1.")
         self.x_name = x_name
         self._validate_arg_names()
         self.polyorder = polyorder
-        self.data_shape = data_shape
-        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
-        self.fit_mu = None
-        self.fit_sigma = None
-
-    @property
-    def width(self):
-        return self.polyorder + 1
-
-    @property
-    def nvectors(self):
-        return 1
-
-    @property
-    def arg_names(self):
-        return {self.x_name}
-
-    @property
-    def _INIT_ATTRS(self):
-        return [
-            "x_name",
-            "prior_mu",
-            "prior_sigma",
-            "offset_prior",
-            "data_shape",
-            "polyorder",
-        ]
-
-    def design_matrix(self, *args, **kwargs):
-        """Build a 1D polynomial in x
-
-        Parameters
-        ----------
-        {} : np.ndarray
-            Vector to create polynomial of
-
-        Returns
-        -------
-        X : np.ndarray
-            Design matrix with shape (len(x), self.nvectors)
-        """
-        if not self.arg_names.issubset(set(kwargs.keys())):
-            raise ValueError(f"Expected {self.arg_names} to be passed.")
-        x = kwargs.get(self.x_name).ravel()
-        return np.vstack([x**idx for idx in range(self.polyorder + 1)]).T
-
-    def fit(self, *args, **kwargs):
-        self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
-
-    @property
-    def offset(self):
-        return self.mu[0], self.sigma[0]
-
-    @property
-    def _equation(self):
-        eqn = [
-            f"\mathbf{{{self.x_name}}}^{{{idx}}}" for idx in range(self.polyorder + 1)
-        ]
-        #        eqn[0] = ""
-        return eqn
-
-    @property
-    def gradient(self):
-        return dPolynomial1DGenerator(
-            weights=self.mu,
-            x_name=self.x_name,
-            polyorder=self.polyorder,
-            data_shape=self.data_shape,
-            offset_prior=(self.mu[1], self.sigma[1]),
-        )
-
-
-class dPolynomial1DGenerator(MathMixins, Generator):
-    def __init__(
-        self,
-        weights: list,
-        x_name: str = "x",
-        polyorder: int = 3,
-        prior_mu=None,
-        prior_sigma=None,
-        offset_prior=None,
-        data_shape=None,
-    ):
-        self.weights = weights
-        self.x_name = x_name
-        self._validate_arg_names()
-        self.polyorder = polyorder
-        self.data_shape = data_shape
-        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
-        self.fit_mu = None
-        self.fit_sigma = None
+        super().__init__(prior_distributions=prior_distributions)
 
     @property
     def width(self):
@@ -131,25 +39,8 @@ class dPolynomial1DGenerator(MathMixins, Generator):
     def arg_names(self):
         return {self.x_name}
 
-    @property
-    def _INIT_ATTRS(self):
-        return [
-            "weights",
-            "x_name",
-            "prior_mu",
-            "prior_sigma",
-            "offset_prior",
-            "data_shape",
-            "polyorder",
-        ]
-
-    def design_matrix(self, *args, **kwargs):
-        """Build a 1D polynomial in x
-
-        Parameters
-        ----------
-        {} : np.ndarray
-            Vector to create polynomial of
+    def design_matrix(self, **kwargs):
+        """Build a 1D polynomial in `x_name`.
 
         Returns
         -------
@@ -159,68 +50,36 @@ class dPolynomial1DGenerator(MathMixins, Generator):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name).ravel()
-        return np.vstack(
-            [
-                (idx + 1) * w * x**idx
-                for idx, w in zip(range(self.polyorder), self.weights[1:])
-            ]
-        ).T
+        return np.vstack([x**idx for idx in range(1, self.polyorder + 1)]).T
 
-    def fit(self, *args, **kwargs):
-        self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
-
-    @property
-    def offset(self):
-        return self.mu[0], self.sigma[0]
-
-    @property
-    def _mu_letter(self):
-        return "v"
-
-    @property
-    def _equation(self):
-        eqn = [
-            f"({idx + 1}w_{{{idx + 1}}}\mathbf{{{self.x_name}}}^{{{idx}}})"
-            for idx in range(self.polyorder)
-        ]
-        #        eqn[0] = ""
-        return eqn
+    def to_gradient(self, prior_distributions=None):
+        weights = [fit if fit is not None else prior for fit, prior in zip(self.fit_mean, self.prior_mean)]
+        return dPolynomial(weights=weights[1:],
+                            x_name=self.x_name,
+                            polyorder=self.polyorder - 1,
+                            prior_distributions=prior_distributions)
 
 
-class ConstantGenerator(Polynomial1DGenerator):
-    def __init__(
-            self,
-            x_name: str = "x",
-            prior_mu=None,
-            prior_sigma=None,
-            offset_prior=None,
-            data_shape=None,
-        ):
-    
-       return super().__init__(x_name=x_name, polyorder=0, prior_mu=prior_mu, prior_sigma=prior_sigma, offset_prior=offset_prior, data_shape=data_shape)
-        
 
-class SinusoidGenerator(MathMixins, Generator):
+class dPolynomial(MathMixins, Model):
     def __init__(
         self,
+        weights: List,
         x_name: str = "x",
-        nterms: int = 1,
-        prior_mu=None,
-        prior_sigma=None,
-        offset_prior=None,
-        data_shape=None,
-    ):
-        self.nterms = nterms
-        self.data_shape = data_shape
+        polyorder: int = 3,
+        prior_distributions=None,
+    ):        
+        if polyorder < 1:
+            raise ValueError("Must have polyorder >= 1.")
         self.x_name = x_name
         self._validate_arg_names()
-        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
-        self.fit_mu = None
-        self.fit_sigma = None
+        self.polyorder = polyorder
+        self.weights = weights
+        super().__init__(prior_distributions=prior_distributions)
 
     @property
     def width(self):
-        return (self.nterms * 2) + 1
+        return 1
 
     @property
     def nvectors(self):
@@ -230,18 +89,7 @@ class SinusoidGenerator(MathMixins, Generator):
     def arg_names(self):
         return {self.x_name}
 
-    @property
-    def _INIT_ATTRS(self):
-        return [
-            "x_name",
-            "prior_mu",
-            "prior_sigma",
-            "offset_prior",
-            "data_shape",
-            "nterms",
-        ]
-
-    def design_matrix(self, *args, **kwargs):
+    def design_matrix(self, **kwargs):
         """Build a 1D polynomial in x
 
         Parameters
@@ -259,7 +107,44 @@ class SinusoidGenerator(MathMixins, Generator):
         x = kwargs.get(self.x_name).ravel()
         return np.vstack(
             [
-                x**0,
+                (idx + 1) * x**idx
+                for idx in range(1, self.polyorder + 1)
+            ]
+        ).T.dot(self.weights)[:, None]
+
+
+
+class Sinusoid(MathMixins, Model):
+    def __init__(
+        self,
+        x_name: str = "x",
+        nterms: int = 1,
+        prior_distributions=None,
+    ):        
+        
+        self.x_name = x_name
+        self._validate_arg_names()
+        self.nterms = nterms
+        super().__init__(prior_distributions=prior_distributions)
+
+    @property
+    def width(self):
+        return (self.nterms * 2)
+
+    @property
+    def nvectors(self):
+        return 1
+
+    @property
+    def arg_names(self):
+        return {self.x_name}
+    
+    def design_matrix(self, **kwargs):
+        if not self.arg_names.issubset(set(kwargs.keys())):
+            raise ValueError(f"Expected {self.arg_names} to be passed.")
+        x = kwargs.get(self.x_name).ravel()
+        return np.vstack(
+            [
                 *[
                     [np.sin(x * (idx + 1)), np.cos(x * (idx + 1))]
                     for idx in range(self.nterms)
@@ -267,60 +152,30 @@ class SinusoidGenerator(MathMixins, Generator):
             ]
         ).T
 
-    def fit(self, *args, **kwargs):
-        self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
-
-    @property
-    def _equation(self):
-        def frq(term):
-            return f"{term + 1}" if term > 0 else ""
-
-        return np.hstack(
-            [
-                f"\\mathbf{{{self.x_name}}}^0",
-                *[
-                    [
-                        f"\sin({frq(idx)}\\mathbf{{{self.x_name}}})",
-                        f"\cos({frq(idx)}\\mathbf{{{self.x_name}}})",
-                    ]
-                    for idx in range(self.nterms)
-                ],
-            ]
-        )
-
-    @property
-    def gradient(self):
-        return dSinusoidGenerator(
-            nterms=self.nterms,
-            weights=self.mu,
-            x_name=self.x_name,
-            data_shape=self.data_shape,
-        )
+    def to_gradient(self, prior_distributions=None):
+        weights = [fit if fit is not None else prior for fit, prior in zip(self.fit_mean, self.prior_mean)]
+        return dSinusoid(weights=weights, x_name=self.x_name, nterms=self.nterms, prior_distributions=prior_distributions)
 
 
-class dSinusoidGenerator(MathMixins, Generator):
+
+class dSinusoid(MathMixins, Model):
     def __init__(
         self,
-        weights: list,
+        weights : List,
         x_name: str = "x",
         nterms: int = 1,
-        prior_mu=None,
-        prior_sigma=None,
-        offset_prior=None,
-        data_shape=None,
-    ):
-        self.nterms = nterms
-        self.weights = weights
-        self.data_shape = data_shape
+        prior_distributions=None,
+    ):        
+        
         self.x_name = x_name
         self._validate_arg_names()
-        self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
-        self.fit_mu = None
-        self.fit_sigma = None
+        self.nterms = nterms
+        self.weights = weights
+        super().__init__(prior_distributions=prior_distributions)
 
     @property
     def width(self):
-        return (self.nterms * 2) + 1
+        return 1
 
     @property
     def nvectors(self):
@@ -329,21 +184,10 @@ class dSinusoidGenerator(MathMixins, Generator):
     @property
     def arg_names(self):
         return {self.x_name}
+  
 
-    @property
-    def _INIT_ATTRS(self):
-        return [
-            "weights",
-            "x_name",
-            "prior_mu",
-            "prior_sigma",
-            "offset_prior",
-            "data_shape",
-            "nterms",
-        ]
-
-    def design_matrix(self, *args, **kwargs):
-        """Build a 1D polynomial in x
+    def design_matrix(self, **kwargs):
+        """
 
         Parameters
         ----------
@@ -360,39 +204,452 @@ class dSinusoidGenerator(MathMixins, Generator):
         x = kwargs.get(self.x_name).ravel()
         return np.vstack(
             [
-                x**0,
                 *[
                     [w1 * np.cos(x * (idx + 1)), -w2 * np.sin(x * (idx + 1))]
                     for idx, w1, w2 in zip(
                         range(self.nterms),
-                        self.weights[1:][::2],
-                        self.weights[1:][1::2],
+                        self.weights[::2],
+                        self.weights[1::2],
                     )
                 ],
             ]
-        ).T
+        ).T.sum(axis=1)[:, None]
 
-    def fit(self, *args, **kwargs):
-        self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+
+class Constant(MathMixins, Model):
+    """
+    A generator which has no variable, and whos design matrix is entirely ones.
+    """
+    def __init__(self, prior_distributions=None):
+        super().__init__(prior_distributions=prior_distributions)
 
     @property
-    def _equation(self):
-        def frq(term):
-            return f"{term + 1}" if term > 0 else ""
+    def width(self):
+        return 1
 
-        return np.hstack(
-            [
-                f"\\mathbf{{{self.x_name}}}^0",
-                *[
-                    [
-                        f"w_{{{idx * 2 + 1}}}\cos({frq(idx)}\\mathbf{{{self.x_name}}})",
-                        f"w_{{{idx * 2 + 2}}}(-\sin({frq(idx)}\\mathbf{{{self.x_name}}}))",
-                    ]
-                    for idx in range(self.nterms)
-                ],
-            ]
-        )
+    @property
+    def nvectors(self):
+        return 0
+
+    @property
+    def arg_names(self):
+        return {}
     
-    @property
-    def _mu_letter(self):
-        return "v"
+
+    def design_matrix(self, **kwargs):
+        """Build a 1D polynomial in x
+
+        Parameters
+        ----------
+        {} : np.ndarray
+            Vector to create polynomial of
+
+        Returns
+        -------
+        X : np.ndarray
+            Design matrix with shape (len(x), self.nvectors)
+        """
+        if len(kwargs) < 1:
+            raise ValueError("Cannot create design matrix without regressors.")
+
+        x = np.ones_like(next(iter(kwargs.values())))
+        return np.atleast_2d(x).T
+
+
+
+
+
+    # @property
+    # def gradient(self):
+    #     return dPolynomial1DGenerator(
+    #         weights=self._mu,
+    #         x_name=self.x_name,
+    #         polyorder=self.polyorder,
+    #         data_shape=self.data_shape,
+    #         offset_prior=(self._mu[1], self._sigma[1]),
+    #     )
+
+
+
+# class Polynomial1DGenerator(MathMixins, Generator):
+#     def __init__(
+#         self,
+#         x_name: str = "x",
+#         polyorder: int = 3,
+#         prior_mu=None,
+#         prior_sigma=None,
+#         offset_prior=None,
+#         data_shape=None,
+#     ):
+#         self.x_name = x_name
+#         self._validate_arg_names()
+#         self.polyorder = polyorder
+#         self.data_shape = data_shape
+#         self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
+#         self.fit_mu = None
+#         self.fit_sigma = None
+
+#     @property
+#     def width(self):
+#         return self.polyorder + 1
+
+#     @property
+#     def nvectors(self):
+#         return 1
+
+#     @property
+#     def arg_names(self):
+#         return {self.x_name}
+
+#     @property
+#     def _INIT_ATTRS(self):
+#         return [
+#             "x_name",
+#             "prior_mu",
+#             "prior_sigma",
+#             "offset_prior",
+#             "data_shape",
+#             "polyorder",
+#         ]
+
+#     def design_matrix(self, *args, **kwargs):
+#         """Build a 1D polynomial in x
+
+#         Parameters
+#         ----------
+#         {} : np.ndarray
+#             Vector to create polynomial of
+
+#         Returns
+#         -------
+#         X : np.ndarray
+#             Design matrix with shape (len(x), self.nvectors)
+#         """
+#         if not self.arg_names.issubset(set(kwargs.keys())):
+#             raise ValueError(f"Expected {self.arg_names} to be passed.")
+#         x = kwargs.get(self.x_name).ravel()
+#         return np.vstack([x**idx for idx in range(self.polyorder + 1)]).T
+
+#     def fit(self, *args, **kwargs):
+#         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+
+#     @property
+#     def offset(self):
+#         return self.mu[0], self.sigma[0]
+
+#     @property
+#     def _equation(self):
+#         eqn = [
+#             f"\mathbf{{{self.x_name}}}^{{{idx}}}" for idx in range(self.polyorder + 1)
+#         ]
+#         #        eqn[0] = ""
+#         return eqn
+
+#     @property
+#     def gradient(self):
+#         return dPolynomial1DGenerator(
+#             weights=self.mu,
+#             x_name=self.x_name,
+#             polyorder=self.polyorder,
+#             data_shape=self.data_shape,
+#             offset_prior=(self.mu[1], self.sigma[1]),
+#         )
+
+
+# class dPolynomial1DGenerator(MathMixins, Generator):
+#     def __init__(
+#         self,
+#         weights: list,
+#         x_name: str = "x",
+#         polyorder: int = 3,
+#         prior_mu=None,
+#         prior_sigma=None,
+#         offset_prior=None,
+#         data_shape=None,
+#     ):
+#         self.weights = weights
+#         self.x_name = x_name
+#         self._validate_arg_names()
+#         self.polyorder = polyorder
+#         self.data_shape = data_shape
+#         self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
+#         self.fit_mu = None
+#         self.fit_sigma = None
+
+#     @property
+#     def width(self):
+#         return self.polyorder
+
+#     @property
+#     def nvectors(self):
+#         return 1
+
+#     @property
+#     def arg_names(self):
+#         return {self.x_name}
+
+#     @property
+#     def _INIT_ATTRS(self):
+#         return [
+#             "weights",
+#             "x_name",
+#             "prior_mu",
+#             "prior_sigma",
+#             "offset_prior",
+#             "data_shape",
+#             "polyorder",
+#         ]
+
+#     def design_matrix(self, *args, **kwargs):
+#         """Build a 1D polynomial in x
+
+#         Parameters
+#         ----------
+#         {} : np.ndarray
+#             Vector to create polynomial of
+
+#         Returns
+#         -------
+#         X : np.ndarray
+#             Design matrix with shape (len(x), self.nvectors)
+#         """
+#         if not self.arg_names.issubset(set(kwargs.keys())):
+#             raise ValueError(f"Expected {self.arg_names} to be passed.")
+#         x = kwargs.get(self.x_name).ravel()
+#         return np.vstack(
+#             [
+#                 (idx + 1) * w * x**idx
+#                 for idx, w in zip(range(self.polyorder), self.weights[1:])
+#             ]
+#         ).T
+
+#     def fit(self, *args, **kwargs):
+#         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+
+#     @property
+#     def offset(self):
+#         return self.mu[0], self.sigma[0]
+
+#     @property
+#     def _mu_letter(self):
+#         return "v"
+
+#     @property
+#     def _equation(self):
+#         eqn = [
+#             f"({idx + 1}w_{{{idx + 1}}}\mathbf{{{self.x_name}}}^{{{idx}}})"
+#             for idx in range(self.polyorder)
+#         ]
+#         #        eqn[0] = ""
+#         return eqn
+
+
+# class ConstantGenerator(Polynomial1DGenerator):
+#     def __init__(
+#             self,
+#             x_name: str = "x",
+#             prior_mu=None,
+#             prior_sigma=None,
+#             offset_prior=None,
+#             data_shape=None,
+#         ):
+    
+#        return super().__init__(x_name=x_name, polyorder=0, prior_mu=prior_mu, prior_sigma=prior_sigma, offset_prior=offset_prior, data_shape=data_shape)
+        
+
+# class SinusoidGenerator(MathMixins, Generator):
+#     def __init__(
+#         self,
+#         x_name: str = "x",
+#         nterms: int = 1,
+#         prior_mu=None,
+#         prior_sigma=None,
+#         offset_prior=None,
+#         data_shape=None,
+#     ):
+#         self.nterms = nterms
+#         self.data_shape = data_shape
+#         self.x_name = x_name
+#         self._validate_arg_names()
+#         self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
+#         self.fit_mu = None
+#         self.fit_sigma = None
+
+#     @property
+#     def width(self):
+#         return (self.nterms * 2) + 1
+
+#     @property
+#     def nvectors(self):
+#         return 1
+
+#     @property
+#     def arg_names(self):
+#         return {self.x_name}
+
+#     @property
+#     def _INIT_ATTRS(self):
+#         return [
+#             "x_name",
+#             "prior_mu",
+#             "prior_sigma",
+#             "offset_prior",
+#             "data_shape",
+#             "nterms",
+#         ]
+
+#     def design_matrix(self, *args, **kwargs):
+#         """Build a 1D polynomial in x
+
+#         Parameters
+#         ----------
+#         {} : np.ndarray
+#             Vector to create polynomial of
+
+#         Returns
+#         -------
+#         X : np.ndarray
+#             Design matrix with shape (len(x), self.nvectors)
+#         """
+#         if not self.arg_names.issubset(set(kwargs.keys())):
+#             raise ValueError(f"Expected {self.arg_names} to be passed.")
+#         x = kwargs.get(self.x_name).ravel()
+#         return np.vstack(
+#             [
+#                 x**0,
+#                 *[
+#                     [np.sin(x * (idx + 1)), np.cos(x * (idx + 1))]
+#                     for idx in range(self.nterms)
+#                 ],
+#             ]
+#         ).T
+
+#     def fit(self, *args, **kwargs):
+#         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+
+#     @property
+#     def _equation(self):
+#         def frq(term):
+#             return f"{term + 1}" if term > 0 else ""
+
+#         return np.hstack(
+#             [
+#                 f"\\mathbf{{{self.x_name}}}^0",
+#                 *[
+#                     [
+#                         f"\sin({frq(idx)}\\mathbf{{{self.x_name}}})",
+#                         f"\cos({frq(idx)}\\mathbf{{{self.x_name}}})",
+#                     ]
+#                     for idx in range(self.nterms)
+#                 ],
+#             ]
+#         )
+
+#     @property
+#     def gradient(self):
+#         return dSinusoidGenerator(
+#             nterms=self.nterms,
+#             weights=self.mu,
+#             x_name=self.x_name,
+#             data_shape=self.data_shape,
+#         )
+
+
+# class dSinusoidGenerator(MathMixins, Generator):
+#     def __init__(
+#         self,
+#         weights: list,
+#         x_name: str = "x",
+#         nterms: int = 1,
+#         prior_mu=None,
+#         prior_sigma=None,
+#         offset_prior=None,
+#         data_shape=None,
+#     ):
+#         self.nterms = nterms
+#         self.weights = weights
+#         self.data_shape = data_shape
+#         self.x_name = x_name
+#         self._validate_arg_names()
+#         self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
+#         self.fit_mu = None
+#         self.fit_sigma = None
+
+#     @property
+#     def width(self):
+#         return (self.nterms * 2) + 1
+
+#     @property
+#     def nvectors(self):
+#         return 1
+
+#     @property
+#     def arg_names(self):
+#         return {self.x_name}
+
+#     @property
+#     def _INIT_ATTRS(self):
+#         return [
+#             "weights",
+#             "x_name",
+#             "prior_mu",
+#             "prior_sigma",
+#             "offset_prior",
+#             "data_shape",
+#             "nterms",
+#         ]
+
+#     def design_matrix(self, *args, **kwargs):
+#         """Build a 1D polynomial in x
+
+#         Parameters
+#         ----------
+#         {} : np.ndarray
+#             Vector to create polynomial of
+
+#         Returns
+#         -------
+#         X : np.ndarray
+#             Design matrix with shape (len(x), self.nvectors)
+#         """
+#         if not self.arg_names.issubset(set(kwargs.keys())):
+#             raise ValueError(f"Expected {self.arg_names} to be passed.")
+#         x = kwargs.get(self.x_name).ravel()
+#         return np.vstack(
+#             [
+#                 x**0,
+#                 *[
+#                     [w1 * np.cos(x * (idx + 1)), -w2 * np.sin(x * (idx + 1))]
+#                     for idx, w1, w2 in zip(
+#                         range(self.nterms),
+#                         self.weights[1:][::2],
+#                         self.weights[1:][1::2],
+#                     )
+#                 ],
+#             ]
+#         ).T
+
+#     def fit(self, *args, **kwargs):
+#         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)
+
+#     @property
+#     def _equation(self):
+#         def frq(term):
+#             return f"{term + 1}" if term > 0 else ""
+
+#         return np.hstack(
+#             [
+#                 f"\\mathbf{{{self.x_name}}}^0",
+#                 *[
+#                     [
+#                         f"w_{{{idx * 2 + 1}}}\cos({frq(idx)}\\mathbf{{{self.x_name}}})",
+#                         f"w_{{{idx * 2 + 2}}}(-\sin({frq(idx)}\\mathbf{{{self.x_name}}}))",
+#                     ]
+#                     for idx in range(self.nterms)
+#                 ],
+#             ]
+#         )
+    
+#     @property
+#     def _mu_letter(self):
+#         return "v"
