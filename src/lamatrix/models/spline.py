@@ -7,7 +7,7 @@ from ..math import MathMixins
 __all__ = [
     "Spline",
     "dSpline",
-#    "dSpline1DGenerator",
+    #    "dSpline1DGenerator",
 ]
 
 
@@ -22,7 +22,7 @@ class SplineMixins:
         x : position where the basis function is evaluated
         """
         if k == 1:
-            #return 1.0 if t[i] <= x < t[i + 1] else 0.0
+            # return 1.0 if t[i] <= x < t[i + 1] else 0.0
             return ((x < t[i + 1]) & (t[i] <= x)).astype(float)
         else:
             div0 = t[i + k - 1] - t[i]
@@ -64,17 +64,14 @@ class SplineMixins:
             return 0  # The derivative of a constant (k=1) function is 0
 
 
-
-
-
 class Spline(MathMixins, SplineMixins, Model):
     def __init__(
         self,
         x_name: str = "x",
-        knots:np.ndarray = np.arange(1, 1, 0.3),
+        knots: np.ndarray = np.arange(1, 1, 0.3),
         splineorder: int = 3,
         prior_distributions=None,
-    ):        
+    ):
         if splineorder < 1:
             raise ValueError("Must have splineorder >= 1.")
         self.x_name = x_name
@@ -93,7 +90,7 @@ class Spline(MathMixins, SplineMixins, Model):
 
     @property
     def arg_names(self):
-        return {self.x_name}    
+        return {self.x_name}
 
     def design_matrix(self, **kwargs):
         """Build a 1D spline in x
@@ -115,31 +112,32 @@ class Spline(MathMixins, SplineMixins, Model):
         # Set up the least squares problem
         X = np.zeros((len(x), self.width))
         for i in range(self.width):
-            X[:, i] = self.bspline_basis(
-                k=self.splineorder, i=i, t=self.knots, x=x
-            )
+            X[:, i] = self.bspline_basis(k=self.splineorder, i=i, t=self.knots, x=x)
         return X
 
-
     def to_gradient(self, prior_distributions=None):
-        weights = [fit if fit is not None else prior for fit, prior in zip(self.fit_mean, self.prior_mean)]
-        return dSpline(weights=weights,
-                        x_name=self.x_name,
-                        knots=self.knots,
-                        splineorder=self.splineorder,
-                        prior_distributions=prior_distributions)
-
+        weights = [
+            fit if fit is not None else prior
+            for fit, prior in zip(self.fit_mean, self.prior_mean)
+        ]
+        return dSpline(
+            weights=weights,
+            x_name=self.x_name,
+            knots=self.knots,
+            splineorder=self.splineorder,
+            prior_distributions=prior_distributions,
+        )
 
 
 class dSpline(MathMixins, SplineMixins, Model):
     def __init__(
         self,
-        weights : List,
+        weights: List,
         x_name: str = "x",
-        knots:np.ndarray = np.arange(1, 1, 0.3),
+        knots: np.ndarray = np.arange(1, 1, 0.3),
         splineorder: int = 3,
         prior_distributions=None,
-    ):        
+    ):
         if splineorder < 1:
             raise ValueError("Must have splineorder >= 1.")
         self.x_name = x_name
@@ -159,7 +157,7 @@ class dSpline(MathMixins, SplineMixins, Model):
 
     @property
     def arg_names(self):
-        return {self.x_name}    
+        return {self.x_name}
 
     def design_matrix(self, **kwargs):
         if not self.arg_names.issubset(set(kwargs.keys())):
@@ -173,9 +171,6 @@ class dSpline(MathMixins, SplineMixins, Model):
                 k=self.splineorder, i=i, t=self.knots, x=x
             )
         return X.dot(self.weights)[:, None]
-
-
-
 
 
 # class Spline1DGenerator(MathMixins, SplineMixins, Generator):
@@ -275,8 +270,8 @@ class dSpline(MathMixins, SplineMixins, Model):
 #     def to_latex(self):
 #         eqn1 = f"\\begin{{equation}}\\label{{eq:spline}}f(\\mathbf{{{self.x_name}}}) = \sum_{{i=0}}^{{n-1}} w_i N_{{i,k}}(\\mathbf{{{self.x_name}}}) \\]\\end{{equation}}"
 #         eqn2 = f"\\[N_{{i,k}}(\\mathbf{{{self.x_name}}}) = \\frac{{\\mathbf{{{self.x_name}}} - t_i}}{{t_{{i+k-1}} - t_i}} N_{{i,k-1}}(\\mathbf{{{self.x_name}}}) + \\frac{{t_{{i+k}} - \\mathbf{{{self.x_name}}}}}{{t_{{i+k}} - t_{{i+1}}}} N_{{i+1,k-1}}(\\mathbf{{{self.x_name}}})\\]"
-#         eqn3 = f"""\\[N_{{i,1}}(\\mathbf{{{self.x_name}}}) = 
-#         \\begin{{cases}} 
+#         eqn3 = f"""\\[N_{{i,1}}(\\mathbf{{{self.x_name}}}) =
+#         \\begin{{cases}}
 #         1 & \\text{{if }} t_i \leq \\mathbf{{{self.x_name}}} < t_{{i+1}} \\\\
 #         0 & \\text{{otherwise}} \\\\
 #         \\end{{cases}}

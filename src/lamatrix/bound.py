@@ -31,7 +31,7 @@
 
 #     def _bounds_to_latex(self, bounds):
 #         bound_latex = [
-#             f"""\\[b_{{{idx}}}(\\mathbf{{{self.x_name}}}) = 
+#             f"""\\[b_{{{idx}}}(\\mathbf{{{self.x_name}}}) =
 #         \\begin{{cases}}
 #         \\mathbf{{{self.x_name}}}, & \\text{{if }} {bound[0]} < \\mathbf{{{self.x_name}}} \\leq {bound[1]} \\\\
 #         0, & \\text{{otherwise}}
@@ -49,7 +49,7 @@
 #             def_str1 = ", ".join([f"{s}" for s in np.arange(0, 3)])
 #         def_str = f"For $i = {def_str1}, \\ldots, {nbounds} $ define:"
 #         bound_latex = [
-#             f"""b_{{i}}(\\mathbf{{{self.x_name}}}) = 
+#             f"""b_{{i}}(\\mathbf{{{self.x_name}}}) =
 #         \\begin{{cases}}
 #         \\mathbf{{{self.x_name}}}, & \\text{{if }} ({start} + {step_str}i)  < \\mathbf{{{self.x_name}}} \\leq ({start} + {step_str}(i + 1)) \\\\
 #         0, & \\text{{otherwise}}

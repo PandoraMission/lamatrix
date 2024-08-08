@@ -17,11 +17,11 @@ class MathMixins:
 
     def __mul__(self, other):
         if (self.arg_names == {}) & (other.arg_names == {}):
-            raise ValueError("Can not multiply offset terms.")
+            return other
         if (self.arg_names == {}) ^ (other.arg_names == {}):
-            if (self.arg_names == {}):
+            if self.arg_names == {}:
                 return other
-            elif (other.arg_names == {}):
+            elif other.arg_names == {}:
                 return self
         if isinstance(other, CrosstermModel):
             return CrosstermModel(self, *other.models)

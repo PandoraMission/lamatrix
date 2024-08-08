@@ -1,13 +1,20 @@
 import numpy as np
 
-from lamatrix import (BoundedGenerator, Polynomial1DGenerator,
-                      SinusoidGenerator, Spline1DGenerator,
-                      StackedIndependentGenerator, lnGaussian1DGenerator, dlnGaussian2DGenerator,
-                      lnGaussian2DGenerator, load)
+from lamatrix import (
+    BoundedGenerator,
+    Polynomial1DGenerator,
+    SinusoidGenerator,
+    Spline1DGenerator,
+    StackedIndependentGenerator,
+    lnGaussian1DGenerator,
+    dlnGaussian2DGenerator,
+    lnGaussian2DGenerator,
+    load,
+)
 
 
 def test_lngauss1d():
-    g = lnGaussian1DGenerator('r')
+    g = lnGaussian1DGenerator("r")
     r = np.arange(-2, 2, 0.1)
     true_w = np.random.normal(size=g.width)
     true_w[1] = -np.abs(true_w[1])
@@ -18,7 +25,8 @@ def test_lngauss1d():
     g2 = StackedIndependentGenerator(g, g.gradient)
     g2.fit(r=r, data=data, errors=errors)
     assert np.isclose(-g2[1].shift[0], 0.2, atol=g2[1].shift[1] * 2)
-    
+
+
 def test_lngauss2d():
     column, row = np.meshgrid(
         np.arange(-10, 10, 0.2), np.arange(-10, 10, 0.2), indexing="ij"

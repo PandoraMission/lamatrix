@@ -13,13 +13,14 @@ __all__ = [
     "dSinusoid",
 ]
 
+
 class Polynomial(MathMixins, Model):
     def __init__(
         self,
         x_name: str = "x",
         polyorder: int = 3,
         prior_distributions=None,
-    ):        
+    ):
         if polyorder < 1:
             raise ValueError("Must have polyorder >= 1.")
         self.x_name = x_name
@@ -53,12 +54,16 @@ class Polynomial(MathMixins, Model):
         return np.vstack([x**idx for idx in range(1, self.polyorder + 1)]).T
 
     def to_gradient(self, prior_distributions=None):
-        weights = [fit if fit is not None else prior for fit, prior in zip(self.fit_mean, self.prior_mean)]
-        return dPolynomial(weights=weights[1:],
-                            x_name=self.x_name,
-                            polyorder=self.polyorder - 1,
-                            prior_distributions=prior_distributions)
-
+        weights = [
+            fit if fit is not None else prior
+            for fit, prior in zip(self.fit_mean, self.prior_mean)
+        ]
+        return dPolynomial(
+            weights=weights[1:],
+            x_name=self.x_name,
+            polyorder=self.polyorder - 1,
+            prior_distributions=prior_distributions,
+        )
 
 
 class dPolynomial(MathMixins, Model):
@@ -68,7 +73,7 @@ class dPolynomial(MathMixins, Model):
         x_name: str = "x",
         polyorder: int = 3,
         prior_distributions=None,
-    ):        
+    ):
         if polyorder < 1:
             raise ValueError("Must have polyorder >= 1.")
         self.x_name = x_name
@@ -106,12 +111,8 @@ class dPolynomial(MathMixins, Model):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name).ravel()
         return np.vstack(
-            [
-                (idx + 1) * x**idx
-                for idx in range(1, self.polyorder + 1)
-            ]
+            [(idx + 1) * x**idx for idx in range(1, self.polyorder + 1)]
         ).T.dot(self.weights)[:, None]
-
 
 
 class Sinusoid(MathMixins, Model):
@@ -120,8 +121,8 @@ class Sinusoid(MathMixins, Model):
         x_name: str = "x",
         nterms: int = 1,
         prior_distributions=None,
-    ):        
-        
+    ):
+
         self.x_name = x_name
         self._validate_arg_names()
         self.nterms = nterms
@@ -129,7 +130,7 @@ class Sinusoid(MathMixins, Model):
 
     @property
     def width(self):
-        return (self.nterms * 2)
+        return self.nterms * 2
 
     @property
     def nvectors(self):
@@ -138,7 +139,7 @@ class Sinusoid(MathMixins, Model):
     @property
     def arg_names(self):
         return {self.x_name}
-    
+
     def design_matrix(self, **kwargs):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
@@ -153,20 +154,27 @@ class Sinusoid(MathMixins, Model):
         ).T
 
     def to_gradient(self, prior_distributions=None):
-        weights = [fit if fit is not None else prior for fit, prior in zip(self.fit_mean, self.prior_mean)]
-        return dSinusoid(weights=weights, x_name=self.x_name, nterms=self.nterms, prior_distributions=prior_distributions)
-
+        weights = [
+            fit if fit is not None else prior
+            for fit, prior in zip(self.fit_mean, self.prior_mean)
+        ]
+        return dSinusoid(
+            weights=weights,
+            x_name=self.x_name,
+            nterms=self.nterms,
+            prior_distributions=prior_distributions,
+        )
 
 
 class dSinusoid(MathMixins, Model):
     def __init__(
         self,
-        weights : List,
+        weights: List,
         x_name: str = "x",
         nterms: int = 1,
         prior_distributions=None,
-    ):        
-        
+    ):
+
         self.x_name = x_name
         self._validate_arg_names()
         self.nterms = nterms
@@ -184,7 +192,6 @@ class dSinusoid(MathMixins, Model):
     @property
     def arg_names(self):
         return {self.x_name}
-  
 
     def design_matrix(self, **kwargs):
         """
@@ -220,6 +227,7 @@ class Constant(MathMixins, Model):
     """
     A generator which has no variable, and whos design matrix is entirely ones.
     """
+
     def __init__(self, prior_distributions=None):
         super().__init__(prior_distributions=prior_distributions)
 
@@ -234,7 +242,6 @@ class Constant(MathMixins, Model):
     @property
     def arg_names(self):
         return {}
-    
 
     def design_matrix(self, **kwargs):
         """Build a 1D polynomial in x
@@ -255,10 +262,6 @@ class Constant(MathMixins, Model):
         x = np.ones_like(next(iter(kwargs.values())))
         return np.atleast_2d(x).T
 
-
-
-
-
     # @property
     # def gradient(self):
     #     return dPolynomial1DGenerator(
@@ -268,7 +271,6 @@ class Constant(MathMixins, Model):
     #         data_shape=self.data_shape,
     #         offset_prior=(self._mu[1], self._sigma[1]),
     #     )
-
 
 
 # class Polynomial1DGenerator(MathMixins, Generator):
@@ -453,9 +455,9 @@ class Constant(MathMixins, Model):
 #             offset_prior=None,
 #             data_shape=None,
 #         ):
-    
+
 #        return super().__init__(x_name=x_name, polyorder=0, prior_mu=prior_mu, prior_sigma=prior_sigma, offset_prior=offset_prior, data_shape=data_shape)
-        
+
 
 # class SinusoidGenerator(MathMixins, Generator):
 #     def __init__(
@@ -649,7 +651,7 @@ class Constant(MathMixins, Model):
 #                 ],
 #             ]
 #         )
-    
+
 #     @property
 #     def _mu_letter(self):
 #         return "v"

@@ -1,9 +1,11 @@
 """Classes and methods to combine models"""
+
 from .model import Model
 import itertools
 import numpy as np
 
-__all__ = ["JointModel"]
+__all__ = ["JointModel", "CrosstermModel"]
+
 
 def combine_matrices(*matrices):
     if len(matrices) == 1:
@@ -16,7 +18,7 @@ def combine_matrices(*matrices):
         return np.hstack(combine_matrices(combined, *matrices[2:]))
     else:
         return np.hstack(combined)
-    
+
 
 class JointModel(Model):
     def __init__(self, *args):
@@ -26,12 +28,14 @@ class JointModel(Model):
         self.models = [a.copy() for a in args]
         self.widths = [g.width for g in self.models]
         self.fit_distributions = [(None, None)] * np.sum(self.widths)
-    
+
     def __getitem__(self, key):
         return self.models[key]
 
     def __repr__(self):
-        return f"{type(self).__name__}\n\t" + "\n\t".join([g.__repr__() for g in self.models])
+        return f"{type(self).__name__}\n\t" + "\n\t".join(
+            [g.__repr__() for g in self.models]
+        )
 
     def set_prior(self, index, distribution):
         cs = np.cumsum(self.widths)
@@ -42,7 +46,9 @@ class JointModel(Model):
     def set_priors(self, distributions):
         cs = [0, *np.cumsum(self.widths)]
         for idx, g in enumerate(self.models):
-            g.set_priors([distributions[jdx] for jdx in np.arange(cs[idx], cs[idx + 1])])
+            g.set_priors(
+                [distributions[jdx] for jdx in np.arange(cs[idx], cs[idx + 1])]
+            )
 
     @property
     def arg_names(self):
@@ -54,11 +60,23 @@ class JointModel(Model):
 
     @property
     def prior_mean(self):
-        return np.asarray([distribution[0] for g in self.models for distribution in g.prior_distributions])
+        return np.asarray(
+            [
+                distribution[0]
+                for g in self.models
+                for distribution in g.prior_distributions
+            ]
+        )
 
     @property
     def prior_std(self):
-        return np.asarray([distribution[1] for g in self.models for distribution in g.prior_distributions])
+        return np.asarray(
+            [
+                distribution[1]
+                for g in self.models
+                for distribution in g.prior_distributions
+            ]
+        )
 
     @property
     def fit_mean(self):
@@ -78,7 +96,7 @@ class JointModel(Model):
     @property
     def nvectors(self):
         return np.sum([g.nvectors for g in self.models])
-    
+
     def fit(self, *args, **kwargs):
         super().fit(*args, **kwargs)
         means = np.array_split(self.fit_mean, np.cumsum(self.widths)[:-1])
@@ -93,7 +111,9 @@ class JointModel(Model):
             return self
         if isinstance(other, JointModel):
             if has_constant:
-                return JointModel(*self.models, *[g for g in other.models if not g.arg_names == {}])
+                return JointModel(
+                    *self.models, *[g for g in other.models if not g.arg_names == {}]
+                )
             else:
                 return JointModel(*self.models, *other.models)
         elif isinstance(other, Model):
@@ -123,6 +143,31 @@ class CrosstermModel(Model):
         self.models = [a.copy() for a in args]
         self.widths = [g.width for g in self.models]
         self.fit_distributions = [(None, None)] * np.prod(self.widths)
+        prior_mean = np.asarray(
+            [
+                np.sum(i)
+                for i in itertools.product(
+                    *[
+                        [distribution[0] for distribution in g.prior_distributions]
+                        for g in self.models
+                    ]
+                )
+            ]
+        )
+        prior_std = np.asarray(
+            [
+                np.prod(i)
+                for i in itertools.product(
+                    *[
+                        [distribution[1] for distribution in g.prior_distributions]
+                        for g in self.models
+                    ]
+                )
+            ]
+        )
+        prior_distributions = [(m, s) for m, s in zip(prior_mean, prior_std)]
+        self._validate_distributions(prior_distributions)
+        self.prior_distributions = prior_distributions
 
     @property
     def arg_names(self):
@@ -135,18 +180,39 @@ class CrosstermModel(Model):
     @property
     def nvectors(self):
         return np.sum([g.nvectors for g in self.models])
-    
-    @property
-    def prior_distributions(self):
-        return [(m, s) for m, s in zip(self.prior_mean, self.prior_std)]
 
-    @property
-    def prior_mean(self):
-        return np.asarray([np.sum(i) for i in itertools.product(*[[distribution[0] for distribution in g.prior_distributions] for g in self.models])])
+    # @property
+    # def prior_distributions(self):
+    #     return [(m, s) for m, s in zip(self.prior_mean, self.prior_std)]
 
-    @property
-    def prior_std(self):
-        return np.asarray([np.prod(i) for i in itertools.product(*[[distribution[1] for distribution in g.prior_distributions] for g in self.models])])
+
+    # @property
+    # def prior_mean(self):
+    #     return np.asarray(
+    #         [
+    #             np.sum(i)
+    #             for i in itertools.product(
+    #                 *[
+    #                     [distribution[0] for distribution in g.prior_distributions]
+    #                     for g in self.models
+    #                 ]
+    #             )
+    #         ]
+    #     )
+
+    # @property
+    # def prior_std(self):
+    #     return np.asarray(
+    #         [
+    #             np.prod(i)
+    #             for i in itertools.product(
+    #                 *[
+    #                     [distribution[1] for distribution in g.prior_distributions]
+    #                     for g in self.models
+    #                 ]
+    #             )
+    #         ]
+    #     )
 
     @property
     def fit_mean(self):
@@ -157,8 +223,15 @@ class CrosstermModel(Model):
         return np.asarray([distribution[1] for distribution in self.fit_distributions])
 
     def design_matrix(self, **kwargs):
-        return np.asarray([np.prod(i, axis=0) for i in itertools.product(*[g.design_matrix(**kwargs).T for g in self.models])]).T
-    
+        return np.asarray(
+            [
+                np.prod(i, axis=0)
+                for i in itertools.product(
+                    *[g.design_matrix(**kwargs).T for g in self.models]
+                )
+            ]
+        ).T
+
     def fit(self, *args, **kwargs):
         super().fit(*args, **kwargs)
 
@@ -172,7 +245,6 @@ class CrosstermModel(Model):
         else:
             raise ValueError("Can only combine `Model` objects.")
 
-
     def __mul__(self, other):
         if isinstance(other, CrosstermModel):
             raise ValueError
@@ -184,7 +256,6 @@ class CrosstermModel(Model):
             raise ValueError("Can only combine `Model` objects.")
 
 
-
 # class CrosstermGenerator(Generator):
 #     def __init__(self, generator1, generator2):
 #         # Check that every arg is a generator
@@ -193,7 +264,7 @@ class CrosstermModel(Model):
 #         self.generator1, self.generator2 = generator1.copy(), generator2.copy()
 #         self.widths = [self.generator1.width, self.generator2.width]
 #         self.fit_distributions = [[(None, None)] * self.generator1.width] * self.generator2.width
-    
+
 #     @property
 #     def arg_names(self):
 #         return {*np.unique(np.hstack([list(self.generator1.arg_names), list(self.generator2.arg_names)]))}
@@ -228,10 +299,9 @@ class CrosstermModel(Model):
 #     @property
 #     def nvectors(self):
 #         return np.sum([g.nvectors for g in self.generators])
-    
+
 #     def design_matrix(self, **kwargs):
 #         return combine_matrices(self.generator1.design_matrix(**kwargs), self.generator2.design_matrix(**kwargs))
-    
 
 
 # import json
