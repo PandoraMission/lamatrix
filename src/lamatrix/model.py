@@ -10,6 +10,7 @@ import numpy as np
 import numpy.typing as npt
 
 from . import _META_DATA
+from .distributions import DistributionsContainer, Distribution
 
 __all__ = ["Model"]
 
@@ -17,17 +18,25 @@ __all__ = ["Model"]
 class Model(ABC):
     def __init__(
         self,
-        prior_distributions: List[Tuple] = None,
+        priors: List[Tuple] = None,
     ):
-        # prior_distrbutions (always normal, and always specfied by mean and standard deviation)
+        # prior (always normal, and always specfied by mean and standard deviation)
         # fit_distributions (always normal, and always specfied by mean and standard deviation)
-        if prior_distributions is None:
-            self.prior_distributions = [(0, np.inf)] * self.width
+        if priors is None:
+            self.priors = DistributionsContainer.from_number(self.width)
+        elif isinstance(priors, (list, np.ndarray)):
+            self.priors = DistributionsContainer(priors)
+        elif isinstance(priors, DistributionsContainer):
+            self.priors = priors
         else:
-            self._validate_distributions(prior_distributions)
-            self.prior_distributions = prior_distributions
-        self.fit_distributions = [(None, None)] * self.width
+            raise ValueError("Could not parse input `priors`.")
+        if not len(self.priors) == self.width:
+            raise ValueError(
+                "distributions must have the number of elements as the design matrix."
+            )
 
+        self.best_fit = DistributionsContainer.from_number(self.width)
+        
     @property
     @abstractmethod
     def width(self):
@@ -53,64 +62,72 @@ class Model(ABC):
             if not isinstance(arg, str):
                 raise ValueError("Argument names must be strings.")
 
-    def _validate_distribution(self, distribution: Tuple):
-        """Checks that a distribution is a valid input with format (mean, std)."""
-        # Must be a tuple
-        if not isinstance(distribution, tuple):
-            raise ValueError("distribution must be a tuple of format (mean, std)")
-        # Must be float or int
-        for value in distribution:
-            if not isinstance(value, (float, int, np.integer, np.floating)):
-                raise ValueError("Values in distribution must be numeric.")
-        # Standard deviation must be positive
-        if np.sign(distribution[1]) == -1:
-            raise ValueError("Standard deviation must be positive.")
-        return
+    # def _validate_distribution(self, distribution: Tuple):
+    #     """Checks that a distribution is a valid input with format (mean, std)."""
+    #     # Must be a tuple
+    #     if not isinstance(distribution, tuple):
+    #         raise ValueError("distribution must be a tuple of format (mean, std)")
+    #     # Must be float or int
+    #     for value in distribution:
+    #         if not isinstance(value, (float, int, np.integer, np.floating)):
+    #             raise ValueError("Values in distribution must be numeric.")
+    #     # Standard deviation must be positive
+    #     if np.sign(distribution[1]) == -1:
+    #         raise ValueError("Standard deviation must be positive.")
+    #     return
 
-    def _validate_distributions(self, distributions: List[Tuple]):
-        """Checks that a list of distributions is a valid"""
-        if not len(distributions) == self.width:
-            raise ValueError(
-                "distributions must have the number of elements as the design matrix."
-            )
-        [self._validate_distribution(distribution) for distribution in distributions]
-        return
+    # def _validate_distributions(self, distributions: List[Tuple]):
+    #     """Checks that a list of distributions is a valid"""
+    #     if not len(distributions) == self.width:
+    #         raise ValueError(
+    #             "distributions must have the number of elements as the design matrix."
+    #         )
+    #     return
 
-    def set_prior(self, index: int, distribution: Tuple) -> None:
-        """Sets a single prior."""
-        self._validate_distribution(distribution=distribution)
-        self.prior_distributions[index] = distribution
-        return
+    def _validate_weights(self, weights, weights_width):
+        if not isinstance(weights, (list, np.ndarray)):
+            raise ValueError(f"`weights` must be a list of numeric values with length {weights_width}.")
+        if not isinstance(weights[0], (float, int, np.integer, np.number)):
+            raise ValueError(f"`weights` must be a list of numeric values with length {weights_width}.")
+        if not len(weights) == weights_width:
+            raise ValueError(f"`weights` must be a list of numeric values with length {weights_width}.")
+        return np.asarray(weights)
 
-    def set_priors(self, distributions: List[Tuple]) -> None:
-        """sets the full list of priors"""
-        self._validate_distributions(distributions=distributions)
-        self.prior_distributions = distributions
-        return
+    # def set_prior(self, index: int, distribution: Tuple) -> None:
+    #     """Sets a single prior."""
+    #     self._validate_distribution(distribution=distribution)
+    #     self.prior_distributions[index] = distribution
+    #     return
 
-    def freeze_element(self, index: int):
-        """Freezes an element of the design matrix by setting prior_sigma to zero."""
-        self.set_prior(index, (self.prior_distributions[index][0], 0))
+    # def set_priors(self, distributions: List[Tuple]) -> None:
+    #     """sets the full list of priors"""
+    #     self._validate_distributions(distributions=distributions)
+    #     self.prior_distributions = distributions
+    #     return
 
-    @property
-    def prior_mean(self):
-        return np.asarray(
-            [distribution[0] for distribution in self.prior_distributions]
-        )
+    # def freeze_element(self, index: int):
+    #     """Freezes an element of the design matrix by setting prior_sigma to zero."""
+    #     self.set_prior(index, (self.prior_distributions[index][0], 1e-10))
 
-    @property
-    def prior_std(self):
-        return np.asarray(
-            [distribution[1] for distribution in self.prior_distributions]
-        )
+    # @property
+    # def prior_mean(self):
+    #     return np.asarray(
+    #         [distribution[0] for distribution in self.prior_distributions]
+    #     )
 
-    @property
-    def fit_mean(self):
-        return np.asarray([distribution[0] for distribution in self.fit_distributions])
+    # @property
+    # def prior_std(self):
+    #     return np.asarray(
+    #         [distribution[1] for distribution in self.prior_distributions]
+    #     )
 
-    @property
-    def fit_std(self):
-        return np.asarray([distribution[1] for distribution in self.fit_distributions])
+    # @property
+    # def fit_mean(self):
+    #     return np.asarray([distribution[0] for distribution in self.fit_distributions])
+
+    # @property
+    # def fit_std(self):
+    #     return np.asarray([distribution[1] for distribution in self.fit_distributions])
 
     @abstractmethod
     def design_matrix(self):
@@ -123,7 +140,7 @@ class Model(ABC):
         """Returns a set of the user defined strings for all the arguments that the design matrix requires."""
         pass
 
-    def fit(self, data: npt.NDArray, errors: npt.NDArray = None, **kwargs):
+    def fit(self, data: npt.NDArray, errors: npt.NDArray = None, mask:npt.NDArray = None, **kwargs):
         """Fit the design matrix.
 
         Parameters
@@ -132,7 +149,9 @@ class Model(ABC):
             Input data to fit
         errors: np.ndarray, optional
             Errors on the input data
-
+        mask: np.ndarray, optional
+            Mask to apply when fitting. Values where mask is False will not be used during the fit.
+            
         Returns
         -------
         fit_distributions: List of Tuples
@@ -142,35 +161,34 @@ class Model(ABC):
         for attr in ["error", "err"]:
             if attr in kwargs.keys():
                 raise ValueError(f"Pass `errors` not `{attr}`.")
-        for key, item in kwargs.items():
-            if not item.ndim == 1:
-                raise ValueError(f"Must pass 1D vector for variable `{key}`.")
-        if not data.ndim == 1:
-            raise ValueError("Must pass 1D data.")
-        if errors is not None:
-            if not errors.ndim == 1:
-                raise ValueError("Must pass 1D errors.")
-
-        X = self.design_matrix(**kwargs)
-        if np.prod(data.shape) != X.shape[0]:
-            raise ValueError(f"Data must have shape {X.shape[0]}")
+        if mask is None:
+            mask = np.ones(data.shape, bool)
         if errors is None:
             errors = np.ones_like(data)
-        sigma_w_inv = X.T.dot(X / errors.ravel()[:, None] ** 2) + np.diag(
-            1 / self.prior_std**2
+        for key, item in kwargs.items():
+            if not item.shape == data.shape:
+                raise ValueError(f"Must pass vector for variable `{key}` with shape {data.shape}.")
+        if not errors.shape == data.shape:
+            raise ValueError(f"Must pass vector for variable `errors` with shape {data.shape}.")
+        if not mask.shape == data.shape:
+            raise ValueError(f"Must pass vector for variable `mask` with shape {data.shape}.")
+
+        X = self.design_matrix(**kwargs)
+        sigma_w_inv = X[mask].T.dot(X[mask] / errors[mask][:, None] ** 2) + np.diag(
+            1 / self.priors.std**2
         )
         self.cov = np.linalg.inv(sigma_w_inv)
-        B = X.T.dot(data.ravel() / errors.ravel() ** 2) + np.nan_to_num(
-            self.prior_mean / self.prior_std**2
+        B = X[mask].T.dot(data[mask] / errors[mask] ** 2) + np.nan_to_num(
+            self.priors.mean / self.priors.std**2
         )
         fit_mean = np.linalg.solve(sigma_w_inv, B)
         fit_std = self.cov.diagonal() ** 0.5
-        self.fit_distributions = [(m, s) for m, s in zip(fit_mean, fit_std)]
+        self.best_fit = DistributionsContainer([Distribution(m, s) for m, s in zip(fit_mean, fit_std)])
         return
 
     def evaluate(self, **kwargs):
         X = self.design_matrix(**kwargs)
-        return X.dot(self.fit_mean)
+        return X.dot(self.best_fit.mean)
 
     def __call__(self, *args, **kwargs):
         return self.design_matrix(*args, **kwargs)

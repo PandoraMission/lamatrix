@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from lamatrix import Polynomial, Constant, Sinusoid
+from lamatrix import Polynomial, Constant, Sinusoid, DistributionsContainer, Distribution
 from lamatrix.combine import JointModel, CrosstermModel
 
 
@@ -35,23 +35,24 @@ def test_priors():
     g2 = Polynomial("x", polyorder=3)
     g = g1 + g2
 
-    g.set_prior(0, (0, 10))
-    g.set_priors([(0, 10), (0, np.inf), (0, np.inf), (0, np.inf)])
+    g.priors[0] = (0, 10)
+    g.priors[:] = [(0, 10), (0, np.inf), (0, np.inf), (0, np.inf)]
+    g.priors[:] = DistributionsContainer([(0, 10), (0, np.inf), (0, np.inf), (0, np.inf)])
 
     g1 = Constant()
     g2 = Polynomial("x", polyorder=3)
     g = g1 + g2
 
-    assert g[0].prior_distributions == [(0, np.inf)]
-    g[0].set_prior(0, (0, 10))
-    assert g[0].prior_distributions == [(0, 10)]
-    assert g.prior_distributions[0] == (0, 10)
+    assert g[0].priors[0] == (0, np.inf)
+    g[0].priors[0] = (0, 10)
+    assert g[0].priors[0] == (0, 10)
+    assert g.priors[0] == (0, 10)
 
-    assert g[1].prior_distributions == [(0, np.inf), (0, np.inf), (0, np.inf)]
-    g[1].set_prior(1, (0, 10))
-    assert g[1].prior_distributions[1] == (0, 10)
-    assert g.prior_distributions[0] == (0, 10)
-    assert g.prior_distributions[2] == (0, 10)
+    assert g[1].priors[0] == (0, np.inf)
+    g[1].priors[1] = (0, 10)
+    assert g[1].priors[1] == (0, 10)
+    assert g.priors[0] == (0, 10)
+    assert g.priors[2] == (0, 10)
 
 
 def test_polynomial():
@@ -64,10 +65,10 @@ def test_polynomial():
     assert dm.shape == (10, 4)
     assert (dm[:, 0] == np.ones(10)).all()
     assert g.width == 4
-    assert len(g.prior_distributions) == 4
-    assert len(g.fit_distributions) == 4
-    assert isinstance(g.prior_distributions, list)
-    assert isinstance(g.prior_distributions[0], tuple)
+    assert len(g.priors) == 4
+    assert len(g.best_fit) == 4
+    assert isinstance(g.priors, DistributionsContainer)
+    assert isinstance(g.priors[0], Distribution)
 
     x = np.arange(-1, 1, 0.01)
     w, c = np.random.normal(size=2)
@@ -76,8 +77,8 @@ def test_polynomial():
     ye = np.ones_like(x) + 0.001
 
     g.fit(data=y, errors=ye, x=x)
-    assert len(g.fit_distributions) == 4
-    assert np.isclose(g.fit_distributions[1][0], w, atol=0.01)
+    assert len(g.best_fit) == 4
+    assert np.isclose(g.best_fit.mean[1], w, atol=0.01)
 
 
 def test_cross():
@@ -86,10 +87,9 @@ def test_cross():
     g3 = Polynomial("z", polyorder=2)
 
     g = CrosstermModel(g1, g2)
-    assert len(g.prior_distributions) == 12
+    assert len(g.priors) == 12
     assert g.width == 12
-    assert g.prior_mean.shape == (12,)
-    assert g.prior_std.shape == (12,)
+    assert len(g.priors) == 12
     assert g.arg_names == {"x", "y"}
 
     x, y = np.mgrid[0:20, 0:21] - 10
@@ -97,10 +97,9 @@ def test_cross():
     assert dm.shape == (x.ravel().shape[0], g.width)
 
     g = CrosstermModel(g1, g2, g3)
-    assert len(g.prior_distributions) == 24
+    assert len(g.priors) == 24
     assert g.width == 24
-    assert g.prior_mean.shape == (24,)
-    assert g.prior_std.shape == (24,)
+    assert len(g.priors) == 24
     assert g.arg_names == {"x", "y", "z"}
 
     x, y, z = np.mgrid[0:20, 0:21, :22] - 10
@@ -259,3 +258,15 @@ def test_math():
     assert g[1].models[0].arg_names == {"x"} and g[1].models[1].arg_names == {"a"}
     assert g[2].models[0].arg_names == {"y"} and g[2].models[1].arg_names == {"z"}
     assert g[3].models[0].arg_names == {"y"} and g[3].models[1].arg_names == {"a"}
+
+def test_shape_combine():
+    """Test that we can pass in all sorts of weird shaped vectors and get the right shapes when combined"""
+    for shape in [(53, ), (53, 5), (53, 5, 3), (53, 5, 3, 2)]:
+        x = np.random.normal(size=shape)
+        p1 = Polynomial(x_name="x", polyorder=4)
+        s1 = Sinusoid(x_name="x", nterms=3)
+        X = (p1 + s1).design_matrix(x=x)
+        assert X.shape == (*shape, 10)
+
+        X = (p1 * s1).design_matrix(x=x)
+        assert X.shape == (*shape, 24)

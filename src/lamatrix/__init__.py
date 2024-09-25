@@ -36,12 +36,14 @@ import json
 
 import numpy as np
 
+from .distributions import DistributionsContainer, Distribution  # noqa: E402, F401
 from .bound import *
 from .combine import *  # noqa: E402, F401
 from .models.astrophysical import *  # noqa: E402, F401
 from .models.gaussian import *  # noqa: E402, F401
 from .models.simple import *  # noqa: E402, F401
 from .models.spline import *  # noqa: E402, F401
+
 
 
 def _load_from_dict(dict):

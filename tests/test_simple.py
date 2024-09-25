@@ -1,5 +1,5 @@
 import numpy as np
-from lamatrix import Polynomial, Constant, Sinusoid
+from lamatrix import Polynomial, Constant, Sinusoid, dPolynomial, dSinusoid, Spline, dSpline
 
 
 def test_constant():
@@ -20,11 +20,11 @@ def test_constant():
 
     g = Constant()
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.fit_distributions[0][0], w, atol=0.01)
+    assert np.isclose(g.best_fit.mean[0], w, atol=0.01)
 
-    g = Constant(prior_distributions=[(w, 0.1)])
+    g = Constant(priors=[(w, 0.1)])
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.fit_distributions[0][0], w, atol=0.01)
+    assert np.isclose(g.best_fit.mean[0], w, atol=0.01)
 
 
 def test_polynomial():
@@ -45,15 +45,15 @@ def test_polynomial():
 
     g = Polynomial("x", polyorder=3)
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.fit_distributions[0][0], w, atol=0.01)
-    assert np.allclose(g.fit_mean[1:], np.zeros(g.width - 1), atol=0.01)
+    assert np.isclose(g.best_fit.mean[0], w, atol=0.01)
+    assert np.allclose(g.best_fit.mean[1:], np.zeros(g.width - 1), atol=0.01)
 
     g = Polynomial(
-        "x", polyorder=3, prior_distributions=[(w, 0.1), (0, np.inf), (0, np.inf)]
+        "x", polyorder=3, priors=[(w, 0.1), (0, np.inf), (0, np.inf)]
     )
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.fit_distributions[0][0], w, atol=0.01)
-    assert np.allclose(g.fit_mean[1:], np.zeros(g.width - 1), atol=0.01)
+    assert np.isclose(g.best_fit.mean[0], w, atol=0.01)
+    assert np.allclose(g.best_fit.mean[1:], np.zeros(g.width - 1), atol=0.01)
 
 
 def test_sinusoid():
@@ -74,16 +74,35 @@ def test_sinusoid():
 
     g = Sinusoid("x", nterms=2)
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.fit_distributions[0][0], w[0], atol=0.01)
-    assert np.isclose(g.fit_distributions[1][0], w[1], atol=0.01)
-    assert np.allclose(g.fit_mean[2:], np.zeros(g.width - 2), atol=0.01)
+    assert np.isclose(g.best_fit.mean[0], w[0], atol=0.01)
+    assert np.isclose(g.best_fit.mean[1], w[1], atol=0.01)
+    assert np.allclose(g.best_fit.mean[2:], np.zeros(g.width - 2), atol=0.01)
 
     g = Sinusoid(
         "x",
         nterms=2,
-        prior_distributions=[(w[0], 0.1), (w[1], 0.1), (0, np.inf), (0, np.inf)],
+        priors=[(w[0], 0.1), (w[1], 0.1), (0, np.inf), (0, np.inf)],
     )
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.fit_distributions[0][0], w[0], atol=0.01)
-    assert np.isclose(g.fit_distributions[1][0], w[1], atol=0.01)
-    assert np.allclose(g.fit_mean[2:], np.zeros(g.width - 2), atol=0.01)
+    assert np.isclose(g.best_fit.mean[0], w[0], atol=0.01)
+    assert np.isclose(g.best_fit.mean[1], w[1], atol=0.01)
+    assert np.allclose(g.best_fit.mean[2:], np.zeros(g.width - 2), atol=0.01)
+
+def test_shape():
+    """Test that we can pass in all sorts of weird shaped vectors"""
+    for shape in [(53, ), (53, 5), (53, 5, 3), (53, 5, 3, 2)]:
+        x = np.random.normal(size=shape)
+        X = Polynomial(x_name='x', polyorder=4).design_matrix(x=x)    
+        assert X.shape == (*shape, 4)
+        X = dPolynomial(np.arange(4), x_name='x', polyorder=4).design_matrix(x=x)    
+        assert X.shape == (*shape, 1)
+        X = Sinusoid(x_name='x', nterms=4).design_matrix(x=x)    
+        assert X.shape == (*shape, 8)
+        X = dSinusoid(np.arange(8), x_name='x', nterms=4).design_matrix(x=x)    
+        assert X.shape == (*shape, 1)
+        X = Constant().design_matrix(x=x)    
+        assert X.shape == (*shape, 1)
+        X = Spline(x_name='x', knots=np.arange(-2, 2, 0.4)).design_matrix(x=x)    
+        assert X.shape == (*shape, 6)
+        X = dSpline(np.arange(6), x_name='x', knots=np.arange(-2, 2, 0.4)).design_matrix(x=x)    
+        assert X.shape == (*shape, 1)

@@ -1,5 +1,6 @@
 from .combine import JointModel, CrosstermModel
 from .model import Model
+import numpy as np
 
 __all__ = ["MathMixins"]
 
@@ -31,3 +32,11 @@ class MathMixins:
             return CrosstermModel(self, other)
         else:
             raise ValueError("Can only combine `Model` objects.")
+
+    def __pow__(self, other):
+        if other != 2:
+            raise ValueError("Can only square `Model` objects")
+        model = CrosstermModel(self, self)
+        prior_std_cube = np.tril(np.ones(self.width, bool))
+        model.set_priors([model.prior_distributions[idx] if i else (0, 1e-10) for idx, i in enumerate(prior_std_cube.ravel())])
+        return model

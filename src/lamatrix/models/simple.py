@@ -4,6 +4,7 @@ import numpy as np
 from typing import List
 from ..model import Model
 from ..math import MathMixins
+from ..combine import CrosstermModel
 
 __all__ = [
     "Polynomial",
@@ -19,14 +20,14 @@ class Polynomial(MathMixins, Model):
         self,
         x_name: str = "x",
         polyorder: int = 3,
-        prior_distributions=None,
+        priors=None,
     ):
         if polyorder < 1:
             raise ValueError("Must have polyorder >= 1.")
         self.x_name = x_name
         self._validate_arg_names()
         self.polyorder = polyorder
-        super().__init__(prior_distributions=prior_distributions)
+        super().__init__(priors=priors)
 
     @property
     def width(self):
@@ -50,10 +51,11 @@ class Polynomial(MathMixins, Model):
         """
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
-        x = kwargs.get(self.x_name).ravel()
-        return np.vstack([x**idx for idx in range(1, self.polyorder + 1)]).T
+        x = kwargs.get(self.x_name)
+        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+        return np.asarray([x**idx for idx in range(1, self.polyorder + 1)]).transpose(shape_a)
 
-    def to_gradient(self, prior_distributions=None):
+    def to_gradient(self, priors=None):
         weights = [
             fit if fit is not None else prior
             for fit, prior in zip(self.fit_mean, self.prior_mean)
@@ -62,9 +64,16 @@ class Polynomial(MathMixins, Model):
             weights=weights[1:],
             x_name=self.x_name,
             polyorder=self.polyorder - 1,
-            prior_distributions=prior_distributions,
+            priors=priors,
         )
 
+    def __pow__(self, other):
+        if other != 2:
+            raise ValueError("Can only square `Model` objects")
+        model = CrosstermModel(self, self)
+        prior_std_cube = (np.tril(np.ones(self.width)) * (1 - np.tril(np.ones(self.width), -2))).astype(bool)
+        model.set_priors([model.prior_distributions[idx] if i else (0, 1e-10) for idx, i in enumerate(prior_std_cube.ravel())])
+        return model
 
 class dPolynomial(MathMixins, Model):
     def __init__(
@@ -72,15 +81,16 @@ class dPolynomial(MathMixins, Model):
         weights: List,
         x_name: str = "x",
         polyorder: int = 3,
-        prior_distributions=None,
+        priors=None,
     ):
         if polyorder < 1:
             raise ValueError("Must have polyorder >= 1.")
         self.x_name = x_name
         self._validate_arg_names()
         self.polyorder = polyorder
-        self.weights = weights
-        super().__init__(prior_distributions=prior_distributions)
+        self._weight_width = self.polyorder
+        self.weights = self._validate_weights(weights, self._weight_width)
+        super().__init__(priors=priors)
 
     @property
     def width(self):
@@ -109,10 +119,11 @@ class dPolynomial(MathMixins, Model):
         """
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
-        x = kwargs.get(self.x_name).ravel()
-        return np.vstack(
+        x = kwargs.get(self.x_name)
+        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+        return np.expand_dims(np.asarray(
             [(idx + 1) * x**idx for idx in range(1, self.polyorder + 1)]
-        ).T.dot(self.weights)[:, None]
+        ).transpose(shape_a).dot(self.weights), axis=x.ndim)
 
 
 class Sinusoid(MathMixins, Model):
@@ -120,13 +131,13 @@ class Sinusoid(MathMixins, Model):
         self,
         x_name: str = "x",
         nterms: int = 1,
-        prior_distributions=None,
+        priors=None,
     ):
 
         self.x_name = x_name
         self._validate_arg_names()
         self.nterms = nterms
-        super().__init__(prior_distributions=prior_distributions)
+        super().__init__(priors=priors)
 
     @property
     def width(self):
@@ -143,17 +154,18 @@ class Sinusoid(MathMixins, Model):
     def design_matrix(self, **kwargs):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
-        x = kwargs.get(self.x_name).ravel()
-        return np.vstack(
-            [
-                *[
-                    [np.sin(x * (idx + 1)), np.cos(x * (idx + 1))]
-                    for idx in range(self.nterms)
-                ],
-            ]
-        ).T
+        x = kwargs.get(self.x_name)
+        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+        shape_b = [x.ndim, *np.arange(0, x.ndim)]
+        sin = np.asarray([np.sin(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
+        cos = np.asarray([np.cos(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
+        X = np.vstack([sin.transpose(shape_b), cos.transpose(shape_b)])
+        # # Reorder to be sin, cos, sin, cos...
+        R, C = np.mgrid[:2, :self.nterms]
+        X = X[((R * self.nterms + C).T).ravel()]
+        return X.transpose(shape_a)
 
-    def to_gradient(self, prior_distributions=None):
+    def to_gradient(self, priors=None):
         weights = [
             fit if fit is not None else prior
             for fit, prior in zip(self.fit_mean, self.prior_mean)
@@ -162,7 +174,7 @@ class Sinusoid(MathMixins, Model):
             weights=weights,
             x_name=self.x_name,
             nterms=self.nterms,
-            prior_distributions=prior_distributions,
+            priors=priors,
         )
 
 
@@ -172,14 +184,15 @@ class dSinusoid(MathMixins, Model):
         weights: List,
         x_name: str = "x",
         nterms: int = 1,
-        prior_distributions=None,
+        priors=None,
     ):
 
         self.x_name = x_name
         self._validate_arg_names()
         self.nterms = nterms
-        self.weights = weights
-        super().__init__(prior_distributions=prior_distributions)
+        self._weight_width = self.nterms * 2
+        self.weights = self._validate_weights(weights, self._weight_width)
+        super().__init__(priors=priors)
 
     @property
     def width(self):
@@ -208,19 +221,30 @@ class dSinusoid(MathMixins, Model):
         """
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
-        x = kwargs.get(self.x_name).ravel()
-        return np.vstack(
-            [
-                *[
-                    [w1 * np.cos(x * (idx + 1)), -w2 * np.sin(x * (idx + 1))]
-                    for idx, w1, w2 in zip(
-                        range(self.nterms),
-                        self.weights[::2],
-                        self.weights[1::2],
-                    )
-                ],
-            ]
-        ).T.sum(axis=1)[:, None]
+        x = kwargs.get(self.x_name)
+        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+        shape_b = [x.ndim, *np.arange(0, x.ndim)]
+        dsin = np.asarray([np.cos(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
+        dcos = np.asarray([-np.sin(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
+        X = np.vstack([dsin.transpose(shape_b), dcos.transpose(shape_b)])
+        # Reorder to be sin, cos, sin, cos...
+        R, C = np.mgrid[:2, :self.nterms]
+        X = X[((R * self.nterms + C).T).ravel()]
+        return np.expand_dims(X.transpose(shape_a).dot(self.weights), axis=x.ndim)
+
+        # shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+        # return np.asarray(
+        #     [
+        #         *[
+        #             [w1 * np.cos(x * (idx + 1)), -w2 * np.sin(x * (idx + 1))]
+        #             for idx, w1, w2 in zip(
+        #                 range(self.nterms),
+        #                 self.weights[::2],
+        #                 self.weights[1::2],
+        #             )
+        #         ],
+        #     ]
+        # ).transpose(shape_a).sum(axis=1)[:, None]
 
 
 class Constant(MathMixins, Model):
@@ -228,8 +252,8 @@ class Constant(MathMixins, Model):
     A generator which has no variable, and whos design matrix is entirely ones.
     """
 
-    def __init__(self, prior_distributions=None):
-        super().__init__(prior_distributions=prior_distributions)
+    def __init__(self, priors=None):
+        super().__init__(priors=priors)
 
     @property
     def width(self):
@@ -260,7 +284,7 @@ class Constant(MathMixins, Model):
             raise ValueError("Cannot create design matrix without regressors.")
 
         x = np.ones_like(next(iter(kwargs.values())))
-        return np.atleast_2d(x).T
+        return np.expand_dims(x, axis=x.ndim)
 
     # @property
     # def gradient(self):

@@ -3,6 +3,7 @@
 from .model import Model
 import itertools
 import numpy as np
+from .distributions import Distribution, DistributionsContainer
 
 __all__ = ["JointModel", "CrosstermModel"]
 
@@ -27,7 +28,7 @@ class JointModel(Model):
             raise ValueError("Can only combine `Model` objects.")
         self.models = [a.copy() for a in args]
         self.widths = [g.width for g in self.models]
-        self.fit_distributions = [(None, None)] * np.sum(self.widths)
+        self.best_fit = DistributionsContainer.from_number(np.sum(self.widths))
 
     def __getitem__(self, key):
         return self.models[key]
@@ -37,57 +38,61 @@ class JointModel(Model):
             [g.__repr__() for g in self.models]
         )
 
-    def set_prior(self, index, distribution):
-        cs = np.cumsum(self.widths)
-        generator_index = np.where(cs >= index)[0][0]
-        vector_index = index - cs[generator_index - 1] if generator_index > 0 else 0
-        return self.models[generator_index].set_prior(vector_index, distribution)
+    # def set_prior(self, index, distribution):
+    #     cs = np.cumsum(self.widths)
+    #     generator_index = np.where(cs >= index)[0][0]
+    #     vector_index = index - cs[generator_index - 1] if generator_index > 0 else 0
+    #     return self.models[generator_index].set_prior(vector_index, distribution)
 
-    def set_priors(self, distributions):
-        cs = [0, *np.cumsum(self.widths)]
-        for idx, g in enumerate(self.models):
-            g.set_priors(
-                [distributions[jdx] for jdx in np.arange(cs[idx], cs[idx + 1])]
-            )
+    # def set_priors(self, distributions):
+    #     cs = [0, *np.cumsum(self.widths)]
+    #     for idx, g in enumerate(self.models):
+    #         g.set_priors(
+    #             [distributions[jdx] for jdx in np.arange(cs[idx], cs[idx + 1])]
+    #         )
 
     @property
     def arg_names(self):
         return {*np.unique(np.hstack([list(g.arg_names) for g in self.models]))}
 
     @property
-    def prior_distributions(self):
-        return [p for g in self.models for p in g.prior_distributions]
+    def priors(self):
+        return DistributionsContainer([p for g in self.models for p in g.priors])
 
-    @property
-    def prior_mean(self):
-        return np.asarray(
-            [
-                distribution[0]
-                for g in self.models
-                for distribution in g.prior_distributions
-            ]
-        )
+    # @property
+    # def prior_mean(self):
+    #     return np.asarray(
+    #         [
+    #             distribution.mean
+    #             for g in self.models
+    #             for distribution in g.priors
+    #         ]
+    #     )
 
-    @property
-    def prior_std(self):
-        return np.asarray(
-            [
-                distribution[1]
-                for g in self.models
-                for distribution in g.prior_distributions
-            ]
-        )
+    # @property
+    # def prior_std(self):
+    #     return np.asarray(
+    #         [
+    #             distribution.std
+    #             for g in self.models
+    #             for distribution in g.prior_distributions
+    #         ]
+    #     )
 
-    @property
-    def fit_mean(self):
-        return np.asarray([distribution[0] for distribution in self.fit_distributions])
+    # @property
+    # def fit_mean(self):
+    #     return np.asarray([distribution[0] for distribution in self.fit_distributions])
 
-    @property
-    def fit_std(self):
-        return np.asarray([distribution[1] for distribution in self.fit_distributions])
+    # @property
+    # def fit_std(self):
+    #     return np.asarray([distribution[1] for distribution in self.fit_distributions])
 
     def design_matrix(self, *args, **kwargs):
-        return np.hstack([g.design_matrix(*args, **kwargs) for g in self.models])
+        Xs = [g.design_matrix(*args, **kwargs) for g in self.models]
+        ndim = Xs[0].ndim - 1
+        shape_a = [*np.arange(1, ndim + 1).astype(int), 0]
+        shape_b = [ndim, *np.arange(0, ndim)]
+        return np.vstack([X.transpose(shape_b) for X in Xs]).transpose(shape_a)
 
     @property
     def width(self):
@@ -99,11 +104,11 @@ class JointModel(Model):
 
     def fit(self, *args, **kwargs):
         super().fit(*args, **kwargs)
-        means = np.array_split(self.fit_mean, np.cumsum(self.widths)[:-1])
-        stds = np.array_split(self.fit_std, np.cumsum(self.widths)[:-1])
+        means = np.array_split(self.best_fit.mean, np.cumsum(self.widths)[:-1])
+        stds = np.array_split(self.best_fit.std, np.cumsum(self.widths)[:-1])
 
         for idx, mean, std in zip(range(len(self.models)), means, stds):
-            self.models[idx].fit_distributions = [(m, s) for m, s in zip(mean, std)]
+            self.models[idx].best_fit = DistributionsContainer([Distribution((m, s)) for m, s in zip(mean, std)])
 
     def __add__(self, other):
         has_constant = np.any([g.arg_names == {} for g in self.models])
@@ -142,13 +147,13 @@ class CrosstermModel(Model):
             raise ValueError("Can only combine `Model` objects.")
         self.models = [a.copy() for a in args]
         self.widths = [g.width for g in self.models]
-        self.fit_distributions = [(None, None)] * np.prod(self.widths)
+        self.best_fit = DistributionsContainer.from_number(np.prod(self.widths))
         prior_mean = np.asarray(
             [
                 np.sum(i)
                 for i in itertools.product(
                     *[
-                        [distribution[0] for distribution in g.prior_distributions]
+                        [distribution[0] for distribution in g.priors]
                         for g in self.models
                     ]
                 )
@@ -159,15 +164,15 @@ class CrosstermModel(Model):
                 np.prod(i)
                 for i in itertools.product(
                     *[
-                        [distribution[1] for distribution in g.prior_distributions]
+                        [distribution[1] for distribution in g.priors]
                         for g in self.models
                     ]
                 )
             ]
         )
-        prior_distributions = [(m, s) for m, s in zip(prior_mean, prior_std)]
-        self._validate_distributions(prior_distributions)
-        self.prior_distributions = prior_distributions
+        self.priors = DistributionsContainer([Distribution(m, s) for m, s in zip(prior_mean, prior_std)])
+        # self._validate_distributions(prior_distributions)
+        # self.prior_distributions = prior_distributions
 
     @property
     def arg_names(self):
@@ -214,15 +219,30 @@ class CrosstermModel(Model):
     #         ]
     #     )
 
-    @property
-    def fit_mean(self):
-        return np.asarray([distribution[0] for distribution in self.fit_distributions])
+    # @property
+    # def fit_mean(self):
+    #     return np.asarray([distribution[0] for distribution in self.fit_distributions])
 
-    @property
-    def fit_std(self):
-        return np.asarray([distribution[1] for distribution in self.fit_distributions])
+    # @property
+    # def fit_std(self):
+    #     return np.asarray([distribution[1] for distribution in self.fit_distributions])
 
-    def design_matrix(self, **kwargs):
+    def design_matrix(self, *args, **kwargs):
+        Xs = [g.design_matrix(*args, **kwargs) for g in self.models]
+        ndim = Xs[0].ndim - 1
+        shape_a = [*np.arange(1, ndim + 1).astype(int), 0]
+        shape_b = [ndim, *np.arange(0, ndim)]
+        Xs = [X.transpose(shape_b) for X in Xs]
+        X = np.vstack([np.expand_dims(np.prod(i, axis=0), ndim).transpose(shape_b) for i in itertools.product(*Xs)]).transpose(shape_a)
+        return X
+
+        print(itertools.product())
+
+        return np.vstack([np.expand_dims(np.prod(i, axis=0), axis=ndim) for i in itertools.product(*Xs)]).transpose(shape_a)
+        return np.vstack([np.prod(i, axis=0) for i in itertools.product(*Xs)]).transpose(shape_a)
+
+        return np.vstack([X.transpose(shape_b) for X in Xs]).transpose(shape_a)
+
         return np.asarray(
             [
                 np.prod(i, axis=0)

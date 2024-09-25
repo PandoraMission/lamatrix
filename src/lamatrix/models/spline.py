@@ -7,9 +7,7 @@ from ..math import MathMixins
 __all__ = [
     "Spline",
     "dSpline",
-    #    "dSpline1DGenerator",
 ]
-
 
 class SplineMixins:
     def bspline_basis(self, k, i, t, x):
@@ -70,7 +68,7 @@ class Spline(MathMixins, SplineMixins, Model):
         x_name: str = "x",
         knots: np.ndarray = np.arange(1, 1, 0.3),
         splineorder: int = 3,
-        prior_distributions=None,
+        priors=None,
     ):
         if splineorder < 1:
             raise ValueError("Must have splineorder >= 1.")
@@ -78,7 +76,7 @@ class Spline(MathMixins, SplineMixins, Model):
         self._validate_arg_names()
         self.splineorder = splineorder
         self.knots = knots
-        super().__init__(prior_distributions=prior_distributions)
+        super().__init__(priors=priors)
 
     @property
     def width(self):
@@ -107,25 +105,25 @@ class Spline(MathMixins, SplineMixins, Model):
         """
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
-        x = kwargs.get(self.x_name).ravel()
+        x = kwargs.get(self.x_name)
+        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
 
-        # Set up the least squares problem
-        X = np.zeros((len(x), self.width))
+        X = np.zeros((self.width, *x.shape))
         for i in range(self.width):
-            X[:, i] = self.bspline_basis(k=self.splineorder, i=i, t=self.knots, x=x)
-        return X
+            X[i] = self.bspline_basis(k=self.splineorder, i=i, t=self.knots, x=x)
+        return X.transpose(shape_a)
 
-    def to_gradient(self, prior_distributions=None):
+    def to_gradient(self, priors=None):
         weights = [
             fit if fit is not None else prior
-            for fit, prior in zip(self.fit_mean, self.prior_mean)
+            for fit, prior in zip(self.best_fit.mean, self.best_fit.std)
         ]
         return dSpline(
             weights=weights,
             x_name=self.x_name,
             knots=self.knots,
             splineorder=self.splineorder,
-            prior_distributions=prior_distributions,
+            priors=priors,
         )
 
 
@@ -136,7 +134,7 @@ class dSpline(MathMixins, SplineMixins, Model):
         x_name: str = "x",
         knots: np.ndarray = np.arange(1, 1, 0.3),
         splineorder: int = 3,
-        prior_distributions=None,
+        priors=None,
     ):
         if splineorder < 1:
             raise ValueError("Must have splineorder >= 1.")
@@ -144,8 +142,9 @@ class dSpline(MathMixins, SplineMixins, Model):
         self._validate_arg_names()
         self.splineorder = splineorder
         self.knots = knots
-        self.weights = weights
-        super().__init__(prior_distributions=prior_distributions)
+        self._weight_width = len(self.knots) - self.splineorder - 1
+        self.weights = self._validate_weights(weights, self._weight_width)
+        super().__init__(priors=priors)
 
     @property
     def width(self):
@@ -162,15 +161,15 @@ class dSpline(MathMixins, SplineMixins, Model):
     def design_matrix(self, **kwargs):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
-        x = kwargs.get(self.x_name).ravel()
-
+        x = kwargs.get(self.x_name)
+        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
         # Set up the least squares problem
-        X = np.zeros((len(x), len(self.weights)))
+        X = np.zeros((len(self.weights), *x.shape))
         for i in range(len(self.weights)):
-            X[:, i] = self.bspline_basis_derivative(
+            X[i] = self.bspline_basis_derivative(
                 k=self.splineorder, i=i, t=self.knots, x=x
             )
-        return X.dot(self.weights)[:, None]
+        return np.expand_dims(X.transpose(shape_a).dot(self.weights), x.ndim)
 
 
 # class Spline1DGenerator(MathMixins, SplineMixins, Generator):
