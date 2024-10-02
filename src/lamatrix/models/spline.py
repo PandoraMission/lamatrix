@@ -114,10 +114,7 @@ class Spline(MathMixins, SplineMixins, Model):
         return X.transpose(shape_a)
 
     def to_gradient(self, priors=None):
-        weights = [
-            fit if fit is not None else prior
-            for fit, prior in zip(self.best_fit.mean, self.best_fit.std)
-        ]
+        weights = self.best_fit.mean if self.best_fit is not None else self.priors.mean
         return dSpline(
             weights=weights,
             x_name=self.x_name,

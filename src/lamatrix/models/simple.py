@@ -6,6 +6,8 @@ from ..model import Model
 from ..math import MathMixins
 from ..combine import CrosstermModel
 
+from scipy import sparse
+
 __all__ = [
     "Polynomial",
     "Constant",
@@ -52,14 +54,14 @@ class Polynomial(MathMixins, Model):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
-        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
-        return np.asarray([x**idx for idx in range(1, self.polyorder + 1)]).transpose(shape_a)
+        if sparse.issparse(x):
+            return sparse.hstack([x.power(idx) for idx in range(1, self.polyorder + 1)])
+        else:
+            shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+            return np.asarray([x**idx for idx in range(1, self.polyorder + 1)]).transpose(shape_a)
 
     def to_gradient(self, priors=None):
-        weights = [
-            fit if fit is not None else prior
-            for fit, prior in zip(self.fit_mean, self.prior_mean)
-        ]
+        weights = self.best_fit.mean if self.best_fit is not None else self.priors.mean
         return dPolynomial(
             weights=weights[1:],
             x_name=self.x_name,
@@ -120,10 +122,15 @@ class dPolynomial(MathMixins, Model):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
-        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
-        return np.expand_dims(np.asarray(
-            [(idx + 1) * x**idx for idx in range(1, self.polyorder + 1)]
-        ).transpose(shape_a).dot(self.weights), axis=x.ndim)
+        if sparse.issparse(x):
+            if not x.shape[1] == 1:
+                raise ValueError(f"Can only fit sparse matrices with shape (n, 1), {self.x_name} has shape {x.shape}.")
+            return sparse.hstack([x.power(idx).multiply(idx + 1) for idx in range(1, self.polyorder + 1)]).dot(sparse.csr_matrix(self.weights).T)
+        else:
+            shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+            return np.expand_dims(np.asarray(
+                [(idx + 1) * x**idx for idx in range(1, self.polyorder + 1)]
+            ).transpose(shape_a).dot(self.weights), axis=x.ndim)
 
 
 class Sinusoid(MathMixins, Model):
@@ -155,21 +162,21 @@ class Sinusoid(MathMixins, Model):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
-        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
-        shape_b = [x.ndim, *np.arange(0, x.ndim)]
-        sin = np.asarray([np.sin(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
-        cos = np.asarray([np.cos(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
-        X = np.vstack([sin.transpose(shape_b), cos.transpose(shape_b)])
-        # # Reorder to be sin, cos, sin, cos...
-        R, C = np.mgrid[:2, :self.nterms]
-        X = X[((R * self.nterms + C).T).ravel()]
-        return X.transpose(shape_a)
+        if sparse.issparse(x):
+            raise ValueError("Can not make a sparse verison of this object. Zero valued inputs are not zero valued outputs.")
+        else:
+            shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+            shape_b = [x.ndim, *np.arange(0, x.ndim)]
+            sin = np.asarray([np.sin(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
+            cos = np.asarray([np.cos(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
+            X = np.vstack([sin.transpose(shape_b), cos.transpose(shape_b)])
+            # # Reorder to be sin, cos, sin, cos...
+            R, C = np.mgrid[:2, :self.nterms]
+            X = X[((R * self.nterms + C).T).ravel()]
+            return X.transpose(shape_a)
 
     def to_gradient(self, priors=None):
-        weights = [
-            fit if fit is not None else prior
-            for fit, prior in zip(self.fit_mean, self.prior_mean)
-        ]
+        weights = self.best_fit.mean if self.best_fit is not None else self.priors.mean
         return dSinusoid(
             weights=weights,
             x_name=self.x_name,
@@ -222,15 +229,18 @@ class dSinusoid(MathMixins, Model):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
-        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
-        shape_b = [x.ndim, *np.arange(0, x.ndim)]
-        dsin = np.asarray([np.cos(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
-        dcos = np.asarray([-np.sin(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
-        X = np.vstack([dsin.transpose(shape_b), dcos.transpose(shape_b)])
-        # Reorder to be sin, cos, sin, cos...
-        R, C = np.mgrid[:2, :self.nterms]
-        X = X[((R * self.nterms + C).T).ravel()]
-        return np.expand_dims(X.transpose(shape_a).dot(self.weights), axis=x.ndim)
+        if sparse.issparse(x):
+            raise ValueError("Can not make a sparse verison of this object. Zero valued inputs are not zero valued outputs.")
+        else:
+            shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+            shape_b = [x.ndim, *np.arange(0, x.ndim)]
+            dsin = np.asarray([np.cos(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
+            dcos = np.asarray([-np.sin(x * (idx + 1)) for idx in np.arange(self.nterms)]).transpose(shape_a)
+            X = np.vstack([dsin.transpose(shape_b), dcos.transpose(shape_b)])
+            # Reorder to be sin, cos, sin, cos...
+            R, C = np.mgrid[:2, :self.nterms]
+            X = X[((R * self.nterms + C).T).ravel()]
+            return np.expand_dims(X.transpose(shape_a).dot(self.weights), axis=x.ndim)
 
         # shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
         # return np.asarray(

@@ -1,7 +1,6 @@
 """Classes to hold distributions, either of priors or of fit values."""
 from typing import List, Tuple
 import numpy as np
-from copy import deepcopy
 
 class Distribution(tuple):
     """Special tuple with the ability to "freeze", i.e. set standard deviation to 0."""
@@ -47,10 +46,10 @@ class Distribution(tuple):
         """Return the distribution as a standard tuple."""
         return (self.mean, self.std)
 
-    # def copy(self):
-    #     copy = Distribution(self.mean, self.std)
-    #     copy.frozen = self.frozen
-    #     return copy
+    def sample(self):
+        if self.frozen:
+            return self.mean
+        return np.random.normal(self.mean, self.std)
 
 class DistributionsContainer:
     """Holds distributions"""
@@ -135,5 +134,5 @@ class DistributionsContainer:
     def std(self):
         return np.asarray([dist.std for dist in self])
     
-    # def copy(self):
-    #     return DistributionsContainer(self._distributions)
+    def sample(self):
+        return np.asarray([dist.sample() for dist in self._distributions])

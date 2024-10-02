@@ -92,17 +92,33 @@ def test_shape():
     """Test that we can pass in all sorts of weird shaped vectors"""
     for shape in [(53, ), (53, 5), (53, 5, 3), (53, 5, 3, 2)]:
         x = np.random.normal(size=shape)
-        X = Polynomial(x_name='x', polyorder=4).design_matrix(x=x)    
+        p1 = Polynomial(x_name='x', polyorder=4)
+
+        X = p1.design_matrix(x=x)    
         assert X.shape == (*shape, 4)
+        dp1 = p1.to_gradient()
+        X = dp1.design_matrix(x=x)
+        assert X.shape == (*shape, 1)
         X = dPolynomial(np.arange(4), x_name='x', polyorder=4).design_matrix(x=x)    
         assert X.shape == (*shape, 1)
-        X = Sinusoid(x_name='x', nterms=4).design_matrix(x=x)    
+
+        s1 = Sinusoid(x_name='x', nterms=4)
+        X = s1.design_matrix(x=x)    
         assert X.shape == (*shape, 8)
+        ds1 = s1.to_gradient()
+        X = ds1.design_matrix(x=x)
+        assert X.shape == (*shape, 1)
         X = dSinusoid(np.arange(8), x_name='x', nterms=4).design_matrix(x=x)    
         assert X.shape == (*shape, 1)
+
         X = Constant().design_matrix(x=x)    
         assert X.shape == (*shape, 1)
-        X = Spline(x_name='x', knots=np.arange(-2, 2, 0.4)).design_matrix(x=x)    
+        
+        sp1 = Spline(x_name='x', knots=np.arange(-2, 2, 0.4))
+        X = sp1.design_matrix(x=x)    
         assert X.shape == (*shape, 6)
+        dsp1 = sp1.to_gradient()
+        X = dsp1.design_matrix(x=x)
+        assert X.shape == (*shape, 1)
         X = dSpline(np.arange(6), x_name='x', knots=np.arange(-2, 2, 0.4)).design_matrix(x=x)    
         assert X.shape == (*shape, 1)

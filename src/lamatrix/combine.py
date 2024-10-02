@@ -4,21 +4,22 @@ from .model import Model
 import itertools
 import numpy as np
 from .distributions import Distribution, DistributionsContainer
+from scipy import sparse
 
 __all__ = ["JointModel", "CrosstermModel"]
 
 
-def combine_matrices(*matrices):
-    if len(matrices) == 1:
-        return matrices[0]
-    # Step case: combine the first two equations and recursively call the function with the result
-    combined = [matrices[0] * f[:, None] for f in matrices[1].T]
+# def combine_matrices(*matrices):
+#     if len(matrices) == 1:
+#         return matrices[0]
+#     # Step case: combine the first two equations and recursively call the function with the result
+#     combined = [matrices[0] * f[:, None] for f in matrices[1].T]
 
-    # If there are more equations left, combine further
-    if len(matrices) > 2:
-        return np.hstack(combine_matrices(combined, *matrices[2:]))
-    else:
-        return np.hstack(combined)
+#     # If there are more equations left, combine further
+#     if len(matrices) > 2:
+#         return np.hstack(combine_matrices(combined, *matrices[2:]))
+#     else:
+#         return np.hstack(combined)
 
 
 class JointModel(Model):
@@ -89,10 +90,15 @@ class JointModel(Model):
 
     def design_matrix(self, *args, **kwargs):
         Xs = [g.design_matrix(*args, **kwargs) for g in self.models]
-        ndim = Xs[0].ndim - 1
-        shape_a = [*np.arange(1, ndim + 1).astype(int), 0]
-        shape_b = [ndim, *np.arange(0, ndim)]
-        return np.vstack([X.transpose(shape_b) for X in Xs]).transpose(shape_a)
+        if np.all([sparse.issparse(matrix) for matrix in Xs]):
+            return sparse.hstack(Xs, format='csr')
+        elif np.all([not sparse.issparse(matrix) for matrix in Xs]):
+            ndim = Xs[0].ndim - 1
+            shape_a = [*np.arange(1, ndim + 1).astype(int), 0]
+            shape_b = [ndim, *np.arange(0, ndim)]
+            return np.vstack([X.transpose(shape_b) for X in Xs]).transpose(shape_a)
+        else:
+            raise ValueError("Can not combine sparse and dense matrices.")
 
     @property
     def width(self):
@@ -150,8 +156,8 @@ class CrosstermModel(Model):
         self.best_fit = DistributionsContainer.from_number(np.prod(self.widths))
         prior_mean = np.asarray(
             [
-                np.sum(i)
-                for i in itertools.product(
+                means[0] * means[1]
+                for means in itertools.product(
                     *[
                         [distribution[0] for distribution in g.priors]
                         for g in self.models
@@ -159,17 +165,23 @@ class CrosstermModel(Model):
                 )
             ]
         )
-        prior_std = np.asarray(
+        prior_std = np.sqrt(np.asarray(
             [
-                np.prod(i)
-                for i in itertools.product(
+                means[0]**2 * stds[0]**2 + means[1]**2 * stds[1]**2 + stds[0]**2 * stds[1]**2
+                for means, stds in zip(itertools.product(
+                    *[
+                        [distribution[1] for distribution in g.priors]
+                        for g in self.models
+                    ]
+                ), itertools.product(
                     *[
                         [distribution[1] for distribution in g.priors]
                         for g in self.models
                     ]
                 )
+                )
             ]
-        )
+        ))
         self.priors = DistributionsContainer([Distribution(m, s) for m, s in zip(prior_mean, prior_std)])
         # self._validate_distributions(prior_distributions)
         # self.prior_distributions = prior_distributions
@@ -229,12 +241,19 @@ class CrosstermModel(Model):
 
     def design_matrix(self, *args, **kwargs):
         Xs = [g.design_matrix(*args, **kwargs) for g in self.models]
-        ndim = Xs[0].ndim - 1
-        shape_a = [*np.arange(1, ndim + 1).astype(int), 0]
-        shape_b = [ndim, *np.arange(0, ndim)]
-        Xs = [X.transpose(shape_b) for X in Xs]
-        X = np.vstack([np.expand_dims(np.prod(i, axis=0), ndim).transpose(shape_b) for i in itertools.product(*Xs)]).transpose(shape_a)
-        return X
+        if np.all([sparse.issparse(matrix) for matrix in Xs]):
+            X = sparse.hstack([i[0].multiply(i[1]).T for i in itertools.product(*[x.T for x in Xs])], format='csr')
+            return X
+        elif np.all([not sparse.issparse(matrix) for matrix in Xs]):
+            ndim = Xs[0].ndim - 1
+            shape_a = [*np.arange(1, ndim + 1).astype(int), 0]
+            shape_b = [ndim, *np.arange(0, ndim)]
+            Xs = [X.transpose(shape_b) for X in Xs]
+            X = np.vstack([np.expand_dims(np.prod(i, axis=0), ndim).transpose(shape_b) for i in itertools.product(*Xs)]).transpose(shape_a)
+            return X
+        else:
+            raise ValueError("Can not combine sparse and dense matrices.")
+
 
         print(itertools.product())
 
