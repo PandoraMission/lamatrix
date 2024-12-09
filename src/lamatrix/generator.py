@@ -164,7 +164,7 @@ class Generator(ABC):
     def to_latex(self):
         return "\n".join([self.equation, self._to_latex_table()])
 
-    def _fit(self, data, errors=None, mask=None, *args, **kwargs):
+    def _fit(self, data, errors=None, mask=None, return_model=False, *args, **kwargs):
         X = self.design_matrix(*args, **kwargs)
         if np.prod(data.shape) != X.shape[0]:
             raise ValueError(f"Data must have shape {X.shape[0]}")
@@ -183,7 +183,10 @@ class Generator(ABC):
         ) + np.nan_to_num(self.prior_mu / self.prior_sigma**2)
         fit_mu = np.linalg.solve(sigma_w_inv, B)
         fit_sigma = self.cov.diagonal() ** 0.5
+        if return_model:
+            return fit_mu, fit_sigma, X.dot(fit_mu)
         return fit_mu, fit_sigma
+
 
     @property
     def mu(self):

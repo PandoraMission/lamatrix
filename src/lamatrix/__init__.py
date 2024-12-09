@@ -5,7 +5,7 @@ from datetime import datetime
 
 PACKAGEDIR = os.path.abspath(os.path.dirname(__file__))
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def _META_DATA():
