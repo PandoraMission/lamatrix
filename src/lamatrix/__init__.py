@@ -37,18 +37,19 @@ import json
 import numpy as np
 
 from .distributions import DistributionsContainer, Distribution  # noqa: E402, F401
-from .bound import *
+from .model import *  # noqa: E402, F401
 from .combine import *  # noqa: E402, F401
+from .bounded import *  # noqa: E402, F401
 from .models.astrophysical import *  # noqa: E402, F401
 from .models.gaussian import *  # noqa: E402, F401
 from .models.simple import *  # noqa: E402, F401
 from .models.spline import *  # noqa: E402, F401
 
-
-
 def _load_from_dict(dict):
     new = globals()[dict["object_type"]](**dict["initializing_kwargs"])
-    _ = [setattr(new, key, value) for key, value in dict["fit_results"].items()]
+    new.priors = DistributionsContainer.from_dict(dict['priors'])
+    if dict['posteriors'] is not None:
+        new.posteriors = DistributionsContainer.from_dict(dict['posteriors'])
     return new
 
 
@@ -71,14 +72,11 @@ def load(filename):
     with open(filename, "r") as json_file:
         data_loaded = json.load(json_file)
     data_loaded = {key: process(item) for key, item in data_loaded.items()}
-    if "generators" in data_loaded.keys():
-        generators = [
-            _load_from_dict(item) for _, item in data_loaded["generators"].items()
+    if "models" in data_loaded.keys():
+        models = [
+            _load_from_dict(item) for _, item in data_loaded["models"].items()
         ]
-        new = globals()[data_loaded["object_type"]](*generators)
-        _ = [
-            setattr(new, key, value)
-            for key, value in data_loaded["fit_results"].items()
-        ]
-        return new
-    return _load_from_dict(data_loaded)
+        new = globals()[data_loaded["object_type"]](*models)
+    else:
+        new = _load_from_dict(data_loaded)
+    return new

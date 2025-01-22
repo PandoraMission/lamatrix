@@ -136,3 +136,10 @@ class DistributionsContainer:
     
     def sample(self):
         return np.asarray([dist.sample() for dist in self._distributions])
+    
+    def to_dict(self):
+        return {"mean":self.mean.tolist(), "std":self.std.tolist()}
+    
+    @staticmethod
+    def from_dict(dict):
+        return DistributionsContainer([Distribution(m, s) for m, s, in zip(dict['mean'], dict['std'])])

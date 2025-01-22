@@ -4,6 +4,7 @@ import numpy as np
 
 from ..model import Model
 from ..math import MathMixins
+from ..io import LatexMixins, IOMixins
 
 __all__ = [
     "Gaussian",
@@ -31,7 +32,6 @@ def _coeff_to_mu1d(distributions):
     mu = - (b / (2 * a))
     mu_err = mu * ((berr/b)**2 + (aerr/a)**2)**0.5
     return (mu, mu_err)
-
 
 def _coeff_to_A1d(distributions):
     sigma, sigma_err = _coeff_to_sigma1d(distributions)
@@ -69,20 +69,29 @@ def _coeffs_to_rho(distributions):
     return (rho, rho_err)
 
 
-class Gaussian(MathMixins, Model):
+class Gaussian(MathMixins, LatexMixins, IOMixins, Model):
     def __init__(
         self,
         x_name: str = "x",
-        prior_distributions=None,
-        sigma=1,
-        mu=0,
+        sigma:float=1.,
+        mu:float=0.,
+        priors=None,
+        posteriors=None,
     ):
         self.x_name = x_name
         self._validate_arg_names()
         self.sigma = sigma
         self.mu = mu
-        super().__init__(prior_distributions=prior_distributions)
+        super().__init__(priors=priors, posteriors=posteriors)
 
+    @property
+    def _initialization_attributes(self):
+        return [
+            "x_name",
+            "sigma",
+            "mu",
+        ]
+    
     @property
     def width(self):
         return 1
@@ -111,34 +120,35 @@ class Gaussian(MathMixins, Model):
 
     @property
     def prior_amplitude(self):
-        return self.prior_distributions[0]
+        return self.priors[0]
 
     @property
-    def fit_amplitude(self):
-        return self.fit_distributions[0]
+    def posterior_amplitude(self):
+        return self.posteriors[0]
 
-    def to_gradient(self, prior_distributions=None):
-        return dGaussian(
-            x_name=self.x_name,
-            sigma=self.sigma,
-            mu=self.mu,
-            prior_distributions=prior_distributions,
-        )
+    # def to_gradient(self, prior_distributions=None):
+    #     return dGaussian(
+    #         x_name=self.x_name,
+    #         sigma=self.sigma,
+    #         mu=self.mu,
+    #         prior_distributions=prior_distributions,
+    #     )
 
 
 class dGaussian(MathMixins, Model):
     def __init__(
         self,
         x_name: str = "x",
-        prior_distributions=None,
-        sigma=1,
-        mu=0,
+        sigma:float=1.,
+        mu:float=0.,
+        priors=None,
+        posteriors=None,
     ):
         self.x_name = x_name
         self._validate_arg_names()
         self.sigma = sigma
         self.mu = mu
-        super().__init__(prior_distributions=prior_distributions)
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def width(self):
@@ -169,11 +179,11 @@ class dGaussian(MathMixins, Model):
 
     @property
     def prior_amplitude(self):
-        return self.prior_distributions[0]
+        return self.priors[0]
 
     @property
-    def fit_amplitude(self):
-        return self.fit_distributions[0]
+    def posterior_amplitude(self):
+        return self.posteriors[0]
 
 
 class Gaussian2D(MathMixins, Model):

@@ -1,3 +1,55 @@
+"""Experimental Bounded class..."""
+import functools
+from .model import Model
+from .math import MathMixins
+from .io import LatexMixins, IOMixins
+
+class Bounded(MathMixins, LatexMixins, IOMixins):
+    """Class that applies bounds to models."""
+    def __init__(self, model:Model, bounds:tuple):
+        """Bounded version of a model. The vector that drives the model will have the bound applied whenever it is used.
+        
+        Parameters:
+        -----------
+    
+        model: lamatrix.model.Model
+            An input model to bound
+        bounds: tuple
+            The bounds to apply to the model as a tuple. The first element of the tuple will be the lower bound.
+            The second element is the upper bound. This will be applied as lower_bound > x <= upper_bound.
+        """
+        self.model = model
+        self.x_name = self.model.x_name
+        self.bounds = bounds
+
+    def __repr__(self):
+        return "Bounded " + self.model.__repr__()
+
+    def __getattr__(self, name):
+        """
+        Delegate attribute access to the wrapped instance.
+        """
+        attr = getattr(self.model, name)
+        if callable(attr):
+            @functools.wraps(attr)
+            def wrapped(*args, **kwargs):
+                if self.x_name in kwargs:
+                    old_x = kwargs.pop(self.x_name)
+                    mask = (old_x > self.bounds[0]) & (old_x <= self.bounds[1]) 
+                    new_x = old_x * mask
+                    kwargs[self.x_name] = new_x
+                return attr(*args, **kwargs)                
+            return wrapped
+        else:
+            return attr
+
+
+    def __dir__(self):
+        """
+        Extend the list of attributes to include those of the wrapped instance.
+        """
+        return dir(self.model)
+
 # import numpy as np
 
 # from .combine import StackedIndependentGenerator

@@ -12,22 +12,22 @@ def test_simple_fits():
     w = np.random.normal(size=model.width)
     data = model.design_matrix(Z=Z, C=C, R=R).dot(w)
     model.fit(data=data, Z=Z, C=C, R=R)
-    assert np.allclose(w, model.best_fit.mean, rtol=1e-5)
+    assert np.allclose(w, model.posteriors.mean, rtol=1e-5)
 
     model = ls1 + p1 + sp1
     w = np.random.normal(size=model.width)
     data = model.design_matrix(Z=Z, C=C, R=R).dot(w)
     model.fit(data=data, Z=Z, C=C, R=R)
-    assert np.allclose(w, model.best_fit.mean, rtol=1e-5)
+    assert np.allclose(w, model.posteriors.mean, rtol=1e-5)
 
     model = ls1 * p1
     w = np.random.normal(size=model.width)
     data = model.design_matrix(Z=Z, C=C, R=R).dot(w)
     model.fit(data=data, Z=Z, R=R, C=C)
-    assert np.allclose(w, model.best_fit.mean, rtol=1e-5)
+    assert np.allclose(w, model.posteriors.mean, rtol=1e-5)
 
     model = ls1 * p1 + sp1
     w = np.random.normal(size=model.width)
     data = model.design_matrix(Z=Z, R=R, C=C).dot(w)
     model.fit(data=data, Z=Z, R=R, C=C)
-    assert np.allclose(w, model.best_fit.mean, rtol=1e-5)
+    assert np.allclose(w, model.posteriors.mean, rtol=1e-5)

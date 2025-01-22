@@ -20,11 +20,11 @@ def test_constant():
 
     g = Constant()
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.best_fit.mean[0], w, atol=0.01)
+    assert np.isclose(g.posteriors.mean[0], w, atol=0.01)
 
     g = Constant(priors=[(w, 0.1)])
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.best_fit.mean[0], w, atol=0.01)
+    assert np.isclose(g.posteriors.mean[0], w, atol=0.01)
 
 
 def test_polynomial():
@@ -45,15 +45,15 @@ def test_polynomial():
 
     g = Polynomial("x", polyorder=3)
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.best_fit.mean[0], w, atol=0.01)
-    assert np.allclose(g.best_fit.mean[1:], np.zeros(g.width - 1), atol=0.01)
+    assert np.isclose(g.posteriors.mean[0], w, atol=0.01)
+    assert np.allclose(g.posteriors.mean[1:], np.zeros(g.width - 1), atol=0.01)
 
     g = Polynomial(
         "x", polyorder=3, priors=[(w, 0.1), (0, np.inf), (0, np.inf)]
     )
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.best_fit.mean[0], w, atol=0.01)
-    assert np.allclose(g.best_fit.mean[1:], np.zeros(g.width - 1), atol=0.01)
+    assert np.isclose(g.posteriors.mean[0], w, atol=0.01)
+    assert np.allclose(g.posteriors.mean[1:], np.zeros(g.width - 1), atol=0.01)
 
 
 def test_sinusoid():
@@ -74,9 +74,9 @@ def test_sinusoid():
 
     g = Sinusoid("x", nterms=2)
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.best_fit.mean[0], w[0], atol=0.01)
-    assert np.isclose(g.best_fit.mean[1], w[1], atol=0.01)
-    assert np.allclose(g.best_fit.mean[2:], np.zeros(g.width - 2), atol=0.01)
+    assert np.isclose(g.posteriors.mean[0], w[0], atol=0.01)
+    assert np.isclose(g.posteriors.mean[1], w[1], atol=0.01)
+    assert np.allclose(g.posteriors.mean[2:], np.zeros(g.width - 2), atol=0.01)
 
     g = Sinusoid(
         "x",
@@ -84,9 +84,9 @@ def test_sinusoid():
         priors=[(w[0], 0.1), (w[1], 0.1), (0, np.inf), (0, np.inf)],
     )
     g.fit(data=y, errors=ye, x=x)
-    assert np.isclose(g.best_fit.mean[0], w[0], atol=0.01)
-    assert np.isclose(g.best_fit.mean[1], w[1], atol=0.01)
-    assert np.allclose(g.best_fit.mean[2:], np.zeros(g.width - 2), atol=0.01)
+    assert np.isclose(g.posteriors.mean[0], w[0], atol=0.01)
+    assert np.isclose(g.posteriors.mean[1], w[1], atol=0.01)
+    assert np.allclose(g.posteriors.mean[2:], np.zeros(g.width - 2), atol=0.01)
 
 def test_shape():
     """Test that we can pass in all sorts of weird shaped vectors"""

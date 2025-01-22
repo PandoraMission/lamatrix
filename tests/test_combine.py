@@ -66,7 +66,7 @@ def test_polynomial():
     assert (dm[:, 0] == np.ones(10)).all()
     assert g.width == 4
     assert len(g.priors) == 4
-    assert len(g.best_fit) == 4
+    assert len(g.posteriors) == 4
     assert isinstance(g.priors, DistributionsContainer)
     assert isinstance(g.priors[0], Distribution)
 
@@ -77,8 +77,8 @@ def test_polynomial():
     ye = np.ones_like(x) + 0.001
 
     g.fit(data=y, errors=ye, x=x)
-    assert len(g.best_fit) == 4
-    assert np.isclose(g.best_fit.mean[1], w, atol=0.01)
+    assert len(g.posteriors) == 4
+    assert np.isclose(g.posteriors.mean[1], w, atol=0.01)
 
 
 def test_cross():

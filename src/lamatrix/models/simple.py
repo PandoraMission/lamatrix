@@ -4,9 +4,12 @@ import numpy as np
 from typing import List
 from ..model import Model
 from ..math import MathMixins
+from ..io import LatexMixins, IOMixins
 from ..combine import CrosstermModel
 
 from scipy import sparse
+from scipy.sparse import SparseEfficiencyWarning
+import warnings
 
 __all__ = [
     "Polynomial",
@@ -14,22 +17,25 @@ __all__ = [
     "Sinusoid",
     "dPolynomial",
     "dSinusoid",
+    "Step",
+    "Fixed",
 ]
 
 
-class Polynomial(MathMixins, Model):
+class Polynomial(MathMixins, LatexMixins, IOMixins, Model):
     def __init__(
         self,
         x_name: str = "x",
         polyorder: int = 3,
         priors=None,
+        posteriors=None,
     ):
         if polyorder < 1:
             raise ValueError("Must have polyorder >= 1.")
         self.x_name = x_name
         self._validate_arg_names()
         self.polyorder = polyorder
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def width(self):
@@ -43,6 +49,20 @@ class Polynomial(MathMixins, Model):
     def arg_names(self):
         return {self.x_name}
 
+    @property
+    def _initialization_attributes(self):
+        return [
+            "x_name",
+            "polyorder",
+        ]
+
+    @property
+    def _equation(self):
+        eqn = [
+            f"\mathbf{{{self.x_name}}}^{{{idx}}}" for idx in range(1, self.polyorder + 1)
+        ]
+        return eqn
+
     def design_matrix(self, **kwargs):
         """Build a 1D polynomial in `x_name`.
 
@@ -55,13 +75,16 @@ class Polynomial(MathMixins, Model):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
         if sparse.issparse(x):
-            return sparse.hstack([x.power(idx) for idx in range(1, self.polyorder + 1)])
+            if not x.shape[1] == 1:
+                raise ValueError(f"Can only fit sparse matrices with shape (n, 1), {self.x_name} has shape {x.shape}.")
+            return sparse.hstack([x.power(idx) for idx in range(1, self.polyorder + 1)], format='csr')
         else:
             shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
             return np.asarray([x**idx for idx in range(1, self.polyorder + 1)]).transpose(shape_a)
 
-    def to_gradient(self, priors=None):
-        weights = self.best_fit.mean if self.best_fit is not None else self.priors.mean
+    def to_gradient(self, weights=None, priors=None):
+        if weights is None:
+            weights = self.posteriors.mean if self.posteriors is not None else self.priors.mean
         return dPolynomial(
             weights=weights[1:],
             x_name=self.x_name,
@@ -77,13 +100,14 @@ class Polynomial(MathMixins, Model):
         model.set_priors([model.prior_distributions[idx] if i else (0, 1e-10) for idx, i in enumerate(prior_std_cube.ravel())])
         return model
 
-class dPolynomial(MathMixins, Model):
+class dPolynomial(MathMixins, LatexMixins, IOMixins, Model):
     def __init__(
         self,
         weights: List,
         x_name: str = "x",
         polyorder: int = 3,
         priors=None,
+        posteriors=None,
     ):
         if polyorder < 1:
             raise ValueError("Must have polyorder >= 1.")
@@ -92,7 +116,7 @@ class dPolynomial(MathMixins, Model):
         self.polyorder = polyorder
         self._weight_width = self.polyorder
         self.weights = self._validate_weights(weights, self._weight_width)
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def width(self):
@@ -105,6 +129,18 @@ class dPolynomial(MathMixins, Model):
     @property
     def arg_names(self):
         return {self.x_name}
+
+    @property
+    def _mu_letter(self):
+        return "v"
+
+    @property
+    def _equation(self):
+        eqn = [
+            f"{idx + 1 if idx != 0 else ''}w_{{{idx}}}\mathbf{{{self.x_name}}}^{{{idx}}}"
+            for idx in range(self.polyorder + 1)
+        ]
+        return eqn
 
     def design_matrix(self, **kwargs):
         """Build a 1D polynomial in x
@@ -125,7 +161,7 @@ class dPolynomial(MathMixins, Model):
         if sparse.issparse(x):
             if not x.shape[1] == 1:
                 raise ValueError(f"Can only fit sparse matrices with shape (n, 1), {self.x_name} has shape {x.shape}.")
-            return sparse.hstack([x.power(idx).multiply(idx + 1) for idx in range(1, self.polyorder + 1)]).dot(sparse.csr_matrix(self.weights).T)
+            return sparse.hstack([x.power(idx).multiply(idx + 1) for idx in range(1, self.polyorder + 1)], format='csr').dot(sparse.csr_matrix(self.weights).T)
         else:
             shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
             return np.expand_dims(np.asarray(
@@ -133,18 +169,19 @@ class dPolynomial(MathMixins, Model):
             ).transpose(shape_a).dot(self.weights), axis=x.ndim)
 
 
-class Sinusoid(MathMixins, Model):
+class Sinusoid(MathMixins, LatexMixins, IOMixins, Model):
     def __init__(
         self,
         x_name: str = "x",
         nterms: int = 1,
         priors=None,
+        posteriors=None,
     ):
 
         self.x_name = x_name
         self._validate_arg_names()
         self.nterms = nterms
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def width(self):
@@ -157,6 +194,21 @@ class Sinusoid(MathMixins, Model):
     @property
     def arg_names(self):
         return {self.x_name}
+
+    @property
+    def _equation(self):
+        def frq(term):
+            return f"{term + 1}" if term > 0 else ""
+
+        return np.hstack(
+                [
+                    [
+                        f"\sin({frq(idx)}\\mathbf{{{self.x_name}}})",
+                        f"\cos({frq(idx)}\\mathbf{{{self.x_name}}})",
+                    ]
+                    for idx in range(self.nterms)
+                ]
+        )
 
     def design_matrix(self, **kwargs):
         if not self.arg_names.issubset(set(kwargs.keys())):
@@ -175,8 +227,9 @@ class Sinusoid(MathMixins, Model):
             X = X[((R * self.nterms + C).T).ravel()]
             return X.transpose(shape_a)
 
-    def to_gradient(self, priors=None):
-        weights = self.best_fit.mean if self.best_fit is not None else self.priors.mean
+    def to_gradient(self, weights=None, priors=None):
+        if weights is None:
+            weights = self.posteriors.mean if self.posteriors is not None else self.priors.mean
         return dSinusoid(
             weights=weights,
             x_name=self.x_name,
@@ -185,13 +238,14 @@ class Sinusoid(MathMixins, Model):
         )
 
 
-class dSinusoid(MathMixins, Model):
+class dSinusoid(MathMixins, LatexMixins, IOMixins, Model):
     def __init__(
         self,
         weights: List,
         x_name: str = "x",
         nterms: int = 1,
         priors=None,
+        posteriors=None,
     ):
 
         self.x_name = x_name
@@ -199,7 +253,7 @@ class dSinusoid(MathMixins, Model):
         self.nterms = nterms
         self._weight_width = self.nterms * 2
         self.weights = self._validate_weights(weights, self._weight_width)
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def width(self):
@@ -212,6 +266,25 @@ class dSinusoid(MathMixins, Model):
     @property
     def arg_names(self):
         return {self.x_name}
+
+    @property
+    def _mu_letter(self):
+        return "v"
+
+    @property
+    def _equation(self):
+        def frq(term):
+            return f"{term + 1}" if term > 0 else ""
+
+        return np.hstack(
+                [
+                    [
+                        f"w_{{{idx * 2}}}\cos({frq(idx)}\\mathbf{{{self.x_name}}})",
+                        f"w_{{{idx * 2 + 1}}}(-\sin({frq(idx)}\\mathbf{{{self.x_name}}}))",
+                    ]
+                    for idx in range(self.nterms)
+                ],
+        )
 
     def design_matrix(self, **kwargs):
         """
@@ -257,13 +330,13 @@ class dSinusoid(MathMixins, Model):
         # ).transpose(shape_a).sum(axis=1)[:, None]
 
 
-class Constant(MathMixins, Model):
+class Constant(MathMixins, LatexMixins, IOMixins, Model):
     """
     A generator which has no variable, and whos design matrix is entirely ones.
     """
 
-    def __init__(self, priors=None):
-        super().__init__(priors=priors)
+    def __init__(self, priors=None, posteriors=None):
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def width(self):
@@ -276,6 +349,10 @@ class Constant(MathMixins, Model):
     @property
     def arg_names(self):
         return {}
+    
+    @property
+    def _equation(self):
+        return [""]
 
     def design_matrix(self, **kwargs):
         """Build a 1D polynomial in x
@@ -305,6 +382,135 @@ class Constant(MathMixins, Model):
     #         data_shape=self.data_shape,
     #         offset_prior=(self._mu[1], self._sigma[1]),
     #     )
+
+
+
+class Step(MathMixins, LatexMixins, IOMixins, Model):
+    def __init__(
+        self,
+        x_name: str = "x",
+        breakpoints: list[float] = [0],
+        priors=None,
+        posteriors=None,
+    ):
+        if len(breakpoints) == 0:
+            raise ValueError("Must have at least one breakpoint")
+        self.x_name = x_name
+        self._validate_arg_names()
+        self.breakpoints = np.sort(breakpoints)
+        super().__init__(priors=priors, posteriors=posteriors)
+
+    @property
+    def width(self):
+        return len(self.breakpoints) + 1
+
+    @property
+    def nvectors(self):
+        return 1
+
+    @property
+    def arg_names(self):
+        return {self.x_name}
+
+    @property
+    def _initialization_attributes(self):
+        return [
+            "x_name",
+            "breakpoints",
+        ]
+
+    @property
+    def _equation(self):
+        bounds = np.hstack(["-\infty", self.breakpoints, "\infty"])
+        eqn = [
+            f"\mathbb{{I}}_{{[{{{bounds[idx]}}}, {{{bounds[idx + 1]}}}]}}(\mathbf{{{self.x_name}}})" for idx in range(0, self.width)
+        ]
+        return eqn
+
+    def design_matrix(self, **kwargs):
+        """Build a 1D polynomial in `x_name`.
+
+        Returns
+        -------
+        X : np.ndarray
+            Design matrix with shape (len(x), self.nvectors)
+        """
+        if not self.arg_names.issubset(set(kwargs.keys())):
+            raise ValueError(f"Expected {self.arg_names} to be passed.")
+        x = kwargs.get(self.x_name)
+        bounds = np.hstack([-np.inf, self.breakpoints, np.inf])
+        if sparse.issparse(x):
+            if 0 in bounds:
+                raise ValueError("Can not create a Step function with a boundary at 0 if you supply a sparse matrix.")
+            if not x.shape[1] == 1:
+                raise ValueError(f"Can only fit sparse matrices with shape (n, 1), {self.x_name} has shape {x.shape}.")
+            vectors = []
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", SparseEfficiencyWarning)
+                for idx in range(0, self.width):
+                    vectors.append((x >= bounds[idx]).multiply(x < bounds[idx + 1]))
+            return sparse.hstack(vectors, format='csr')
+        else:
+            shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+            return np.asarray([(x >= bounds[idx]) & (x < bounds[idx+1]) for idx in range(0, self.width)]).transpose(shape_a).astype(float)
+
+
+class Fixed(MathMixins, LatexMixins, IOMixins, Model):
+    """A model that has fixed input vectors"""
+    def __init__(
+        self,
+        x_name: str = "x",
+        width: int = 1,
+        priors=None,
+        posteriors=None,
+    ):
+        """A model with fixed vector inputs"""
+        self.x_name = x_name
+        # We give this a hidden name so we can comply with the ABC
+        self._width = width
+        self._validate_arg_names()
+        super().__init__(priors=priors, posteriors=posteriors)
+
+    @property
+    def width(self):
+        return self._width
+        
+    @property
+    def nvectors(self):
+        return self.width
+
+    @property
+    def arg_names(self):
+        return {self.x_name}
+
+    @property
+    def _initialization_attributes(self):
+        return [
+            "x_name",
+            "width",
+        ]
+
+    @property
+    def _equation(self):
+        eqn = [
+            f"\mathbf{{{self.x_name}}}_{{{idx}}}" for idx in range(0, self.width)
+        ]
+        return eqn
+
+    def design_matrix(self, **kwargs):
+        """Build a 1D polynomial in `x_name`.
+
+        Returns
+        -------
+        X : np.ndarray
+            Design matrix with shape (len(x), self.nvectors)
+        """
+        if not self.arg_names.issubset(set(kwargs.keys())):
+            raise ValueError(f"Expected {self.arg_names} to be passed.")
+        x = kwargs.get(self.x_name)
+        if not x.shape[-1] == self.width:
+            raise ValueError(f"Must pass a vector for {self.x_name} that has width {self.width}.")
+        return x
 
 
 # class Polynomial1DGenerator(MathMixins, Generator):

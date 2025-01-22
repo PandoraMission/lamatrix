@@ -55,11 +55,14 @@ class Model(ABC):
     def __init__(
         self,
         priors: List[Tuple] = None,
+        posteriors: List[Tuple] = None,
     ):
         # prior (always normal, and always specfied by mean and standard deviation)
         # fit_distributions (always normal, and always specfied by mean and standard deviation)
         if priors is None:
             self.priors = DistributionsContainer.from_number(self.width)
+        elif isinstance(priors, (tuple, Distribution)):
+            self.priors = DistributionsContainer([priors])
         elif isinstance(priors, (list, np.ndarray)):
             self.priors = DistributionsContainer(priors)
         elif isinstance(priors, DistributionsContainer):
@@ -71,7 +74,7 @@ class Model(ABC):
                 "distributions must have the number of elements as the design matrix."
             )
 
-        self.best_fit = None
+        self.posteriors = posteriors
         
     @property
     @abstractmethod
@@ -84,6 +87,34 @@ class Model(ABC):
     def nvectors(self):
         """Returns the number of vectors required to build the object."""
         pass
+
+    @property
+    def _initialization_attributes(self):
+        return [
+            "x_name",
+        ]
+
+    @property
+    def _mu_letter(self):
+        """Letter to represent the weight in equation representation."""
+        return "w"
+
+    @property
+    @abstractmethod
+    def _equation(self):
+        """Returns a list of latex equations for each vector to describe the generation of the design matrix."""
+        pass
+
+    @property
+    def equation(self):
+        func_signature = ", ".join([f"\\mathbf{{{a}}}" for a in self.arg_names])
+        return (
+            f"\\[f({func_signature}) = "
+            + " + ".join(
+                [f"{self._mu_letter}_{{{coeff}}} {e}" for coeff, e in enumerate(self._equation)]
+            )
+            + "\\]"
+        )
 
     def __repr__(self):
         return (
@@ -195,7 +226,9 @@ class Model(ABC):
 
         """
         if not isinstance(self.priors, DistributionsContainer):
-            if isinstance(self.priors, list):
+            if isinstance(self.priors, tuple):
+                self.priors = DistributionsContainer(self.priors)
+            elif isinstance(self.priors, list):
                 self.priors = DistributionsContainer([Distribution(d) for d in self.priors])
             else:
                 raise ValueError("Can not parse priors.")
@@ -232,7 +265,8 @@ class Model(ABC):
             if dense_vector:
                 if dense_data:
                     if not item.shape == data.shape:
-                        raise ValueError(f"Must pass vector for variable `{key}` with shape {data.shape}.")                    
+                        if not item.shape[:-1] == data.shape:
+                            raise ValueError(f"Must pass vector for variable `{key}` with shape {data.shape}.")                    
                 else:
                     if not (item.shape[0] == data.shape[0]) & (item.ndim == 1):
                         raise ValueError(f"Must pass vector for variable `{key}` with shape ({data.shape[0]}, 1).")                                        
@@ -280,12 +314,12 @@ class Model(ABC):
             )
             fit_mean = np.linalg.solve(sigma_w_inv, B)
             fit_std = self.cov.diagonal() ** 0.5
-        self.best_fit = DistributionsContainer([Distribution(m, s) for m, s in zip(fit_mean, fit_std)])
+        self.posteriors = DistributionsContainer([Distribution(m, s) for m, s in zip(fit_mean, fit_std)])
         return
 
     def evaluate(self, **kwargs):
         X = self.design_matrix(**kwargs)
-        return X.dot(self.best_fit.mean)
+        return X.dot(self.posteriors.mean)
 
     def __call__(self, *args, **kwargs):
         return self.design_matrix(*args, **kwargs)

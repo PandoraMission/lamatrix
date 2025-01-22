@@ -1,8 +1,10 @@
 # """Generator objects for different types of models"""
 from typing import List
 import numpy as np
+from scipy import sparse
 from ..model import Model
 from ..math import MathMixins
+from ..io import LatexMixins, IOMixins
 
 __all__ = [
     "Spline",
@@ -62,25 +64,26 @@ class SplineMixins:
             return 0  # The derivative of a constant (k=1) function is 0
 
 
-class Spline(MathMixins, SplineMixins, Model):
+class Spline(MathMixins, SplineMixins, LatexMixins, IOMixins, Model):
     def __init__(
         self,
         x_name: str = "x",
         knots: np.ndarray = np.arange(1, 1, 0.3),
-        splineorder: int = 3,
+        order: int = 3,
         priors=None,
+        posteriors=None,
     ):
-        if splineorder < 1:
-            raise ValueError("Must have splineorder >= 1.")
+        if order < 1:
+            raise ValueError("Must have order >= 1.")
         self.x_name = x_name
         self._validate_arg_names()
-        self.splineorder = splineorder
+        self.order = order
         self.knots = knots
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def width(self):
-        return len(self.knots) - self.splineorder - 1
+        return len(self.knots) - self.order - 1
 
     @property
     def nvectors(self):
@@ -89,6 +92,14 @@ class Spline(MathMixins, SplineMixins, Model):
     @property
     def arg_names(self):
         return {self.x_name}
+
+    @property
+    def _equation(self):
+        return [
+                f"N_{{{idx}, {{{self.order}}}}}(\\mathbf{{{self.x_name}}})"
+                for idx in np.arange(1, self.width)
+            ]
+
 
     def design_matrix(self, **kwargs):
         """Build a 1D spline in x
@@ -106,20 +117,29 @@ class Spline(MathMixins, SplineMixins, Model):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
-        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+        if sparse.issparse(x):
+            if not x.shape[1] == 1:
+                raise ValueError(f"Can only fit sparse matrices with shape (n, 1), {self.x_name} has shape {x.shape}.")
+            k = x.nonzero()[0]
+            X = sparse.lil_matrix((self.width, x.shape[0]))
+            for i in range(self.width):
+                X[i, k] = self.bspline_basis(k=self.order, i=i, t=self.knots, x=x.data)
+            return X.T.tocsr()
+        else:
+            shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+            X = np.zeros((self.width, *x.shape))
+            for i in range(self.width):
+                X[i] = self.bspline_basis(k=self.order, i=i, t=self.knots, x=x)
+            return X.transpose(shape_a)
 
-        X = np.zeros((self.width, *x.shape))
-        for i in range(self.width):
-            X[i] = self.bspline_basis(k=self.splineorder, i=i, t=self.knots, x=x)
-        return X.transpose(shape_a)
-
-    def to_gradient(self, priors=None):
-        weights = self.best_fit.mean if self.best_fit is not None else self.priors.mean
+    def to_gradient(self, weights=None, priors=None):
+        if weights is None:
+            weights = self.posteriors.mean if self.posteriors is not None else self.priors.mean
         return dSpline(
             weights=weights,
             x_name=self.x_name,
             knots=self.knots,
-            splineorder=self.splineorder,
+            order=self.order,
             priors=priors,
         )
 
@@ -130,18 +150,19 @@ class dSpline(MathMixins, SplineMixins, Model):
         weights: List,
         x_name: str = "x",
         knots: np.ndarray = np.arange(1, 1, 0.3),
-        splineorder: int = 3,
+        order: int = 3,
         priors=None,
+        posteriors=None,
     ):
-        if splineorder < 1:
-            raise ValueError("Must have splineorder >= 1.")
+        if order < 1:
+            raise ValueError("Must have order >= 1.")
         self.x_name = x_name
         self._validate_arg_names()
-        self.splineorder = splineorder
+        self.order = order
         self.knots = knots
-        self._weight_width = len(self.knots) - self.splineorder - 1
+        self._weight_width = len(self.knots) - self.order - 1
         self.weights = self._validate_weights(weights, self._weight_width)
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def width(self):
@@ -155,18 +176,54 @@ class dSpline(MathMixins, SplineMixins, Model):
     def arg_names(self):
         return {self.x_name}
 
+
+    @property
+    def _equation(self):
+        return [
+            f"\\frac{{\\partial \\left( \\sum_{{i=0}}^{{{len(self.knots) - self.order - 2}}} w_{{i}} N_{{i,{self.order}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
+        ]
+
+    @property
+    def _mu_letter(self):
+        return "v"
+
+
     def design_matrix(self, **kwargs):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
-        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
-        # Set up the least squares problem
-        X = np.zeros((len(self.weights), *x.shape))
-        for i in range(len(self.weights)):
-            X[i] = self.bspline_basis_derivative(
-                k=self.splineorder, i=i, t=self.knots, x=x
-            )
-        return np.expand_dims(X.transpose(shape_a).dot(self.weights), x.ndim)
+        if sparse.issparse(x):
+            if not x.shape[1] == 1:
+                raise ValueError(f"Can only fit sparse matrices with shape (n, 1), {self.x_name} has shape {x.shape}.")
+            k = x.nonzero()[0]
+            X = sparse.lil_matrix((len(self.weights), x.shape[0]))
+            for i in range(len(self.weights)):
+                X[i, k] = self.bspline_basis_derivative(k=self.order, i=i, t=self.knots, x=x.data)
+            return sparse.csr_matrix(X.T.dot(self.weights)).T
+        else:
+            shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+            # Set up the least squares problem
+            X = np.zeros((len(self.weights), *x.shape))
+            for i in range(len(self.weights)):
+                X[i] = self.bspline_basis_derivative(
+                    k=self.order, i=i, t=self.knots, x=x
+                )
+            return np.expand_dims(X.transpose(shape_a).dot(self.weights), x.ndim)
+
+
+        # x = kwargs.get(self.x_name)
+        # if sparse.issparse(x):
+        #     k = x.nonzero()[0]
+        #     X = sparse.lil_matrix((self.width, x.shape[0]))
+        #     for i in range(self.width):
+        #         X[i, k] = self.bspline_basis(k=self.order, i=i, t=self.knots, x=x.data)
+        #     return X.T.tocsr()
+        # else:
+        #     shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+        #     X = np.zeros((self.width, *x.shape))
+        #     for i in range(self.width):
+        #         X[i] = self.bspline_basis(k=self.order, i=i, t=self.knots, x=x)
+        #     return X.transpose(shape_a)
 
 
 # class Spline1DGenerator(MathMixins, SplineMixins, Generator):
@@ -174,23 +231,23 @@ class dSpline(MathMixins, SplineMixins, Model):
 #         self,
 #         knots: np.ndarray,
 #         x_name: str = "x",
-#         splineorder: int = 3,
+#         order: int = 3,
 #         prior_mu=None,
 #         prior_sigma=None,
 #         offset_prior=None,
 #         data_shape=None,
 #     ):
 #         # Check if knots are padded
-#         if not (len(np.unique(knots[:splineorder])) == 1) & (
-#             len(np.unique(knots[-splineorder:])) == 1
+#         if not (len(np.unique(knots[:order])) == 1) & (
+#             len(np.unique(knots[-order:])) == 1
 #         ):
 #             knots = np.concatenate(
-#                 ([knots[0]] * (splineorder - 1), knots, [knots[-1]] * (splineorder - 1))
+#                 ([knots[0]] * (order - 1), knots, [knots[-1]] * (order - 1))
 #             )
 #         self.knots = knots
 #         self.x_name = x_name
 #         self._validate_arg_names()
-#         self.splineorder = splineorder
+#         self.order = order
 #         self.data_shape = data_shape
 #         self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
 #         self.fit_mu = None
@@ -198,7 +255,7 @@ class dSpline(MathMixins, SplineMixins, Model):
 
 #     @property
 #     def width(self):
-#         return len(self.knots) - self.splineorder - 1 + 1
+#         return len(self.knots) - self.order - 1 + 1
 
 #     @property
 #     def nvectors(self):
@@ -213,7 +270,7 @@ class dSpline(MathMixins, SplineMixins, Model):
 #         return [
 #             "x_name",
 #             "knots",
-#             "splineorder",
+#             "order",
 #             "prior_mu",
 #             "prior_sigma",
 #             "offset_prior",
@@ -242,7 +299,7 @@ class dSpline(MathMixins, SplineMixins, Model):
 #         for i in range(self.width - 1):
 #             for j, xi in enumerate(x):
 #                 X[j, i] = self.bspline_basis(
-#                     k=self.splineorder, i=i, t=self.knots, x=xi
+#                     k=self.order, i=i, t=self.knots, x=xi
 #                 )
 #         return np.hstack([np.ones((len(x), 1)), X])
 
@@ -281,7 +338,7 @@ class dSpline(MathMixins, SplineMixins, Model):
 #         return dSpline1DGenerator(
 #             weights=self.mu,
 #             knots=self.knots,
-#             splineorder=self.splineorder,
+#             order=self.order,
 #             data_shape=self.data_shape,
 #             x_name=self.x_name,
 #         )
@@ -293,24 +350,24 @@ class dSpline(MathMixins, SplineMixins, Model):
 #         weights: np.ndarray,
 #         knots: np.ndarray,
 #         x_name: str = "x",
-#         splineorder: int = 3,
+#         order: int = 3,
 #         offset_prior=None,
 #         prior_mu=None,
 #         prior_sigma=None,
 #         data_shape=None,
 #     ):
 #         # Check if knots are padded
-#         if not (len(np.unique(knots[:splineorder])) == 1) & (
-#             len(np.unique(knots[-splineorder:])) == 1
+#         if not (len(np.unique(knots[:order])) == 1) & (
+#             len(np.unique(knots[-order:])) == 1
 #         ):
 #             knots = np.concatenate(
-#                 ([knots[0]] * (splineorder - 1), knots, [knots[-1]] * (splineorder - 1))
+#                 ([knots[0]] * (order - 1), knots, [knots[-1]] * (order - 1))
 #             )
 #         self.knots = knots
 #         self.weights = weights
 #         self.x_name = x_name
 #         self._validate_arg_names()
-#         self.splineorder = splineorder
+#         self.order = order
 #         self.data_shape = data_shape
 #         self._validate_priors(prior_mu, prior_sigma, offset_prior=offset_prior)
 #         self.fit_mu = None
@@ -334,7 +391,7 @@ class dSpline(MathMixins, SplineMixins, Model):
 #             "x_name",
 #             "weights",
 #             "knots",
-#             "splineorder",
+#             "order",
 #             "prior_mu",
 #             "prior_sigma",
 #             "offset_prior",
@@ -350,7 +407,7 @@ class dSpline(MathMixins, SplineMixins, Model):
 #         for i in range(n):
 #             for j, xi in enumerate(x):
 #                 y_deriv[j] += self.weights[i + 1] * self.bspline_basis_derivative(
-#                     k=self.splineorder, i=i, t=self.knots, x=xi
+#                     k=self.order, i=i, t=self.knots, x=xi
 #                 )
 #         return np.hstack([np.ones((len(x), 1)), y_deriv[:, None]])
 
@@ -384,7 +441,7 @@ class dSpline(MathMixins, SplineMixins, Model):
 #     def _equation(self):
 #         return [
 #             f"\\mathbf{{{self.x_name}}}^0",
-#             f"\\frac{{\\partial \\left( \\sum_{{i=1}}^{{{len(self.knots) - self.splineorder}}} w_{{i}} N_{{i,{self.splineorder}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
+#             f"\\frac{{\\partial \\left( \\sum_{{i=1}}^{{{len(self.knots) - self.order}}} w_{{i}} N_{{i,{self.order}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
 #         ]
 
 #     @property

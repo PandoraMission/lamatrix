@@ -5,6 +5,7 @@ import itertools
 import numpy as np
 from .distributions import Distribution, DistributionsContainer
 from scipy import sparse
+from .io import IOMixins, LatexMixins
 
 __all__ = ["JointModel", "CrosstermModel"]
 
@@ -21,17 +22,34 @@ __all__ = ["JointModel", "CrosstermModel"]
 #     else:
 #         return np.hstack(combined)
 
+def _combine_equations(*equations):
+    # Base case: if there's only one equation, just return it
+    if len(equations) == 1:
+        return equations[0]
 
-class JointModel(Model):
+    # Step case: combine the first two equations and recursively call the function with the result
+    combined = [f + e for f in equations[1] for e in equations[0]]
+
+    # If there are more equations left, combine further
+    if len(equations) > 2:
+        return _combine_equations(combined, *equations[2:])
+    else:
+        return np.asarray(combined)
+
+class JointModel(Model, IOMixins, LatexMixins):
     def __init__(self, *args):
         # Check that every arg is a generator
         if not np.all([isinstance(a, Model) for a in args]):
             raise ValueError("Can only combine `Model` objects.")
         self.models = [a.copy() for a in args]
         self.widths = [g.width for g in self.models]
-        self.best_fit = DistributionsContainer.from_number(np.sum(self.widths))
+        self.posteriors = DistributionsContainer.from_number(np.sum(self.widths))
 
     def __getitem__(self, key):
+        if isinstance(key, slice):
+            new = self.__class__(*self.models[key])
+            new.posteriors = DistributionsContainer([l for m in new.models for l in m.posteriors])
+            return new
         return self.models[key]
 
     def __repr__(self):
@@ -53,8 +71,21 @@ class JointModel(Model):
     #         )
 
     @property
+    def _initialization_attributes(self):
+        return [
+        ]
+
+    @property
+    def _equation(self):
+        return np.hstack([g._equation for g in self.generators])
+
+    @property
     def arg_names(self):
         return {*np.unique(np.hstack([list(g.arg_names) for g in self.models]))}
+
+    @property
+    def _equation(self):
+        return [*np.hstack([g._equation for g in self.models])]
 
     @property
     def priors(self):
@@ -110,11 +141,11 @@ class JointModel(Model):
 
     def fit(self, *args, **kwargs):
         super().fit(*args, **kwargs)
-        means = np.array_split(self.best_fit.mean, np.cumsum(self.widths)[:-1])
-        stds = np.array_split(self.best_fit.std, np.cumsum(self.widths)[:-1])
+        means = np.array_split(self.posteriors.mean, np.cumsum(self.widths)[:-1])
+        stds = np.array_split(self.posteriors.std, np.cumsum(self.widths)[:-1])
 
         for idx, mean, std in zip(range(len(self.models)), means, stds):
-            self.models[idx].best_fit = DistributionsContainer([Distribution((m, s)) for m, s in zip(mean, std)])
+            self.models[idx].posteriors = DistributionsContainer([Distribution((m, s)) for m, s in zip(mean, std)])
 
     def __add__(self, other):
         has_constant = np.any([g.arg_names == {} for g in self.models])
@@ -146,14 +177,14 @@ class JointModel(Model):
             return JointModel(*[g * other for g in self.models])
 
 
-class CrosstermModel(Model):
+class CrosstermModel(Model, IOMixins, LatexMixins):
     def __init__(self, *args):
         # Check that every arg is a generator
         if not np.all([isinstance(a, Model) for a in args]):
             raise ValueError("Can only combine `Model` objects.")
         self.models = [a.copy() for a in args]
         self.widths = [g.width for g in self.models]
-        self.best_fit = DistributionsContainer.from_number(np.prod(self.widths))
+        self.posteriors = DistributionsContainer.from_number(np.prod(self.widths))
         prior_mean = np.asarray(
             [
                 means[0] * means[1]
@@ -186,6 +217,12 @@ class CrosstermModel(Model):
         # self._validate_distributions(prior_distributions)
         # self.prior_distributions = prior_distributions
 
+
+    @property
+    def _initialization_attributes(self):
+        return [
+        ]
+
     @property
     def arg_names(self):
         return {*np.unique(np.hstack([list(g.arg_names) for g in self.models]))}
@@ -197,6 +234,19 @@ class CrosstermModel(Model):
     @property
     def nvectors(self):
         return np.sum([g.nvectors for g in self.models])
+
+    @property
+    def _equation(self):
+        return np.hstack(
+                [
+                    f"{eqns[0]}{eqns[1]}"
+                    for eqns in itertools.product(
+                        *[
+                            g._equation for g in self.models
+                        ]
+                    )
+                ]
+            )
 
     # @property
     # def prior_distributions(self):
