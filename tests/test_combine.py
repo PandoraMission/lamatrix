@@ -1,7 +1,14 @@
 import numpy as np
 import pytest
-from lamatrix import Polynomial, Constant, Sinusoid, DistributionsContainer, Distribution
-from lamatrix.combine import JointModel, CrosstermModel
+
+from lamatrix import (
+    Constant,
+    Distribution,
+    DistributionsContainer,
+    Polynomial,
+    Sinusoid,
+)
+from lamatrix.combine import CrosstermModel, JointModel
 
 
 def test_bad():
@@ -9,7 +16,7 @@ def test_bad():
     g1 = Constant()
     g2 = Constant()
     with pytest.raises(ValueError):
-        g = g1 + g2
+        g1 + g2
 
 
 def test_add():
@@ -37,7 +44,9 @@ def test_priors():
 
     g.priors[0] = (0, 10)
     g.priors[:] = [(0, 10), (0, np.inf), (0, np.inf), (0, np.inf)]
-    g.priors[:] = DistributionsContainer([(0, 10), (0, np.inf), (0, np.inf), (0, np.inf)])
+    g.priors[:] = DistributionsContainer(
+        [(0, 10), (0, np.inf), (0, np.inf), (0, np.inf)]
+    )
 
     g1 = Constant()
     g2 = Polynomial("x", polyorder=3)
@@ -259,9 +268,10 @@ def test_math():
     assert g[2].models[0].arg_names == {"y"} and g[2].models[1].arg_names == {"z"}
     assert g[3].models[0].arg_names == {"y"} and g[3].models[1].arg_names == {"a"}
 
+
 def test_shape_combine():
     """Test that we can pass in all sorts of weird shaped vectors and get the right shapes when combined"""
-    for shape in [(53, ), (53, 5), (53, 5, 3), (53, 5, 3, 2)]:
+    for shape in [(53,), (53, 5), (53, 5, 3), (53, 5, 3, 2)]:
         x = np.random.normal(size=shape)
         p1 = Polynomial(x_name="x", polyorder=4)
         s1 = Sinusoid(x_name="x", nterms=3)

@@ -4,15 +4,14 @@ import json
 import math
 from abc import ABC, abstractmethod
 from copy import deepcopy
-
 from typing import List, Tuple
+
 import numpy as np
 import numpy.typing as npt
-
 from scipy import sparse
 
 from . import _META_DATA
-from .distributions import DistributionsContainer, Distribution
+from .distributions import Distribution, DistributionsContainer
 
 __all__ = ["Model"]
 
@@ -20,36 +19,44 @@ __all__ = ["Model"]
 import numpy as np
 from scipy import sparse
 
+
 def _sparse_ones_like(matrix):
     """From an input matrix, creates an object of the same type of matrix with all the non zero values as 1."""
     if sparse.isspmatrix_csr(matrix) or sparse.isspmatrix_csc(matrix):
         # For CSR and CSC, we can use the same data, indices, and indptr but replace data with ones
-        return matrix.__class__((np.ones_like(matrix.data), matrix.indices, matrix.indptr), shape=matrix.shape)
-    
+        return matrix.__class__(
+            (np.ones_like(matrix.data), matrix.indices, matrix.indptr),
+            shape=matrix.shape,
+        )
+
     elif sparse.isspmatrix_lil(matrix):
         # For LIL, replace each row's data with ones
         ones_matrix = matrix.copy()
         ones_matrix.data = [[1] * len(row) for row in ones_matrix.data]
         return ones_matrix
-    
+
     elif sparse.isspmatrix_coo(matrix):
         # For COO, replace the data with ones
-        return sparse.coo_matrix((np.ones_like(matrix.data), (matrix.row, matrix.col)), shape=matrix.shape)
-    
+        return sparse.coo_matrix(
+            (np.ones_like(matrix.data), (matrix.row, matrix.col)), shape=matrix.shape
+        )
+
     elif sparse.isspmatrix_dok(matrix):
         # For DOK, we can create a new matrix and fill the data dictionary with ones
         ones_matrix = matrix.copy()
         for key in ones_matrix.keys():
             ones_matrix[key] = 1
         return ones_matrix
-    
+
     elif sparse.isspmatrix_dia(matrix):
         # For DIA (diagonal) matrices, replace the data with ones
-        return sparse.dia_matrix((np.ones_like(matrix.data), matrix.offsets), shape=matrix.shape)
-    
+        return sparse.dia_matrix(
+            (np.ones_like(matrix.data), matrix.offsets), shape=matrix.shape
+        )
+
     else:
         raise TypeError(f"Unsupported sparse matrix type: {type(matrix)}")
-    
+
 
 class Model(ABC):
     def __init__(
@@ -75,7 +82,7 @@ class Model(ABC):
             )
 
         self.posteriors = posteriors
-        
+
     @property
     @abstractmethod
     def width(self):
@@ -111,7 +118,10 @@ class Model(ABC):
         return (
             f"\\[f({func_signature}) = "
             + " + ".join(
-                [f"{self._mu_letter}_{{{coeff}}} {e}" for coeff, e in enumerate(self._equation)]
+                [
+                    f"{self._mu_letter}_{{{coeff}}} {e}"
+                    for coeff, e in enumerate(self._equation)
+                ]
             )
             + "\\]"
         )
@@ -153,11 +163,17 @@ class Model(ABC):
 
     def _validate_weights(self, weights, weights_width):
         if not isinstance(weights, (list, np.ndarray)):
-            raise ValueError(f"`weights` must be a list of numeric values with length {weights_width}.")
+            raise ValueError(
+                f"`weights` must be a list of numeric values with length {weights_width}."
+            )
         if not isinstance(weights[0], (float, int, np.integer, np.number)):
-            raise ValueError(f"`weights` must be a list of numeric values with length {weights_width}.")
+            raise ValueError(
+                f"`weights` must be a list of numeric values with length {weights_width}."
+            )
         if not len(weights) == weights_width:
-            raise ValueError(f"`weights` must be a list of numeric values with length {weights_width}.")
+            raise ValueError(
+                f"`weights` must be a list of numeric values with length {weights_width}."
+            )
         return np.asarray(weights)
 
     # def set_prior(self, index: int, distribution: Tuple) -> None:
@@ -207,7 +223,13 @@ class Model(ABC):
         """Returns a set of the user defined strings for all the arguments that the design matrix requires."""
         pass
 
-    def fit(self, data: npt.NDArray, errors: npt.NDArray = None, mask:npt.NDArray = None, **kwargs):
+    def fit(
+        self,
+        data: npt.NDArray,
+        errors: npt.NDArray = None,
+        mask: npt.NDArray = None,
+        **kwargs,
+    ):
         """Fit the design matrix.
 
         Parameters
@@ -218,7 +240,7 @@ class Model(ABC):
             Errors on the input data
         mask: np.ndarray, optional
             Mask to apply when fitting. Values where mask is False will not be used during the fit.
-            
+
         Returns
         -------
         fit_distributions: List of Tuples
@@ -229,14 +251,16 @@ class Model(ABC):
             if isinstance(self.priors, tuple):
                 self.priors = DistributionsContainer(self.priors)
             elif isinstance(self.priors, list):
-                self.priors = DistributionsContainer([Distribution(d) for d in self.priors])
+                self.priors = DistributionsContainer(
+                    [Distribution(d) for d in self.priors]
+                )
             else:
                 raise ValueError("Can not parse priors.")
-        
+
         for attr in ["error", "err"]:
             if attr in kwargs.keys():
                 raise ValueError(f"Pass `errors` not `{attr}`.")
-            
+
         dense_data = not sparse.issparse(data)
 
         if mask is None:
@@ -246,10 +270,14 @@ class Model(ABC):
                 mask = np.ones(data.shape[0], bool)
         if dense_data:
             if not mask.shape == data.shape:
-                raise ValueError(f"Must pass vector for variable `mask` with shape {data.shape}.")
+                raise ValueError(
+                    f"Must pass vector for variable `mask` with shape {data.shape}."
+                )
         else:
             if not mask.shape[0] == data.shape[0]:
-                raise ValueError(f"Must pass vector for variable `mask` with shape ({data.shape[0]},).")
+                raise ValueError(
+                    f"Must pass vector for variable `mask` with shape ({data.shape[0]},)."
+                )
 
         if errors is None:
             if dense_data:
@@ -257,8 +285,9 @@ class Model(ABC):
             else:
                 errors = _sparse_ones_like(data)
         if not errors.shape == data.shape:
-            raise ValueError(f"Must pass vector for variable `errors` with shape {data.shape}.")
-
+            raise ValueError(
+                f"Must pass vector for variable `errors` with shape {data.shape}."
+            )
 
         for key, item in kwargs.items():
             dense_vector = not sparse.issparse(item)
@@ -266,18 +295,25 @@ class Model(ABC):
                 if dense_data:
                     if not item.shape == data.shape:
                         if not item.shape[:-1] == data.shape:
-                            raise ValueError(f"Must pass vector for variable `{key}` with shape {data.shape}.")                    
+                            raise ValueError(
+                                f"Must pass vector for variable `{key}` with shape {data.shape}."
+                            )
                 else:
                     if not (item.shape[0] == data.shape[0]) & (item.ndim == 1):
-                        raise ValueError(f"Must pass vector for variable `{key}` with shape ({data.shape[0]}, 1).")                                        
+                        raise ValueError(
+                            f"Must pass vector for variable `{key}` with shape ({data.shape[0]}, 1)."
+                        )
             else:
                 if dense_data:
                     if not (item.shape[0] == data.shape[0]) & (data.ndim == 1):
-                        raise ValueError(f"Must pass vector for variable `{key}` with shape ({data.shape[0]}, 1).")
-                else: 
+                        raise ValueError(
+                            f"Must pass vector for variable `{key}` with shape ({data.shape[0]}, 1)."
+                        )
+                else:
                     if not item.shape == data.shape:
-                        raise ValueError(f"Must pass vector for variable `{key}` with shape {data.shape}.")
-
+                        raise ValueError(
+                            f"Must pass vector for variable `{key}` with shape {data.shape}."
+                        )
 
         X = self.design_matrix(**kwargs)
         dense_designmatrix = not sparse.issparse(X)
@@ -285,26 +321,31 @@ class Model(ABC):
             raise ValueError("Must fit sparse data with a sparse design matrix.")
         if not dense_designmatrix:
             if dense_data:
-                sigma_w_inv = X[mask].T.dot(X[mask].multiply(1 / errors[mask][:, None] ** 2)) + sparse.diags(
-                    1 / self.priors.std**2
-                )
+                sigma_w_inv = X[mask].T.dot(
+                    X[mask].multiply(1 / errors[mask][:, None] ** 2)
+                ) + sparse.diags(1 / self.priors.std**2)
                 y = sparse.csr_matrix(data[mask] / errors[mask] ** 2).T
             else:
-                sigma_w_inv = X[mask].T.dot(X[mask].multiply(errors[mask].power(2).power(-1))) + sparse.diags(
-                    1 / self.priors.std**2
-                )
+                sigma_w_inv = X[mask].T.dot(
+                    X[mask].multiply(errors[mask].power(2).power(-1))
+                ) + sparse.diags(1 / self.priors.std**2)
                 y = data[mask].multiply(errors[mask].power(2).power(-1))
 
             self.cov = sparse.linalg.inv(sigma_w_inv)
-            B = X[mask].T.dot(y) + sparse.csr_matrix(np.nan_to_num(
-                self.priors.mean / self.priors.std**2
-            )).T
+            B = (
+                X[mask].T.dot(y)
+                + sparse.csr_matrix(
+                    np.nan_to_num(self.priors.mean / self.priors.std**2)
+                ).T
+            )
             fit_mean = sparse.linalg.spsolve(sigma_w_inv, B)
             fit_std = self.cov.diagonal() ** 0.5
 
         else:
             if sparse.issparse(data):
-                raise ValueError("Can not fit sparse data, if design matrix is not sparse.")
+                raise ValueError(
+                    "Can not fit sparse data, if design matrix is not sparse."
+                )
             sigma_w_inv = X[mask].T.dot(X[mask] / errors[mask][:, None] ** 2) + np.diag(
                 1 / self.priors.std**2
             )
@@ -314,12 +355,18 @@ class Model(ABC):
             )
             fit_mean = np.linalg.solve(sigma_w_inv, B)
             fit_std = self.cov.diagonal() ** 0.5
-        self.posteriors = DistributionsContainer([Distribution(m, s) for m, s in zip(fit_mean, fit_std)])
+        self.posteriors = DistributionsContainer(
+            [Distribution(m, s) for m, s in zip(fit_mean, fit_std)]
+        )
         return
 
     def evaluate(self, **kwargs):
         X = self.design_matrix(**kwargs)
         return X.dot(self.posteriors.mean)
+
+    def sample(self, **kwargs):
+        X = self.design_matrix(**kwargs)
+        return X.dot(self.posteriors.sample())
 
     def __call__(self, *args, **kwargs):
         return self.design_matrix(*args, **kwargs)

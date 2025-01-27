@@ -2,15 +2,19 @@
 
 import numpy as np
 
-from ..model import Model
+from ..io import IOMixins, LatexMixins
 from ..math import MathMixins
-from ..io import LatexMixins, IOMixins
+from ..model import Model
 
 __all__ = [
     "Gaussian",
+    "dGaussian",
     "lnGaussian",
+    "dlnGaussian",
     "Gaussian2D",
+    "dGaussian2D",
     "lnGaussian2D",
+    "dlnGaussian2D",
 ]
 
 
@@ -20,28 +24,31 @@ def _coeff_to_sigma1d(distributions):
     sigma_err = (1 / (2 * np.sqrt(2))) * (1 / ((-a) ** (3 / 2))) * aerr
     return (sigma, sigma_err)
 
+
 def _sigma1d_to_coeff(distribution):
     sigma, sigma_err = distribution
     coeff = -1 / (2 * sigma**2)
     coeff_err = (1 / sigma**3) * sigma_err
     return (coeff, coeff_err)
 
+
 def _coeff_to_mu1d(distributions):
     a, aerr = distributions[0]
     b, berr = distributions[1]
-    mu = - (b / (2 * a))
-    mu_err = mu * ((berr/b)**2 + (aerr/a)**2)**0.5
+    mu = -(b / (2 * a))
+    mu_err = mu * ((berr / b) ** 2 + (aerr / a) ** 2) ** 0.5
     return (mu, mu_err)
+
 
 def _coeff_to_A1d(distributions):
     sigma, sigma_err = _coeff_to_sigma1d(distributions)
     mu, mu_err = _coeff_to_mu1d(distributions)
     c, cerr = distributions[2]
-    A = np.exp(c + mu**2/2*sigma**2 + 0.5*(np.log(2*np.pi*sigma**2)))
+    A = np.exp(c + mu**2 / 2 * sigma**2 + 0.5 * (np.log(2 * np.pi * sigma**2)))
     Aerr = A * np.sqrt(
-        cerr**2 + 
-        (mu / sigma**2 * mu_err)**2 + 
-        ((1 / (2 * sigma) - mu**2 / (2 * sigma**3)) * sigma_err)**2
+        cerr**2
+        + (mu / sigma**2 * mu_err) ** 2
+        + ((1 / (2 * sigma) - mu**2 / (2 * sigma**3)) * sigma_err) ** 2
     )
     return (A, Aerr)
 
@@ -52,6 +59,7 @@ def _coeff_to_sigma2d(distribution, rho_distribution):
     sigma = (-1 / (2 * (1 - rho**2) * a)) ** 0.5
     sigma_err = (1 / (2 * np.sqrt(2))) * (1 / ((-a) ** (3 / 2))) * aerr
     return (sigma, sigma_err)
+
 
 def _coeffs_to_rho(distributions):
     mean, std = np.asarray(distributions).T
@@ -73,8 +81,8 @@ class Gaussian(MathMixins, LatexMixins, IOMixins, Model):
     def __init__(
         self,
         x_name: str = "x",
-        sigma:float=1.,
-        mu:float=0.,
+        sigma: float = 1.0,
+        mu: float = 0.0,
         priors=None,
         posteriors=None,
     ):
@@ -91,7 +99,7 @@ class Gaussian(MathMixins, LatexMixins, IOMixins, Model):
             "sigma",
             "mu",
         ]
-    
+
     @property
     def width(self):
         return 1
@@ -115,8 +123,10 @@ class Gaussian(MathMixins, LatexMixins, IOMixins, Model):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name).ravel()
-        normalization = (1/(2 * np.pi * self.sigma**2)**0.5)
-        return normalization * np.exp(-0.5 * (x - self.mu) ** 2 / (self.sigma**2))[:, None]
+        normalization = 1 / (2 * np.pi * self.sigma**2) ** 0.5
+        return (
+            normalization * np.exp(-0.5 * (x - self.mu) ** 2 / (self.sigma**2))[:, None]
+        )
 
     @property
     def prior_amplitude(self):
@@ -139,8 +149,8 @@ class dGaussian(MathMixins, Model):
     def __init__(
         self,
         x_name: str = "x",
-        sigma:float=1.,
-        mu:float=0.,
+        sigma: float = 1.0,
+        mu: float = 0.0,
         priors=None,
         posteriors=None,
     ):
@@ -173,7 +183,7 @@ class dGaussian(MathMixins, Model):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name).ravel()
-        normalization = (1/(2 * np.pi * self.sigma**2)**0.5)
+        normalization = 1 / (2 * np.pi * self.sigma**2) ** 0.5
         f = normalization * np.exp(-0.5 * (x - self.mu) ** 2 / (self.sigma**2))
         return (-((x - self.mu) / self.sigma**2) * f)[:, None]
 
@@ -196,7 +206,7 @@ class Gaussian2D(MathMixins, Model):
         sigma_y=1,
         mu_x=0,
         mu_y=0,
-        rho=0.,
+        rho=0.0,
     ):
         self.x_name = x_name
         self.y_name = y_name
@@ -230,16 +240,15 @@ class Gaussian2D(MathMixins, Model):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name).ravel() - self.mu_x
         y = kwargs.get(self.y_name).ravel() - self.mu_y
-        normalization = (1/(2 * np.pi * self.sigma_x * self.sigma_y * (1 - self.rho**2)**0.5))
-        p = (- 1 / (2 * (1 - self.rho**2)))
+        normalization = 1 / (
+            2 * np.pi * self.sigma_x * self.sigma_y * (1 - self.rho**2) ** 0.5
+        )
+        p = -1 / (2 * (1 - self.rho**2))
         exponent = p * (
-                (x / self.sigma_x) ** 2
-                + (y / self.sigma_y) ** 2
-                - 2
-                * self.rho
-                * (x / self.sigma_x)
-                * (y / self.sigma_y)
-            )
+            (x / self.sigma_x) ** 2
+            + (y / self.sigma_y) ** 2
+            - 2 * self.rho * (x / self.sigma_x) * (y / self.sigma_y)
+        )
         return normalization * np.exp(exponent)[:, None]
 
     @property
@@ -307,32 +316,27 @@ class dGaussian2D(MathMixins, Model):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name).ravel() - self.mu_x
         y = kwargs.get(self.y_name).ravel() - self.mu_y
-        normalization = (1/(2 * np.pi * self.sigma_x * self.sigma_y * (1 - self.rho**2)**0.5))
-        p = (- 1 / (2 * (1 - self.rho**2)))
-        exponent = p * (
-                (x / self.sigma_x) ** 2
-                + (y / self.sigma_y) ** 2
-                - 2
-                * self.rho
-                * (x / self.sigma_x)
-                * (y / self.sigma_y)
-            )
-        f = np.exp(exponent)
-        dfdx =  (
-            normalization * f
-            * (- 1 / (1 - self.rho**2))
-            * (
-                x / self.sigma_x**2
-                - (self.rho * (y) / (self.sigma_x * self.sigma_y))
-            )
+        normalization = 1 / (
+            2 * np.pi * self.sigma_x * self.sigma_y * (1 - self.rho**2) ** 0.5
         )
-        dfdy =  (
-            normalization * f
-            * (- 1 / (1 - self.rho**2))
-            * (
-                (y) / self.sigma_y**2
-                - (self.rho * x / (self.sigma_x * self.sigma_y))
-            )
+        p = -1 / (2 * (1 - self.rho**2))
+        exponent = p * (
+            (x / self.sigma_x) ** 2
+            + (y / self.sigma_y) ** 2
+            - 2 * self.rho * (x / self.sigma_x) * (y / self.sigma_y)
+        )
+        f = np.exp(exponent)
+        dfdx = (
+            normalization
+            * f
+            * (-1 / (1 - self.rho**2))
+            * (x / self.sigma_x**2 - (self.rho * (y) / (self.sigma_x * self.sigma_y)))
+        )
+        dfdy = (
+            normalization
+            * f
+            * (-1 / (1 - self.rho**2))
+            * ((y) / self.sigma_y**2 - (self.rho * x / (self.sigma_x * self.sigma_y)))
         )
         return np.vstack([dfdx, dfdy]).T
 
@@ -349,14 +353,14 @@ class lnGaussian(MathMixins, Model):
     def __init__(
         self,
         x_name: str = "x",
-        #mu: float = 0,
+        # mu: float = 0,
         prior_distributions=None,
         prior_sigma_distribution=None,
     ):
         self.x_name = x_name
         self._validate_arg_names()
         self.prior_sigma_distribution = prior_sigma_distribution
-        #self.mu = mu
+        # self.mu = mu
         super().__init__(prior_distributions=prior_distributions)
         if self.prior_sigma_distribution is not None:
             if not hasattr(self.prior_sigma_distribution, "__iter__"):
@@ -394,9 +398,10 @@ class lnGaussian(MathMixins, Model):
         """
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
-        x = kwargs.get(self.x_name) #- self.mu
+        x = kwargs.get(self.x_name)  # - self.mu
         return np.vstack([x**2, x]).T
-#        return x[:, None] ** 2
+
+    #        return x[:, None] ** 2
 
     @property
     def prior_sigma(self):
@@ -413,7 +418,6 @@ class lnGaussian(MathMixins, Model):
     # @property
     # def fit_amplitude(self):
     #     return _coeff_to_A1d(self.fit_distributions)
-
 
     def to_gradient(self, prior_distributions=None):
         return dlnGaussian(
@@ -635,13 +639,21 @@ class dlnGaussian2D(MathMixins, Model):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
         y = kwargs.get(self.y_name)
-        dfdx = - 1 / (1 - self.rho**2) * (
-            (x - self.mu_x) / self.sigma_x**2
-            - (self.rho * (y - self.mu_y) / (self.sigma_x * self.sigma_y))
+        dfdx = (
+            -1
+            / (1 - self.rho**2)
+            * (
+                (x - self.mu_x) / self.sigma_x**2
+                - (self.rho * (y - self.mu_y) / (self.sigma_x * self.sigma_y))
+            )
         )
-        dfdy = - 1 / (1 - self.rho**2) * (
-            (y - self.mu_y) / self.sigma_y**2
-            - (self.rho * (x - self.mu_x) / (self.sigma_x * self.sigma_y))
+        dfdy = (
+            -1
+            / (1 - self.rho**2)
+            * (
+                (y - self.mu_y) / self.sigma_y**2
+                - (self.rho * (x - self.mu_x) / (self.sigma_x * self.sigma_y))
+            )
         )
         return np.vstack([dfdx, dfdy]).T
 

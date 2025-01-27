@@ -1,15 +1,20 @@
 # """Generator objects for different types of models"""
 from typing import List
+
 import numpy as np
 from scipy import sparse
-from ..model import Model
+
+from ..io import IOMixins, LatexMixins
 from ..math import MathMixins
-from ..io import LatexMixins, IOMixins
+from ..model import Model
 
 __all__ = [
     "Spline",
     "dSpline",
+    "SparseSpline",
+    "dSparseSpline",
 ]
+
 
 class SplineMixins:
     def bspline_basis(self, k, i, t, x):
@@ -83,7 +88,7 @@ class Spline(MathMixins, SplineMixins, LatexMixins, IOMixins, Model):
 
     @property
     def width(self):
-        return len(self.knots) - self.order - 1
+        return len(self.knots) - self.order
 
     @property
     def nvectors(self):
@@ -96,10 +101,9 @@ class Spline(MathMixins, SplineMixins, LatexMixins, IOMixins, Model):
     @property
     def _equation(self):
         return [
-                f"N_{{{idx}, {{{self.order}}}}}(\\mathbf{{{self.x_name}}})"
-                for idx in np.arange(1, self.width)
-            ]
-
+            f"N_{{{idx}, {{{self.order}}}}}(\\mathbf{{{self.x_name}}})"
+            for idx in np.arange(1, self.width)
+        ]
 
     def design_matrix(self, **kwargs):
         """Build a 1D spline in x
@@ -117,25 +121,79 @@ class Spline(MathMixins, SplineMixins, LatexMixins, IOMixins, Model):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
-        if sparse.issparse(x):
-            if not x.shape[1] == 1:
-                raise ValueError(f"Can only fit sparse matrices with shape (n, 1), {self.x_name} has shape {x.shape}.")
-            k = x.nonzero()[0]
-            X = sparse.lil_matrix((self.width, x.shape[0]))
-            for i in range(self.width):
-                X[i, k] = self.bspline_basis(k=self.order, i=i, t=self.knots, x=x.data)
-            return X.T.tocsr()
-        else:
-            shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
-            X = np.zeros((self.width, *x.shape))
-            for i in range(self.width):
-                X[i] = self.bspline_basis(k=self.order, i=i, t=self.knots, x=x)
-            return X.transpose(shape_a)
+        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+        X = np.zeros((self.width, *x.shape))
+        for i in range(self.width):
+            X[i] = self.bspline_basis(k=self.order, i=i, t=self.knots, x=x)
+        return X.transpose(shape_a)
 
     def to_gradient(self, weights=None, priors=None):
         if weights is None:
-            weights = self.posteriors.mean if self.posteriors is not None else self.priors.mean
+            weights = (
+                self.posteriors.mean
+                if self.posteriors is not None
+                else self.priors.mean
+            )
         return dSpline(
+            weights=weights,
+            x_name=self.x_name,
+            knots=self.knots,
+            order=self.order,
+            priors=priors,
+        )
+
+
+class SparseSpline(Spline):
+    def __init__(
+        self,
+        x_name: str = "x",
+        knots: np.ndarray = np.arange(1, 1, 0.3),
+        order: int = 3,
+        priors=None,
+        posteriors=None,
+    ):
+        super().__init__(
+            x_name=x_name,
+            order=order,
+            knots=knots,
+            priors=priors,
+            posteriors=posteriors,
+        )
+
+    def design_matrix(self, **kwargs):
+        """Build a 1D spline in x
+
+        Parameters
+        ----------
+        {} : np.ndarray
+            Vector to create spline of
+
+        Returns
+        -------
+        X : np.ndarray
+            Design matrix with shape (len(x), self.nvectors)
+        """
+        if not self.arg_names.issubset(set(kwargs.keys())):
+            raise ValueError(f"Expected {self.arg_names} to be passed.")
+        x = kwargs.get(self.x_name)
+        if not x.ndim == 1:
+            raise ValueError(
+                f"Can only fit sparse matrices in one dimension, {self.x_name} has shape {x.shape}."
+            )
+        k = x.nonzero()[0]
+        X = sparse.lil_matrix((self.width, x.shape[0]))
+        for i in range(self.width):
+            X[i, k] = self.bspline_basis(k=self.order, i=i, t=self.knots, x=x.data)
+        return X.T.tocsr()
+
+    def to_gradient(self, weights=None, priors=None):
+        if weights is None:
+            weights = (
+                self.posteriors.mean
+                if self.posteriors is not None
+                else self.priors.mean
+            )
+        return dSparseSpline(
             weights=weights,
             x_name=self.x_name,
             knots=self.knots,
@@ -160,7 +218,7 @@ class dSpline(MathMixins, SplineMixins, Model):
         self._validate_arg_names()
         self.order = order
         self.knots = knots
-        self._weight_width = len(self.knots) - self.order - 1
+        self._weight_width = len(self.knots) - self.order
         self.weights = self._validate_weights(weights, self._weight_width)
         super().__init__(priors=priors, posteriors=posteriors)
 
@@ -176,7 +234,6 @@ class dSpline(MathMixins, SplineMixins, Model):
     def arg_names(self):
         return {self.x_name}
 
-
     @property
     def _equation(self):
         return [
@@ -187,29 +244,52 @@ class dSpline(MathMixins, SplineMixins, Model):
     def _mu_letter(self):
         return "v"
 
+    def design_matrix(self, **kwargs):
+        if not self.arg_names.issubset(set(kwargs.keys())):
+            raise ValueError(f"Expected {self.arg_names} to be passed.")
+        x = kwargs.get(self.x_name)
+        shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
+        # Set up the least squares problem
+        X = np.zeros((len(self.weights), *x.shape))
+        for i in range(len(self.weights)):
+            X[i] = self.bspline_basis_derivative(k=self.order, i=i, t=self.knots, x=x)
+        return np.expand_dims(X.transpose(shape_a).dot(self.weights), x.ndim)
+
+
+class dSparseSpline(dSpline):
+    def __init__(
+        self,
+        weights: List,
+        x_name: str = "x",
+        knots: np.ndarray = np.arange(1, 1, 0.3),
+        order: int = 3,
+        priors=None,
+        posteriors=None,
+    ):
+        super().__init__(
+            weights=weights,
+            x_name=x_name,
+            order=order,
+            knots=knots,
+            priors=priors,
+            posteriors=posteriors,
+        )
 
     def design_matrix(self, **kwargs):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
-        if sparse.issparse(x):
-            if not x.shape[1] == 1:
-                raise ValueError(f"Can only fit sparse matrices with shape (n, 1), {self.x_name} has shape {x.shape}.")
-            k = x.nonzero()[0]
-            X = sparse.lil_matrix((len(self.weights), x.shape[0]))
-            for i in range(len(self.weights)):
-                X[i, k] = self.bspline_basis_derivative(k=self.order, i=i, t=self.knots, x=x.data)
-            return sparse.csr_matrix(X.T.dot(self.weights)).T
-        else:
-            shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
-            # Set up the least squares problem
-            X = np.zeros((len(self.weights), *x.shape))
-            for i in range(len(self.weights)):
-                X[i] = self.bspline_basis_derivative(
-                    k=self.order, i=i, t=self.knots, x=x
-                )
-            return np.expand_dims(X.transpose(shape_a).dot(self.weights), x.ndim)
-
+        if not x.shape[1] == 1:
+            raise ValueError(
+                f"Can only fit sparse matrices with shape (n, 1), {self.x_name} has shape {x.shape}."
+            )
+        k = x.nonzero()[0]
+        X = sparse.lil_matrix((len(self.weights), x.shape[0]))
+        for i in range(len(self.weights)):
+            X[i, k] = self.bspline_basis_derivative(
+                k=self.order, i=i, t=self.knots, x=x.data
+            )
+        return sparse.csr_matrix(X.T.dot(self.weights)).T
 
         # x = kwargs.get(self.x_name)
         # if sparse.issparse(x):

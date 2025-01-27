@@ -1,11 +1,13 @@
 """Classes and methods to combine models"""
 
-from .model import Model
 import itertools
+
 import numpy as np
-from .distributions import Distribution, DistributionsContainer
 from scipy import sparse
+
+from .distributions import Distribution, DistributionsContainer
 from .io import IOMixins, LatexMixins
+from .model import Model
 
 __all__ = ["JointModel", "CrosstermModel"]
 
@@ -22,6 +24,7 @@ __all__ = ["JointModel", "CrosstermModel"]
 #     else:
 #         return np.hstack(combined)
 
+
 def _combine_equations(*equations):
     # Base case: if there's only one equation, just return it
     if len(equations) == 1:
@@ -36,6 +39,7 @@ def _combine_equations(*equations):
     else:
         return np.asarray(combined)
 
+
 class JointModel(Model, IOMixins, LatexMixins):
     def __init__(self, *args):
         # Check that every arg is a generator
@@ -48,7 +52,9 @@ class JointModel(Model, IOMixins, LatexMixins):
     def __getitem__(self, key):
         if isinstance(key, slice):
             new = self.__class__(*self.models[key])
-            new.posteriors = DistributionsContainer([l for m in new.models for l in m.posteriors])
+            new.posteriors = DistributionsContainer(
+                [l for m in new.models for l in m.posteriors]
+            )
             return new
         return self.models[key]
 
@@ -72,8 +78,7 @@ class JointModel(Model, IOMixins, LatexMixins):
 
     @property
     def _initialization_attributes(self):
-        return [
-        ]
+        return []
 
     @property
     def _equation(self):
@@ -122,7 +127,7 @@ class JointModel(Model, IOMixins, LatexMixins):
     def design_matrix(self, *args, **kwargs):
         Xs = [g.design_matrix(*args, **kwargs) for g in self.models]
         if np.all([sparse.issparse(matrix) for matrix in Xs]):
-            return sparse.hstack(Xs, format='csr')
+            return sparse.hstack(Xs, format="csr")
         elif np.all([not sparse.issparse(matrix) for matrix in Xs]):
             ndim = Xs[0].ndim - 1
             shape_a = [*np.arange(1, ndim + 1).astype(int), 0]
@@ -145,7 +150,9 @@ class JointModel(Model, IOMixins, LatexMixins):
         stds = np.array_split(self.posteriors.std, np.cumsum(self.widths)[:-1])
 
         for idx, mean, std in zip(range(len(self.models)), means, stds):
-            self.models[idx].posteriors = DistributionsContainer([Distribution((m, s)) for m, s in zip(mean, std)])
+            self.models[idx].posteriors = DistributionsContainer(
+                [Distribution((m, s)) for m, s in zip(mean, std)]
+            )
 
     def __add__(self, other):
         has_constant = np.any([g.arg_names == {} for g in self.models])
@@ -196,32 +203,38 @@ class CrosstermModel(Model, IOMixins, LatexMixins):
                 )
             ]
         )
-        prior_std = np.sqrt(np.asarray(
-            [
-                means[0]**2 * stds[0]**2 + means[1]**2 * stds[1]**2 + stds[0]**2 * stds[1]**2
-                for means, stds in zip(itertools.product(
-                    *[
-                        [distribution[1] for distribution in g.priors]
-                        for g in self.models
-                    ]
-                ), itertools.product(
-                    *[
-                        [distribution[1] for distribution in g.priors]
-                        for g in self.models
-                    ]
-                )
-                )
-            ]
-        ))
-        self.priors = DistributionsContainer([Distribution(m, s) for m, s in zip(prior_mean, prior_std)])
+        prior_std = np.sqrt(
+            np.asarray(
+                [
+                    means[0] ** 2 * stds[0] ** 2
+                    + means[1] ** 2 * stds[1] ** 2
+                    + stds[0] ** 2 * stds[1] ** 2
+                    for means, stds in zip(
+                        itertools.product(
+                            *[
+                                [distribution[1] for distribution in g.priors]
+                                for g in self.models
+                            ]
+                        ),
+                        itertools.product(
+                            *[
+                                [distribution[1] for distribution in g.priors]
+                                for g in self.models
+                            ]
+                        ),
+                    )
+                ]
+            )
+        )
+        self.priors = DistributionsContainer(
+            [Distribution(m, s) for m, s in zip(prior_mean, prior_std)]
+        )
         # self._validate_distributions(prior_distributions)
         # self.prior_distributions = prior_distributions
 
-
     @property
     def _initialization_attributes(self):
-        return [
-        ]
+        return []
 
     @property
     def arg_names(self):
@@ -238,20 +251,15 @@ class CrosstermModel(Model, IOMixins, LatexMixins):
     @property
     def _equation(self):
         return np.hstack(
-                [
-                    f"{eqns[0]}{eqns[1]}"
-                    for eqns in itertools.product(
-                        *[
-                            g._equation for g in self.models
-                        ]
-                    )
-                ]
-            )
+            [
+                f"{eqns[0]}{eqns[1]}"
+                for eqns in itertools.product(*[g._equation for g in self.models])
+            ]
+        )
 
     # @property
     # def prior_distributions(self):
     #     return [(m, s) for m, s in zip(self.prior_mean, self.prior_std)]
-
 
     # @property
     # def prior_mean(self):
@@ -292,23 +300,37 @@ class CrosstermModel(Model, IOMixins, LatexMixins):
     def design_matrix(self, *args, **kwargs):
         Xs = [g.design_matrix(*args, **kwargs) for g in self.models]
         if np.all([sparse.issparse(matrix) for matrix in Xs]):
-            X = sparse.hstack([i[0].multiply(i[1]).T for i in itertools.product(*[x.T for x in Xs])], format='csr')
+            X = sparse.hstack(
+                [i[0].multiply(i[1]).T for i in itertools.product(*[x.T for x in Xs])],
+                format="csr",
+            )
             return X
         elif np.all([not sparse.issparse(matrix) for matrix in Xs]):
             ndim = Xs[0].ndim - 1
             shape_a = [*np.arange(1, ndim + 1).astype(int), 0]
             shape_b = [ndim, *np.arange(0, ndim)]
             Xs = [X.transpose(shape_b) for X in Xs]
-            X = np.vstack([np.expand_dims(np.prod(i, axis=0), ndim).transpose(shape_b) for i in itertools.product(*Xs)]).transpose(shape_a)
+            X = np.vstack(
+                [
+                    np.expand_dims(np.prod(i, axis=0), ndim).transpose(shape_b)
+                    for i in itertools.product(*Xs)
+                ]
+            ).transpose(shape_a)
             return X
         else:
             raise ValueError("Can not combine sparse and dense matrices.")
 
-
         print(itertools.product())
 
-        return np.vstack([np.expand_dims(np.prod(i, axis=0), axis=ndim) for i in itertools.product(*Xs)]).transpose(shape_a)
-        return np.vstack([np.prod(i, axis=0) for i in itertools.product(*Xs)]).transpose(shape_a)
+        return np.vstack(
+            [
+                np.expand_dims(np.prod(i, axis=0), axis=ndim)
+                for i in itertools.product(*Xs)
+            ]
+        ).transpose(shape_a)
+        return np.vstack(
+            [np.prod(i, axis=0) for i in itertools.product(*Xs)]
+        ).transpose(shape_a)
 
         return np.vstack([X.transpose(shape_b) for X in Xs]).transpose(shape_a)
 
