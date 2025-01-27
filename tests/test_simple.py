@@ -37,7 +37,7 @@ def test_constant():
 
 
 def test_polynomial():
-    g = Polynomial("r", polyorder=3)
+    g = Polynomial("r", order=3)
     g
     assert hasattr(g, "arg_names")
     assert g.arg_names == {"r"}
@@ -52,12 +52,12 @@ def test_polynomial():
     y += np.random.normal(0, 0.001, size=x.shape[0])
     ye = np.ones_like(x) + 0.001
 
-    g = Polynomial("x", polyorder=3)
+    g = Polynomial("x", order=3)
     g.fit(data=y, errors=ye, x=x)
     assert np.isclose(g.posteriors.mean[0], w, atol=0.01)
     assert np.allclose(g.posteriors.mean[1:], np.zeros(g.width - 1), atol=0.01)
 
-    g = Polynomial("x", polyorder=3, priors=[(w, 0.1), (0, np.inf), (0, np.inf)])
+    g = Polynomial("x", order=3, priors=[(w, 0.1), (0, np.inf), (0, np.inf)])
     g.fit(data=y, errors=ye, x=x)
     assert np.isclose(g.posteriors.mean[0], w, atol=0.01)
     assert np.allclose(g.posteriors.mean[1:], np.zeros(g.width - 1), atol=0.01)
@@ -100,14 +100,14 @@ def test_shape():
     """Test that we can pass in all sorts of weird shaped vectors"""
     for shape in [(53,), (53, 5), (53, 5, 3), (53, 5, 3, 2)]:
         x = np.random.normal(size=shape)
-        p1 = Polynomial(x_name="x", polyorder=4)
+        p1 = Polynomial(x_name="x", order=4)
 
         X = p1.design_matrix(x=x)
         assert X.shape == (*shape, 4)
         dp1 = p1.to_gradient()
         X = dp1.design_matrix(x=x)
         assert X.shape == (*shape, 1)
-        X = dPolynomial(np.arange(4), x_name="x", polyorder=4).design_matrix(x=x)
+        X = dPolynomial(np.arange(4), x_name="x", order=4).design_matrix(x=x)
         assert X.shape == (*shape, 1)
 
         s1 = Sinusoid(x_name="x", nterms=4)
@@ -124,11 +124,11 @@ def test_shape():
 
         sp1 = Spline(x_name="x", knots=np.arange(-2, 2, 0.4))
         X = sp1.design_matrix(x=x)
-        assert X.shape == (*shape, 6)
+        assert X.shape == (*shape, 7)
         dsp1 = sp1.to_gradient()
         X = dsp1.design_matrix(x=x)
         assert X.shape == (*shape, 1)
         X = dSpline(
-            np.arange(6), x_name="x", knots=np.arange(-2, 2, 0.4)
+            np.arange(7), x_name="x", knots=np.arange(-2, 2, 0.4)
         ).design_matrix(x=x)
         assert X.shape == (*shape, 1)

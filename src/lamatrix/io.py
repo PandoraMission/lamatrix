@@ -6,7 +6,6 @@ import math
 import numpy as np
 
 from . import _META_DATA
-from .distributions import Distribution, DistributionsContainer
 
 
 def format_significant_figures(mean, error):
@@ -43,7 +42,10 @@ class LatexMixins:
             formatted_prior_mean, formatted_prior_error = format_significant_figures(
                 self.priors[idx].mean, self.priors[idx].std
             )
-            row = f"{self._mu_letter} & ${formatted_fit_mean} \\pm {formatted_fit_error}$  & ${formatted_prior_mean} \\pm {formatted_prior_error}$ \\\\\\hline\n"
+            row = (
+                f"{self._mu_letter} & ${formatted_fit_mean} \\pm {formatted_fit_error}$ "
+                f" & ${formatted_prior_mean} \\pm {formatted_prior_error}$ \\\\\\hline\n"
+            )
             table_matter.append(row)
         return table_matter
 
@@ -100,7 +102,7 @@ class IOMixins:
         data_to_store = self._create_save_data()
         if hasattr(self, "models"):
             models_to_store = {
-                f"model{idx+1}": m._create_save_data()
+                f"model{idx + 1}": m._create_save_data()
                 for idx, m in enumerate(self.models)
             }
             data_to_store["models"] = models_to_store

@@ -10,7 +10,7 @@ def test_sparse_fits():
     col_coord = np.zeros(200)
     x = sparse.csr_matrix((data, (row_coord, col_coord)), shape=(121, 1))
 
-    model = Polynomial("x", polyorder=4)
+    model = Polynomial("x", order=4)
     w = np.random.normal(size=4)
     data = model.design_matrix(x=x.toarray()[:, 0]).dot(w)
     errors = np.ones_like(data) * 0.001
@@ -61,8 +61,8 @@ def test_sparse_fits():
 
 def test_sparse_combine():
     C, Z = np.mgrid[-30:20:11j, 0:15:9j]
-    p1 = Polynomial("Z", polyorder=2)
-    p2 = Polynomial("C", polyorder=3)
+    p1 = Polynomial("Z", order=2)
+    p2 = Polynomial("C", order=3)
     model = p1 + p2
     dm = model.design_matrix(Z=Z, C=C)
     dm_sparse = model.design_matrix(

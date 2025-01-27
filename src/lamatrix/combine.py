@@ -81,10 +81,6 @@ class JointModel(Model, IOMixins, LatexMixins):
         return []
 
     @property
-    def _equation(self):
-        return np.hstack([g._equation for g in self.generators])
-
-    @property
     def arg_names(self):
         return {*np.unique(np.hstack([list(g.arg_names) for g in self.models]))}
 
@@ -382,15 +378,18 @@ class CrosstermModel(Model, IOMixins, LatexMixins):
 
 #     @property
 #     def prior_distributions(self):
-#         return [[(d1[0] + d2[0], (d1[1]**2 + d2[1]**2)**0.5) for d1 in self.generator1.prior_distributions] for d2 in self.generator2.prior_distributions]
+#         return [[(d1[0] + d2[0], (d1[1]**2 + d2[1]**2)**0.5) for d1 in self.generator1.prior_distributions]
+#                   for d2 in self.generator2.prior_distributions]
 
 #     @property
 #     def prior_mean(self):
-#         return np.asarray([[d1[0] + d2[0] for d1 in self.generator1.prior_distributions] for d2 in self.generator2.prior_distributions])
+#         return np.asarray([[d1[0] + d2[0] for d1 in self.generator1.prior_distributions] for
+#               d2 in self.generator2.prior_distributions])
 
 #     @property
 #     def prior_std(self):
-#         return np.asarray([[(d1[1]**2 * d2[1]**2)**0.5 for d1 in self.generator1.prior_distributions] for d2 in self.generator2.prior_distributions])
+#         return np.asarray([[(d1[1]**2 * d2[1]**2)**0.5 for d1 in self.generator1.prior_distributions]
+#           for d2 in self.generator2.prior_distributions])
 
 #     # @property
 #     # def fit_mean(self):
@@ -563,7 +562,8 @@ class CrosstermModel(Model, IOMixins, LatexMixins):
 #                 pm[0] = 0
 #             else:
 #                 pm[0] = (
-#                     np.nansum(np.asarray([g.prior_sigma[0] if g.prior_sigma[0] != np.inf else 0 for g in self.generators], dtype=float) ** 2)
+#                     np.nansum(np.asarray([g.prior_sigma[0] if g.prior_sigma[0] != np.inf
+#                           else 0 for g in self.generators], dtype=float) ** 2)
 #                     ** 0.5
 #                 )
 #             prior_sigma.append(pm)

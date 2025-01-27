@@ -237,7 +237,9 @@ class dSpline(MathMixins, SplineMixins, Model):
     @property
     def _equation(self):
         return [
-            f"\\frac{{\\partial \\left( \\sum_{{i=0}}^{{{len(self.knots) - self.order - 2}}} w_{{i}} N_{{i,{self.order}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
+            f"\\frac{{\\partial \\left( \\sum_{{i=0}}^{{{len(self.knots) - self.order - 2}}}"
+            f" w_{{i}} N_{{i,{self.order}}}(\\mathbf{{{self.x_name}}})\\right)}}"
+            f"{{\\partial \mathbf{{{self.x_name}}}}}",
         ]
 
     @property
@@ -401,8 +403,12 @@ class dSparseSpline(dSpline):
 #         ]
 
 #     def to_latex(self):
-#         eqn1 = f"\\begin{{equation}}\\label{{eq:spline}}f(\\mathbf{{{self.x_name}}}) = \sum_{{i=0}}^{{n-1}} w_i N_{{i,k}}(\\mathbf{{{self.x_name}}}) \\]\\end{{equation}}"
-#         eqn2 = f"\\[N_{{i,k}}(\\mathbf{{{self.x_name}}}) = \\frac{{\\mathbf{{{self.x_name}}} - t_i}}{{t_{{i+k-1}} - t_i}} N_{{i,k-1}}(\\mathbf{{{self.x_name}}}) + \\frac{{t_{{i+k}} - \\mathbf{{{self.x_name}}}}}{{t_{{i+k}} - t_{{i+1}}}} N_{{i+1,k-1}}(\\mathbf{{{self.x_name}}})\\]"
+#         eqn1 = f"\\begin{{equation}}\\label{{eq:spline}}f(\\mathbf{{{self.x_name}}}) =
+#        \sum_{{i=0}}^{{n-1}} w_i N_{{i,k}}(\\mathbf{{{self.x_name}}}) \\]\\end{{equation}}"
+#         eqn2 = f"\\[N_{{i,k}}(\\mathbf{{{self.x_name}}}) =
+#          \\frac{{\\mathbf{{{self.x_name}}} - t_i}}{{t_{{i+k-1}} - t_i}} N_{{i,k-1}}(\\mathbf{{{self.x_name}}})
+#           + \\frac{{t_{{i+k}} - \\mathbf{{{self.x_name}}}}}{{t_{{i+k}} -
+#           t_{{i+1}}}} N_{{i+1,k-1}}(\\mathbf{{{self.x_name}}})\\]"
 #         eqn3 = f"""\\[N_{{i,1}}(\\mathbf{{{self.x_name}}}) =
 #         \\begin{{cases}}
 #         1 & \\text{{if }} t_i \leq \\mathbf{{{self.x_name}}} < t_{{i+1}} \\\\
@@ -521,7 +527,8 @@ class dSparseSpline(dSpline):
 #     def _equation(self):
 #         return [
 #             f"\\mathbf{{{self.x_name}}}^0",
-#             f"\\frac{{\\partial \\left( \\sum_{{i=1}}^{{{len(self.knots) - self.order}}} w_{{i}} N_{{i,{self.order}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
+#             f"\\frac{{\\partial \\left( \\sum_{{i=1}}^{{{len(self.knots) - self.order}}}
+#           w_{{i}} N_{{i,{self.order}}}(\\mathbf{{{self.x_name}}})\\right)}}{{\\partial \mathbf{{{self.x_name}}}}}",
 #         ]
 
 #     @property

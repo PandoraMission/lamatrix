@@ -1,7 +1,5 @@
 """Abstract base class for a Model object"""
 
-import json
-import math
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import List, Tuple
@@ -10,14 +8,9 @@ import numpy as np
 import numpy.typing as npt
 from scipy import sparse
 
-from . import _META_DATA
 from .distributions import Distribution, DistributionsContainer
 
 __all__ = ["Model"]
-
-
-import numpy as np
-from scipy import sparse
 
 
 def _sparse_ones_like(matrix):
@@ -223,7 +216,7 @@ class Model(ABC):
         """Returns a set of the user defined strings for all the arguments that the design matrix requires."""
         pass
 
-    def fit(
+    def fit(  # noqa C901
         self,
         data: npt.NDArray,
         errors: npt.NDArray = None,
@@ -506,7 +499,8 @@ class Model(ABC):
 #             else:
 #                 formatted_prior_mean = ""
 #                 formatted_prior_error = ""
-#             row = f"{symbol} & ${formatted_fit_mean} \\pm {formatted_fit_error}$  & ${formatted_prior_mean} \\pm {formatted_prior_error}$ \\\\\\hline\n"
+#             row = f"{symbol} & ${formatted_fit_mean} \\pm {formatted_fit_error}$
+#                   & ${formatted_prior_mean} \\pm {formatted_prior_error}$ \\\\\\hline\n"
 #             table_matter.append(row)
 #         return table_matter
 

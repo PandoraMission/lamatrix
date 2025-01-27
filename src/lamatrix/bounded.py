@@ -109,7 +109,8 @@ class Bounded(MathMixins, LatexMixins, IOMixins):
 #         bound_latex = [
 #             f"""b_{{i}}(\\mathbf{{{self.x_name}}}) =
 #         \\begin{{cases}}
-#         \\mathbf{{{self.x_name}}}, & \\text{{if }} ({start} + {step_str}i)  < \\mathbf{{{self.x_name}}} \\leq ({start} + {step_str}(i + 1)) \\\\
+#         \\mathbf{{{self.x_name}}}, & \\text{{if }} ({start} + {step_str}i)
+#           < \\mathbf{{{self.x_name}}} \\leq ({start} + {step_str}(i + 1)) \\\\
 #         0, & \\text{{otherwise}}
 #         \\end{{cases}}"""
 #         ]
@@ -189,7 +190,8 @@ class Bounded(MathMixins, LatexMixins, IOMixins):
 #             )
 #         return np.hstack(
 #             [
-#                 self.generator.design_matrix(*args, **kwargs) * ((x >= b[0]) & (x < b[1]))[:, None] + (~(((x >= b[0]) & (x < b[1]))[:, None])).astype(float) * self.fill_value
+#                 self.generator.design_matrix(*args, **kwargs) * ((x >= b[0]) & (x < b[1]))[:, None]
+#                + (~(((x >= b[0]) & (x < b[1]))[:, None])).astype(float) * self.fill_value
 #                 for b in bounds_list
 #             ]
 #         )

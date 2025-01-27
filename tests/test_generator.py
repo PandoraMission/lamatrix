@@ -94,7 +94,7 @@
 #     # data[s] += np.random.normal(0, 3, size=5)
 #     errors = np.ones_like(x) * 0.01
 
-#     g = Polynomial1DGenerator(polyorder=3)
+#     g = Polynomial1DGenerator(order=3)
 #     g.fit(x=x, data=data, errors=errors)
 
 #     outlier_mask = np.abs(data - g.evaluate(x=x)) / errors < 3
@@ -179,18 +179,18 @@
 
 
 # def test_save():
-#     p1 = Polynomial1DGenerator("c", polyorder=2)
+#     p1 = Polynomial1DGenerator("c", order=2)
 #     p2 = Polynomial1DGenerator("r")
 #     p = p1 + p2
 #     p.save("test.json")
 #     p = load("test.json")
 #     assert p[0].x_name == "c"
 #     assert p[1].x_name == "r"
-#     assert p[0].polyorder == 2
+#     assert p[0].order == 2
 
 
 # def test_bounded():
-#     p = Polynomial1DGenerator("x", polyorder=2, prior_sigma=[100, 100, 100])
+#     p = Polynomial1DGenerator("x", order=2, prior_sigma=[100, 100, 100])
 #     bg = BoundedGenerator(p, slice(-10, 10, 5))
 #     x = np.arange(-10, 10, 0.1)
 #     true_w = np.random.normal(0, 1, size=3)

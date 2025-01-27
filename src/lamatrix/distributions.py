@@ -149,11 +149,11 @@ class DistributionsContainer:
             self._distributions[idx].thaw()
 
     @property
-    def mean(self):
+    def mean(self):  # noqa: F811
         return np.asarray([dist.mean for dist in self])
 
     @property
-    def std(self):
+    def std(self):  # noqa: F811
         return np.asarray([dist.std for dist in self])
 
     def sample(self):

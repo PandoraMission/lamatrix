@@ -21,7 +21,7 @@ def test_bad():
 
 def test_add():
     g1 = Constant()
-    g2 = Polynomial("x", polyorder=3)
+    g2 = Polynomial("x", order=3)
     g = g1 + g2
     assert isinstance(g, JointModel)
     assert g.width == 4
@@ -39,7 +39,7 @@ def test_add():
 
 def test_priors():
     g1 = Constant()
-    g2 = Polynomial("x", polyorder=3)
+    g2 = Polynomial("x", order=3)
     g = g1 + g2
 
     g.priors[0] = (0, 10)
@@ -49,7 +49,7 @@ def test_priors():
     )
 
     g1 = Constant()
-    g2 = Polynomial("x", polyorder=3)
+    g2 = Polynomial("x", order=3)
     g = g1 + g2
 
     assert g[0].priors[0] == (0, np.inf)
@@ -66,7 +66,7 @@ def test_priors():
 
 def test_polynomial():
     g1 = Constant()
-    g2 = Polynomial("x", polyorder=3)
+    g2 = Polynomial("x", order=3)
     g = g1 + g2
     assert hasattr(g, "arg_names")
     assert g.arg_names == {"x"}
@@ -91,9 +91,9 @@ def test_polynomial():
 
 
 def test_cross():
-    g1 = Polynomial("x", polyorder=3)
-    g2 = Polynomial("y", polyorder=4)
-    g3 = Polynomial("z", polyorder=2)
+    g1 = Polynomial("x", order=3)
+    g2 = Polynomial("y", order=4)
+    g3 = Polynomial("z", order=2)
 
     g = CrosstermModel(g1, g2)
     assert len(g.priors) == 12
@@ -119,10 +119,10 @@ def test_cross():
 def test_math():
     """Tests all the math combinations"""
     c = Constant()
-    g1 = Polynomial("x", polyorder=3)
-    g2 = Polynomial("y", polyorder=4)
-    g3 = Polynomial("z", polyorder=2)
-    g4 = Polynomial("a", polyorder=1)
+    g1 = Polynomial("x", order=3)
+    g2 = Polynomial("y", order=4)
+    g3 = Polynomial("z", order=2)
+    g4 = Polynomial("a", order=1)
 
     # Constants can't be combined
     # c + c --> ValueError
@@ -273,7 +273,7 @@ def test_shape_combine():
     """Test that we can pass in all sorts of weird shaped vectors and get the right shapes when combined"""
     for shape in [(53,), (53, 5), (53, 5, 3), (53, 5, 3, 2)]:
         x = np.random.normal(size=shape)
-        p1 = Polynomial(x_name="x", polyorder=4)
+        p1 = Polynomial(x_name="x", order=4)
         s1 = Sinusoid(x_name="x", nterms=3)
         X = (p1 + s1).design_matrix(x=x)
         assert X.shape == (*shape, 10)

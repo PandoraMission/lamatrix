@@ -755,7 +755,8 @@ class Fixed(MathMixins, LatexMixins, IOMixins, Model):
 #             data_shape=None,
 #         ):
 
-#        return super().__init__(x_name=x_name, polyorder=0, prior_mu=prior_mu, prior_sigma=prior_sigma, offset_prior=offset_prior, data_shape=data_shape)
+#        return super().__init__(x_name=x_name, polyorder=0, prior_mu=prior_mu,
+#           prior_sigma=prior_sigma, offset_prior=offset_prior, data_shape=data_shape)
 
 
 # class SinusoidGenerator(MathMixins, Generator):

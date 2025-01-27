@@ -32,18 +32,19 @@ from rich.logging import RichHandler  # noqa: E402
 log = logging.getLogger("lamatrix")
 log.addHandler(RichHandler(markup=True))
 
-import json
+import json  # noqa: E402
 
-import numpy as np
+import numpy as np  # noqa: E402
 
-from .bounded import *  # noqa: E402, F401
-from .combine import *  # noqa: E402, F401
-from .distributions import Distribution, DistributionsContainer  # noqa: E402, F401
-from .model import *  # noqa: E402, F401
-from .models.astrophysical import *  # noqa: E402, F401
-from .models.gaussian import *  # noqa: E402, F401
-from .models.simple import *  # noqa: E402, F401
-from .models.spline import *  # noqa: E402, F401
+from .bounded import *  # noqa: E402, F401, F403
+from .combine import *  # noqa: E402, F401, F403
+from .distributions import Distribution  # noqa: E402, F401, F403
+from .distributions import DistributionsContainer  # noqa: E402
+from .model import *  # noqa: E402, F401, F403
+from .models.astrophysical import *  # noqa: E402, F401, F403
+from .models.gaussian import *  # noqa: E402, F401, F403
+from .models.simple import *  # noqa: E402, F401, F403
+from .models.spline import *  # noqa: E402, F401, F403
 
 
 def _load_from_dict(dict):

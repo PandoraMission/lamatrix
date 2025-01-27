@@ -768,8 +768,11 @@ class dlnGaussian2D(MathMixins, Model):
 #         ]
 
 #     def to_latex(self):
-#         eq0 = f"\\begin{{equation}}\\label{{eq:lngauss}}\\ln(G(\\mathbf{{{self.x_name}}})) = -\\frac{{1}}{{2}} \\ln(2\\pi\\sigma^2) + \\frac{{\\mathbf{{{self.x_name}}}^2}}{{2 \\sigma^2}}\\end{{equation}}"
-#         eq1 = f"\\begin{{equation}}\\label{{eq:lngauss}}\\ln(G(\\mathbf{{{self.x_name}}})) = w_0 + w_1\\mathbf{{{self.x_name}}}^2\\end{{equation}}"
+#         eq0 = f"\\begin{{equation}}\\label{{eq:lngauss}}\\ln(G(\\mathbf{{{self.x_name}}}))
+#            = -\\frac{{1}}{{2}} \\ln(2\\pi\\sigma^2) + \\frac{{\\mathbf{{{self.x_name}}}^2}}
+#               {{2 \\sigma^2}}\\end{{equation}}"
+#         eq1 = f"\\begin{{equation}}\\label{{eq:lngauss}}\\ln(G(\\mathbf{{{self.x_name}}}))
+#              = w_0 + w_1\\mathbf{{{self.x_name}}}^2\\end{{equation}}"
 #         eq2 = "\\[ w_0 = -\\frac{{1}}{{2}} \\ln(2\\pi\\sigma^2) \\]"
 #         eq3 = "\\[ w_1 = \\frac{1}{2\\sigma^2}\\]"
 #         eq4 = "\\[\\sigma = \\sqrt{-\\frac{1}{2w_1}}\\]"
@@ -1038,7 +1041,11 @@ class dlnGaussian2D(MathMixins, Model):
 #         ]
 
 #     def to_latex(self):
-#         eq1 = f"\\begin{{equation}}\\label{{eq:lngauss}}\\ln(G(\\mathbf{{{self.x_name}}}, \\mathbf{{{self.y_name}}})) = a + b\\mathbf{{{self.x_name}}}^2 + c\\mathbf{{{self.y_name}}}^2 + 2d\\mathbf{{{self.x_name}}}\\mathbf{{{self.y_name}}}\\end{{equation}}"
+#         eq1 = f"\\begin{{equation}}\\label{{eq:lngauss}}
+#                   \\ln(G(\\mathbf{{{self.x_name}}},
+#                   \\mathbf{{{self.y_name}}})) =
+#                    a + b\\mathbf{{{self.x_name}}}^2 + c\\mathbf{{{self.y_name}}}^2 +
+#                   2d\\mathbf{{{self.x_name}}}\\mathbf{{{self.y_name}}}\\end{{equation}}"
 #         eq2 = f"\\[ a = -\\ln(2\\pi\\sigma_{{{self.x_name}}}\\sigma_{{{self.y_name}}}\\sqrt{{1-\\rho^2}}) \\]"
 #         eq3 = f"\\[ b = \\frac{{1}}{{2(1-\\rho^2)\\sigma_{{{self.x_name}}}^2}}\\]"
 #         eq4 = f"\\[ c = \\frac{{1}}{{2(1-\\rho^2)\\sigma_{{{self.y_name}}}^2}}\\]"
@@ -1165,8 +1172,14 @@ class dlnGaussian2D(MathMixins, Model):
 
 #     @property
 #     def _equation(self):
-#         dfdx = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_{{{self.x_name}}}^2}} - \\rho\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_{{{self.x_name}}}\\sigma_{{{self.y_name}}}}}\\right)\\right)"
-#         dfdy = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left(\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_{{{self.x_name}}}^2}} - \\rho\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_{{{self.x_name}}}\\sigma_{{{self.y_name}}}}}\\right)\\right)"
+#         dfdx = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left
+#           (\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_{{{self.x_name}}}^2}}
+#            - \\rho\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_{{{self.x_name}}}
+#           \\sigma_{{{self.y_name}}}}}\\right)\\right)"
+#         dfdy = f"\\left(-\\frac{{1}}{{1-\\rho^2}}\\left
+#               (\\frac{{\\mathbf{{{self.y_name}}}}}{{\\sigma_{{{self.x_name}}}^2}}
+#            - \\rho\\frac{{\\mathbf{{{self.x_name}}}}}{{\\sigma_{{{self.x_name}}}
+#           \\sigma_{{{self.y_name}}}}}\\right)\\right)"
 #         return [f"\\mathbf{{{self.x_name}}}^0", dfdx, dfdy]
 
 #     @property
