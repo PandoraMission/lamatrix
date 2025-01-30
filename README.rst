@@ -2,8 +2,8 @@
 lamatrix
 ########
 
-.. image:: https://github.com/christinahedges/lamatrix/actions/workflows/python-app.yml/badge.svg
-    :target: https://github.com/christinahedges/lamatrix/actions/workflows/python-app.yml
+.. image:: https://github.com/christinahedges/lamatrix/actions/workflows/pytest.yml/badge.svg
+    :target: https://github.com/christinahedges/lamatrix/actions/workflows/pytest.yml
     :alt: Test status
 
 .. image:: https://badge.fury.io/py/lamatrix.svg
@@ -95,11 +95,13 @@ This has now created a new poetry enviroment and installed the dependencies, dev
 You can now add any updates to the package you would like. The first step is to create and name a new branch.
 
 .. code-block:: console
+
     $ git checkout -b BRANCHNAME
 
 If you have not used your branch in a while, make sure you pull and merge any updates on the main branch.
 
 .. code-block:: console
+
     $ git pull origin main
 
 You will have to resolve any merge conflicts.
@@ -117,6 +119,7 @@ Once you have update the package, you should ensure you have done the following
 To run tests you can go into the root directory for the package and use the ``Makefile``.
 
 .. code-block:: console
+
     $ make
 
 This will run ``black``, ``isort``, ``flake8``, and ``pytest``. All of these should pass locally on your machine. Ensure the tests pass before moving to the next steps.
@@ -127,11 +130,13 @@ This will run ``black``, ``isort``, ``flake8``, and ``pytest``. All of these sho
 The docs can be checked by running the following from within the ``docs/`` directory
 
 .. code-block:: console
+
     $ make serve
 
 This will compile and serve the docs at ``http://127.0.0.1:8001``. This will recompile all the notebooks in the ``docs/`` directory. You should be able to stop the serve action by using ``ctrl+c`` in the terminal window. If you accidentally close the terminal window and that port is blocked you can use
 
 .. code-block:: console
+
     $ make stop-serve
 
 to stop the docs on that port. 
