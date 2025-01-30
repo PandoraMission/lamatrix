@@ -5,7 +5,17 @@ from datetime import datetime
 
 PACKAGEDIR = os.path.abspath(os.path.dirname(__file__))
 
-__version__ = "0.1.0"
+from importlib.metadata import PackageNotFoundError, version  # noqa
+
+
+def get_version():
+    try:
+        return version("lamatrix")
+    except PackageNotFoundError:
+        return "unknown"
+
+
+__version__ = get_version()
 
 
 def _META_DATA():
