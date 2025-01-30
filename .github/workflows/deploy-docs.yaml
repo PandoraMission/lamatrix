@@ -28,7 +28,8 @@ jobs:
 
       - name: Build Documentation
         run: |
-          sphinx-build -b html docs/source docs/_build
+          poetry run sphinx-build -M clean docs docs/_build
+          poetry run sphinx-build -M html docs docs/_build -D nbsphinx_execute='always'
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
