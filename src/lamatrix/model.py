@@ -13,6 +13,22 @@ from .distributions import Distribution, DistributionsContainer
 __all__ = ["Model"]
 
 
+class Equation(str):
+    """Class for holding equations so we can have an HTML repr in Jupyter."""
+
+    def __new__(cls, equation: str):
+        """Ensure Equation behaves like a string while allowing custom behavior."""
+        return super().__new__(cls, equation)
+
+    def _repr_html_(self):
+        """Jupyter-specific representation: renders equation using MathJax."""
+        return f"<div>{self}</div>"
+
+    def __repr__(self):
+        """Fallback representation for debugging."""
+        return super().__repr__()
+
+
 def _sparse_ones_like(matrix):
     """From an input matrix, creates an object of the same type of matrix with all the non zero values as 1."""
     if sparse.isspmatrix_csr(matrix) or sparse.isspmatrix_csc(matrix):
@@ -107,17 +123,18 @@ class Model(ABC):
 
     @property
     def equation(self):
-        func_signature = ", ".join([f"\\mathbf{{{a}}}" for a in self.arg_names])
-        return (
-            f"\\[f({func_signature}) = "
+        func_signature = ", ".join([f"\mathbf{{{a}}}" for a in self.arg_names])
+        eqn = (
+            f"\[f({func_signature}) = "
             + " + ".join(
                 [
                     f"{self._mu_letter}_{{{coeff}}} {e}"
                     for coeff, e in enumerate(self._equation)
                 ]
             )
-            + "\\]"
+            + "\]"
         )
+        return Equation(eqn)
 
     def __repr__(self):
         return (

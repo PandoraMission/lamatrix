@@ -13,8 +13,3 @@ This set of tutorials will help you get started with ``lamatrix``. Click below t
     Example1.ipynb
     Example2.ipynb
     Example3.ipynb
-    Example4.ipynb
-    Example5.ipynb
-    Example6.ipynb
-    Example7.ipynb
-    Example8.ipynb

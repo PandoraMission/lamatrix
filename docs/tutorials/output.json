@@ -1,0 +1,83 @@
+{
+    "object_type": "JointModel",
+    "initializing_kwargs": {},
+    "priors": {
+        "mean": [
+            0,
+            0
+        ],
+        "std": [
+            Infinity,
+            Infinity
+        ]
+    },
+    "posteriors": {
+        "mean": [
+            2.3035723080835266,
+            1.462975001555824
+        ],
+        "std": [
+            0.03674280542968608,
+            0.021213998935697434
+        ]
+    },
+    "equation": "\\[f(\\mathbf{x}) = w_{0} \\mathbf{x}^{1} + w_{1} \\]",
+    "latex": "\\[f(\\mathbf{x}) = w_{0} \\mathbf{x}^{1} + w_{1} \\]\n\\begin{table}[h!]\n\\centering\n\\begin{tabular}{|c|c|c|}\n\\hline\nCoefficient & Posterior & Prior \\\\\\hline\nw & $2.30 \\pm 0.04$  & $0 \\pm \\infty$ \\\\\\hline\nw & $1.46 \\pm 0.02$  & $0 \\pm \\infty$ \\\\\\hline\n\\end{tabular}\n\\end{table}",
+    "models": {
+        "model1": {
+            "object_type": "Polynomial",
+            "initializing_kwargs": {
+                "x_name": "x",
+                "order": 1
+            },
+            "priors": {
+                "mean": [
+                    0
+                ],
+                "std": [
+                    Infinity
+                ]
+            },
+            "posteriors": {
+                "mean": [
+                    2.3035723080835266
+                ],
+                "std": [
+                    0.03674280542968608
+                ]
+            },
+            "equation": "\\[f(\\mathbf{x}) = w_{0} \\mathbf{x}^{1}\\]",
+            "latex": "\\[f(\\mathbf{x}) = w_{0} \\mathbf{x}^{1}\\]\n\\begin{table}[h!]\n\\centering\n\\begin{tabular}{|c|c|c|}\n\\hline\nCoefficient & Posterior & Prior \\\\\\hline\nw & $2.30 \\pm 0.04$  & $0 \\pm \\infty$ \\\\\\hline\n\\end{tabular}\n\\end{table}"
+        },
+        "model2": {
+            "object_type": "Constant",
+            "initializing_kwargs": {},
+            "priors": {
+                "mean": [
+                    0
+                ],
+                "std": [
+                    Infinity
+                ]
+            },
+            "posteriors": {
+                "mean": [
+                    1.462975001555824
+                ],
+                "std": [
+                    0.021213998935697434
+                ]
+            },
+            "equation": "\\[f() = w_{0} \\]",
+            "latex": "\\[f() = w_{0} \\]\n\\begin{table}[h!]\n\\centering\n\\begin{tabular}{|c|c|c|}\n\\hline\nCoefficient & Posterior & Prior \\\\\\hline\nw & $1.46 \\pm 0.02$  & $0 \\pm \\infty$ \\\\\\hline\n\\end{tabular}\n\\end{table}"
+        }
+    },
+    "metadata": {
+        "creation_date": "2025-01-30 11:54:30",
+        "tool_name": "lamatrix",
+        "tool_version": "1.0.0",
+        "operating_system": "Darwin",
+        "os_version": "Darwin Kernel Version 23.5.0: Wed May  1 20:12:58 PDT 2024; root:xnu-10063.121.3~5/RELEASE_ARM64_T6000",
+        "python_version": "3.9.13"
+    }
+}
