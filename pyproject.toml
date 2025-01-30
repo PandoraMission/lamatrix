@@ -3,7 +3,7 @@ name = "lamatrix"
 version = "1.0.0"
 description = ""
 authors = ["Christina Hedges <christina.l.hedges@nasa.gov>"]
-readme = "docs/README.md"
+readme = "README.rst"
 packages = [{include = "lamatrix", from = "src"}]
 
 [tool.poetry.dependencies]
