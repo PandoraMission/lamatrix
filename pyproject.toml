@@ -29,6 +29,7 @@ sphinx_astropy = "^1.9.1"
 sphinx_automodapi = "^0.17.0"
 pydata-sphinx-theme = "^0.15.4"
 sphinx-autobuild = "^2024.10.3"
+flake8 = "^7.1.1"
 
 [build-system]
 requires = ["poetry-core"]
