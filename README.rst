@@ -2,6 +2,7 @@
 lamatrix
 ########
 
+
 .. image:: https://github.com/christinahedges/lamatrix/actions/workflows/pytest.yml/badge.svg
     :target: https://github.com/christinahedges/lamatrix/actions/workflows/pytest.yml
     :alt: Test status
@@ -16,7 +17,9 @@ lamatrix
 
 .. <!-- intro content start -->
 
+
 The ``lamatrix`` package is designed to help you build linear algebra models in Python to help you fit simple models to data. ``lamatrix`` will do all the fitting and shaping inside the package, so you can put in objects of any shape and fit ND models easily. 
+
 
 .. <!-- intro content end -->
 
