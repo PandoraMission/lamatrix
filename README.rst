@@ -3,8 +3,8 @@ lamatrix
 ########
 
 
-.. image:: https://github.com/christinahedges/lamatrix/actions/workflows/pytest.yml/badge.svg
-    :target: https://github.com/christinahedges/lamatrix/actions/workflows/pytest.yml
+.. image:: https://github.com/pandoramission/lamatrix/actions/workflows/pytest.yml/badge.svg
+    :target: https://github.com/pandoramission/lamatrix/actions/workflows/pytest.yml
     :alt: Test status
 
 .. image:: https://badge.fury.io/py/lamatrix.svg
@@ -12,7 +12,7 @@ lamatrix
     :alt: PyPI version
 
 .. image:: https://img.shields.io/badge/documentation-live-blue.svg
-    :target: https://christinahedges.github.io/lamatrix/
+    :target: https://pandoramission.github.io/lamatrix/
     :alt: Documentation
 
 .. <!-- intro content start -->
@@ -160,7 +160,7 @@ Contact
 
 ``lamatrix`` is an open source community package. The best way to notify a bug in the package is to `open an issue`_. Please include a self-contained example that fully demonstrates your problem or question.
 
-  .. _`open an issue`: https://github.com/christinahedges/lamatrix/issues/new
+  .. _`open an issue`: https://github.com/pandoramission/lamatrix/issues/new
 
 .. <!-- Contact content end -->
 

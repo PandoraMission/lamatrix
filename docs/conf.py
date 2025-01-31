@@ -63,7 +63,7 @@ html_sidebars = {
 
 html_theme_options = {
     "external_links": [],
-    "github_url": "https://github.com/christinahedges/lamatrix",
+    "github_url": "https://github.com/pandoramission/lamatrix",
 }
 
 html_title = "lamatrix"
