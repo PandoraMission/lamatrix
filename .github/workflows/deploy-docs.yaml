@@ -34,13 +34,12 @@ jobs:
 
       - name: Build Documentation
         run: |
-          poetry run sphinx-build -M clean docs docs/_build
-          poetry run sphinx-build -M html docs docs/_build -D nbsphinx_execute='always'
+          poetry run sphinx-build -M html docs _build -D nbsphinx_execute='always'
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/_build
+          publish_dir: _build
           publish_branch: gh-pages
 
