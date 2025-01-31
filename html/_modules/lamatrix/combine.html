@@ -1,0 +1,1246 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lamatrix.combine &#8212; lamatrix</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/lamatrix/combine';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="31 Jan 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">lamatrix</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../Quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../model-examples/index.html">
+    Model Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../use-cases/index.html">
+    Use Cases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../apidoc.html">
+    API Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../GetInvolved.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../Contact.html">
+    Contact
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/christinahedges/lamatrix" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../Quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../model-examples/index.html">
+    Model Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../use-cases/index.html">
+    Use Cases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../apidoc.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../GetInvolved.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../Contact.html">
+    Contact
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/christinahedges/lamatrix" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">lamatrix.combine</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for lamatrix.combine</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Classes and methods to combine models&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">sparse</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.distributions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Distribution</span><span class="p">,</span> <span class="n">DistributionsContainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">IOMixins</span><span class="p">,</span> <span class="n">LatexMixins</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;JointModel&quot;</span><span class="p">,</span> <span class="s2">&quot;CrosstermModel&quot;</span><span class="p">]</span>
+
+
+<span class="c1"># def combine_matrices(*matrices):</span>
+<span class="c1">#     if len(matrices) == 1:</span>
+<span class="c1">#         return matrices[0]</span>
+<span class="c1">#     # Step case: combine the first two equations and recursively call the function with the result</span>
+<span class="c1">#     combined = [matrices[0] * f[:, None] for f in matrices[1].T]</span>
+
+<span class="c1">#     # If there are more equations left, combine further</span>
+<span class="c1">#     if len(matrices) &gt; 2:</span>
+<span class="c1">#         return np.hstack(combine_matrices(combined, *matrices[2:]))</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         return np.hstack(combined)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_combine_equations</span><span class="p">(</span><span class="o">*</span><span class="n">equations</span><span class="p">):</span>
+    <span class="c1"># Base case: if there&#39;s only one equation, just return it</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">equations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Step case: combine the first two equations and recursively call the function with the result</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="o">+</span> <span class="n">e</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">equations</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">equations</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="c1"># If there are more equations left, combine further</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_combine_equations</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="o">*</span><span class="n">equations</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="JointModel">
+<a class="viewcode-back" href="../../api_modules/lamatrix.combine.html#lamatrix.combine.JointModel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JointModel</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="n">IOMixins</span><span class="p">,</span> <span class="n">LatexMixins</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="c1"># Check that every arg is a generator</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">Model</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can only combine `Model` objects.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">]</span>
+        <span class="c1"># self.priors = DistributionsContainer([p for g in self.models for p in g.priors])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="o">.</span><span class="n">from_number</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widths</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="n">new</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">l</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">models</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">posteriors</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">new</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="se">\n\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="c1"># def set_prior(self, index, distribution):</span>
+    <span class="c1">#     cs = np.cumsum(self.widths)</span>
+    <span class="c1">#     generator_index = np.where(cs &gt;= index)[0][0]</span>
+    <span class="c1">#     vector_index = index - cs[generator_index - 1] if generator_index &gt; 0 else 0</span>
+    <span class="c1">#     return self.models[generator_index].set_prior(vector_index, distribution)</span>
+
+    <span class="c1"># def set_priors(self, distributions):</span>
+    <span class="c1">#     cs = [0, *np.cumsum(self.widths)]</span>
+    <span class="c1">#     for idx, g in enumerate(self.models):</span>
+    <span class="c1">#         g.set_priors(</span>
+    <span class="c1">#             [distributions[jdx] for jdx in np.arange(cs[idx], cs[idx + 1])]</span>
+    <span class="c1">#         )</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialization_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">arg_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">arg_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">]))}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_equation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">g</span><span class="o">.</span><span class="n">_equation</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">])]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">priors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">DistributionsContainer</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">priors</span><span class="p">])</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def prior_mean(self):</span>
+    <span class="c1">#     return np.asarray(</span>
+    <span class="c1">#         [</span>
+    <span class="c1">#             distribution.mean</span>
+    <span class="c1">#             for g in self.models</span>
+    <span class="c1">#             for distribution in g.priors</span>
+    <span class="c1">#         ]</span>
+    <span class="c1">#     )</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def prior_std(self):</span>
+    <span class="c1">#     return np.asarray(</span>
+    <span class="c1">#         [</span>
+    <span class="c1">#             distribution.std</span>
+    <span class="c1">#             for g in self.models</span>
+    <span class="c1">#             for distribution in g.prior_distributions</span>
+    <span class="c1">#         ]</span>
+    <span class="c1">#     )</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def fit_mean(self):</span>
+    <span class="c1">#     return np.asarray([distribution[0] for distribution in self.fit_distributions])</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def fit_std(self):</span>
+    <span class="c1">#     return np.asarray([distribution[1] for distribution in self.fit_distributions])</span>
+
+<div class="viewcode-block" id="JointModel.design_matrix">
+<a class="viewcode-back" href="../../api_modules/lamatrix.combine.html#lamatrix.combine.JointModel.design_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">design_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">design_matrix</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span> <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="n">sparse</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">Xs</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="ow">not</span> <span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span> <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">]):</span>
+            <span class="n">ndim</span> <span class="o">=</span> <span class="n">Xs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">shape_a</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">shape_b</span> <span class="o">=</span> <span class="p">[</span><span class="n">ndim</span><span class="p">,</span> <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">X</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">shape_b</span><span class="p">)</span> <span class="k">for</span> <span class="n">X</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">shape_a</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can not combine sparse and dense matrices.&quot;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widths</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nvectors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">g</span><span class="o">.</span><span class="n">nvectors</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">])</span>
+
+<div class="viewcode-block" id="JointModel.fit">
+<a class="viewcode-back" href="../../api_modules/lamatrix.combine.html#lamatrix.combine.JointModel.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widths</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">stds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span><span class="o">.</span><span class="n">std</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widths</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">)),</span> <span class="n">means</span><span class="p">,</span> <span class="n">stds</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">Distribution</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">)]</span>
+            <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">has_constant</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">g</span><span class="o">.</span><span class="n">arg_names</span> <span class="o">==</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">])</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">arg_names</span> <span class="o">==</span> <span class="p">{})</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">has_constant</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">JointModel</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">has_constant</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">JointModel</span><span class="p">(</span>
+                    <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">,</span> <span class="o">*</span><span class="p">[</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">models</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">arg_names</span> <span class="o">==</span> <span class="p">{}]</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">JointModel</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="o">.</span><span class="n">models</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">has_constant</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">arg_names</span> <span class="o">==</span> <span class="p">{}):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can not combine multiple `ConstantModel`s&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">JointModel</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Can only combine `Model` objects, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">arg_names</span> <span class="o">==</span> <span class="p">{}:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">CrosstermModel</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">CrosstermModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="o">.</span><span class="n">models</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">JointModel</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">JointModel</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">g</span> <span class="o">*</span> <span class="n">p</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">models</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">JointModel</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">g</span> <span class="o">*</span> <span class="n">other</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="CrosstermModel">
+<a class="viewcode-back" href="../../api_modules/lamatrix.combine.html#lamatrix.combine.CrosstermModel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CrosstermModel</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="n">IOMixins</span><span class="p">,</span> <span class="n">LatexMixins</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="c1"># Check that every arg is a generator</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">Model</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can only combine `Model` objects.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="o">.</span><span class="n">from_number</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widths</span><span class="p">))</span>
+        <span class="n">prior_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">means</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">means</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">means</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+                    <span class="o">*</span><span class="p">[</span>
+                        <span class="p">[</span><span class="n">distribution</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">distribution</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">priors</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">prior_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">means</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="o">+</span> <span class="n">means</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="o">+</span> <span class="n">stds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="k">for</span> <span class="n">means</span><span class="p">,</span> <span class="n">stds</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                        <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+                            <span class="o">*</span><span class="p">[</span>
+                                <span class="p">[</span><span class="n">distribution</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">distribution</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">priors</span><span class="p">]</span>
+                                <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span>
+                            <span class="p">]</span>
+                        <span class="p">),</span>
+                        <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+                            <span class="o">*</span><span class="p">[</span>
+                                <span class="p">[</span><span class="n">distribution</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">distribution</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">priors</span><span class="p">]</span>
+                                <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span>
+                            <span class="p">]</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">priors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Distribution</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">prior_mean</span><span class="p">,</span> <span class="n">prior_std</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="c1"># self._validate_distributions(prior_distributions)</span>
+        <span class="c1"># self.prior_distributions = prior_distributions</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialization_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">arg_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">arg_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">]))}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widths</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nvectors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">g</span><span class="o">.</span><span class="n">nvectors</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_equation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">eqns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">eqns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">for</span> <span class="n">eqns</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">_equation</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">])</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def prior_distributions(self):</span>
+    <span class="c1">#     return [(m, s) for m, s in zip(self.prior_mean, self.prior_std)]</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def prior_mean(self):</span>
+    <span class="c1">#     return np.asarray(</span>
+    <span class="c1">#         [</span>
+    <span class="c1">#             np.sum(i)</span>
+    <span class="c1">#             for i in itertools.product(</span>
+    <span class="c1">#                 *[</span>
+    <span class="c1">#                     [distribution[0] for distribution in g.prior_distributions]</span>
+    <span class="c1">#                     for g in self.models</span>
+    <span class="c1">#                 ]</span>
+    <span class="c1">#             )</span>
+    <span class="c1">#         ]</span>
+    <span class="c1">#     )</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def prior_std(self):</span>
+    <span class="c1">#     return np.asarray(</span>
+    <span class="c1">#         [</span>
+    <span class="c1">#             np.prod(i)</span>
+    <span class="c1">#             for i in itertools.product(</span>
+    <span class="c1">#                 *[</span>
+    <span class="c1">#                     [distribution[1] for distribution in g.prior_distributions]</span>
+    <span class="c1">#                     for g in self.models</span>
+    <span class="c1">#                 ]</span>
+    <span class="c1">#             )</span>
+    <span class="c1">#         ]</span>
+    <span class="c1">#     )</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def fit_mean(self):</span>
+    <span class="c1">#     return np.asarray([distribution[0] for distribution in self.fit_distributions])</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def fit_std(self):</span>
+    <span class="c1">#     return np.asarray([distribution[1] for distribution in self.fit_distributions])</span>
+
+<div class="viewcode-block" id="CrosstermModel.design_matrix">
+<a class="viewcode-back" href="../../api_modules/lamatrix.combine.html#lamatrix.combine.CrosstermModel.design_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">design_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">design_matrix</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span> <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">]):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">T</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">])],</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">X</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="ow">not</span> <span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span> <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">]):</span>
+            <span class="n">ndim</span> <span class="o">=</span> <span class="n">Xs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">shape_a</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">shape_b</span> <span class="o">=</span> <span class="p">[</span><span class="n">ndim</span><span class="p">,</span> <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)]</span>
+            <span class="n">Xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">shape_b</span><span class="p">)</span> <span class="k">for</span> <span class="n">X</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">]</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">ndim</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">shape_b</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">Xs</span><span class="p">)</span>
+                <span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">shape_a</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">X</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can not combine sparse and dense matrices.&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">ndim</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">Xs</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">shape_a</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">Xs</span><span class="p">)]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">shape_a</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">X</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">shape_b</span><span class="p">)</span> <span class="k">for</span> <span class="n">X</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">shape_a</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+                    <span class="o">*</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">design_matrix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
+
+
+<div class="viewcode-block" id="CrosstermModel.fit">
+<a class="viewcode-back" href="../../api_modules/lamatrix.combine.html#lamatrix.combine.CrosstermModel.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">CrosstermModel</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">JointModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">JointModel</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">JointModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="o">.</span><span class="n">models</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">JointModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can only combine `Model` objects.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">CrosstermModel</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">JointModel</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">CrosstermModel</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can only combine `Model` objects.&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># class CrosstermGenerator(Generator):</span>
+<span class="c1">#     def __init__(self, generator1, generator2):</span>
+<span class="c1">#         # Check that every arg is a generator</span>
+<span class="c1">#         if not (isinstance(generator1, Generator) &amp; isinstance(generator2, Generator)):</span>
+<span class="c1">#             raise ValueError(&quot;Can only combine `Generator` objects.&quot;)</span>
+<span class="c1">#         self.generator1, self.generator2 = generator1.copy(), generator2.copy()</span>
+<span class="c1">#         self.widths = [self.generator1.width, self.generator2.width]</span>
+<span class="c1">#         self.fit_distributions = [[(None, None)] * self.generator1.width] * self.generator2.width</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def arg_names(self):</span>
+<span class="c1">#         return {*np.unique(np.hstack([list(self.generator1.arg_names), list(self.generator2.arg_names)]))}</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def prior_distributions(self):</span>
+<span class="c1">#         return [[(d1[0] + d2[0], (d1[1]**2 + d2[1]**2)**0.5) for d1 in self.generator1.prior_distributions]</span>
+<span class="c1">#                   for d2 in self.generator2.prior_distributions]</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def prior_mean(self):</span>
+<span class="c1">#         return np.asarray([[d1[0] + d2[0] for d1 in self.generator1.prior_distributions] for</span>
+<span class="c1">#               d2 in self.generator2.prior_distributions])</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def prior_std(self):</span>
+<span class="c1">#         return np.asarray([[(d1[1]**2 * d2[1]**2)**0.5 for d1 in self.generator1.prior_distributions]</span>
+<span class="c1">#           for d2 in self.generator2.prior_distributions])</span>
+
+<span class="c1">#     # @property</span>
+<span class="c1">#     # def fit_mean(self):</span>
+<span class="c1">#     #     return np.asarray([distribution[0] for g in self.generators for distribution in g.fit_distributions])</span>
+
+<span class="c1">#     # @property</span>
+<span class="c1">#     # def fit_std(self):</span>
+<span class="c1">#     #     return np.asarray([distribution[1] for g in self.generators for distribution in g.fit_distributions])</span>
+
+<span class="c1">#     # def design_matrix(self, *args, **kwargs):</span>
+<span class="c1">#     #     return np.hstack([g.design_matrix(*args, **kwargs) for g in self.generators])</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def width(self):</span>
+<span class="c1">#         return np.prod(self.widths)</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def nvectors(self):</span>
+<span class="c1">#         return np.sum([g.nvectors for g in self.generators])</span>
+
+<span class="c1">#     def design_matrix(self, **kwargs):</span>
+<span class="c1">#         return combine_matrices(self.generator1.design_matrix(**kwargs), self.generator2.design_matrix(**kwargs))</span>
+
+
+<span class="c1"># import json</span>
+
+<span class="c1"># import numpy as np</span>
+<span class="c1"># import re</span>
+
+<span class="c1"># from . import _META_DATA</span>
+<span class="c1"># from .generator import Generator</span>
+
+<span class="c1"># __all__ = [&quot;StackedIndependentGenerator&quot;, &quot;StackedDependentGenerator&quot;]</span>
+
+
+<span class="c1"># def combine_equations(*equations):</span>
+<span class="c1">#     # Base case: if there&#39;s only one equation, just return it</span>
+<span class="c1">#     if len(equations) == 1:</span>
+<span class="c1">#         return equations[0]</span>
+
+<span class="c1">#     # Step case: combine the first two equations and recursively call the function with the result</span>
+<span class="c1">#     combined = [f + e for f in equations[1] for e in equations[0]]</span>
+
+<span class="c1">#     # If there are more equations left, combine further</span>
+<span class="c1">#     if len(equations) &gt; 2:</span>
+<span class="c1">#         return combine_equations(combined, *equations[2:])</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         return np.asarray(combined)</span>
+
+
+<span class="c1"># def combine_sigmas(*sigmas):</span>
+<span class="c1">#     # Base case: if there&#39;s only one equation, just return it</span>
+<span class="c1">#     if len(sigmas) == 1:</span>
+<span class="c1">#         return sigmas[0]</span>
+
+<span class="c1">#     if (np.isfinite(sigmas[0])).any():</span>
+<span class="c1">#         if sigmas[1][0] == np.inf:</span>
+<span class="c1">#             sigmas[1][0] = 0</span>
+<span class="c1">#     if (np.isfinite(sigmas[1])).any():</span>
+<span class="c1">#         if sigmas[0][0] == np.inf:</span>
+<span class="c1">#             sigmas[0][0] = 0</span>
+
+<span class="c1">#     # Step case: combine the first two equations and recursively call the function with the result</span>
+<span class="c1">#     combined = [(f**2 + e**2) ** 0.5 for f in sigmas[1] for e in sigmas[0]]</span>
+
+<span class="c1">#     # If there are more equations left, combine further</span>
+<span class="c1">#     if len(sigmas) &gt; 2:</span>
+<span class="c1">#         return combine_sigmas(combined, *sigmas[2:])</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         return np.asarray(combined)</span>
+
+
+<span class="c1"># def combine_mus(*mus):</span>
+<span class="c1">#     return combine_equations(*mus)</span>
+
+
+<span class="c1"># def combine_matrices(*matrices):</span>
+<span class="c1">#     # Base case: if there&#39;s only one equation, just return it</span>
+<span class="c1">#     if len(matrices) == 1:</span>
+<span class="c1">#         return matrices[0]</span>
+<span class="c1">#     # Step case: combine the first two equations and recursively call the function with the result</span>
+<span class="c1">#     combined = [matrices[0] * f[:, None] for f in matrices[1].T]</span>
+
+<span class="c1">#     # If there are more equations left, combine further</span>
+<span class="c1">#     if len(matrices) &gt; 2:</span>
+<span class="c1">#         return np.hstack(combine_matrices(combined, *matrices[2:]))</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         return np.hstack(combined)</span>
+
+
+<span class="c1"># class StackedIndependentGenerator(Generator):</span>
+<span class="c1">#     def __init__(self, *args, **kwargs):</span>
+<span class="c1">#         if (</span>
+<span class="c1">#             not len(np.unique([a.data_shape for a in args if a.data_shape is not None]))</span>
+<span class="c1">#             &lt;= 1</span>
+<span class="c1">#         ):</span>
+<span class="c1">#             raise ValueError(&quot;Can not have different `data_shape`.&quot;)</span>
+<span class="c1">#         self.generators = [a.copy() for a in args]</span>
+<span class="c1">#         self.data_shape = self.generators[0].data_shape</span>
+<span class="c1">#         self.fit_mu = None</span>
+<span class="c1">#         self.fit_sigma = None</span>
+
+<span class="c1">#     def __repr__(self):</span>
+<span class="c1">#         str1 = (</span>
+<span class="c1">#             f&quot;{type(self).__name__}({&#39;, &#39;.join(list(self.arg_names))})[n, {self.width}]&quot;</span>
+<span class="c1">#         )</span>
+<span class="c1">#         def add_tab_to_runs_of_tabs(repr_str):</span>
+<span class="c1">#             pattern = r&#39;\t+&#39;</span>
+<span class="c1">#             replacement = lambda match: match.group(0) + &#39;\t&#39;</span>
+<span class="c1">#             result_string = re.sub(pattern, replacement, repr_str)</span>
+<span class="c1">#             return result_string</span>
+
+<span class="c1">#         str2 = [f&quot;\t{add_tab_to_runs_of_tabs(g.__repr__())}&quot; for g in self.generators]</span>
+<span class="c1">#         return &quot;\n&quot;.join([str1, *str2])</span>
+
+<span class="c1">#     def __add__(self, other):</span>
+<span class="c1">#         if isinstance(other, Generator):</span>
+<span class="c1">#             return StackedIndependentGenerator(self, other)</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             raise ValueError(&quot;Can only combine `Generator` objects.&quot;)</span>
+
+<span class="c1">#     def __mul__(self, other):</span>
+<span class="c1">#         if isinstance(other, Generator):</span>
+<span class="c1">#             return StackedDependentGenerator(self, other)</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             raise ValueError(&quot;Can only combine `Generator` objects.&quot;)</span>
+
+<span class="c1">#     def __getitem__(self, key):</span>
+<span class="c1">#         return self.generators[key]</span>
+
+<span class="c1">#     # def __add__(self, other):</span>
+<span class="c1">#     #     if isinstance(other, Generator):</span>
+<span class="c1">#     #         return VStackedGenerator(*self.generators, other)</span>
+<span class="c1">#     #     else:</span>
+<span class="c1">#     #         raise ValueError(&quot;Can only combine `Generator` objects.&quot;)</span>
+
+<span class="c1">#     def design_matrix(self, *args, **kwargs):</span>
+<span class="c1">#         return np.hstack([g.design_matrix(*args, **kwargs) for g in self.generators])</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def gradient(self):</span>
+<span class="c1">#         return StackedIndependentGenerator(*[g.gradient for g in self.generators])</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def width(self):</span>
+<span class="c1">#         return np.sum([g.width for g in self.generators])</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def nvectors(self):</span>
+<span class="c1">#         return len(self.arg_names)</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def prior_mu(self):</span>
+<span class="c1">#         prior_mu = []</span>
+<span class="c1">#         for idx, g in enumerate(self.generators):</span>
+<span class="c1">#             pm = np.copy(g.prior_mu)</span>
+<span class="c1">#             if idx != 0:</span>
+<span class="c1">#                 pm[0] = 0</span>
+<span class="c1">#             else:</span>
+<span class="c1">#                 pm[0] = np.sum([g.prior_mu[0] for g in self.generators])</span>
+<span class="c1">#             prior_mu.append(pm)</span>
+<span class="c1">#         return np.hstack(prior_mu)</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def prior_sigma(self):</span>
+<span class="c1">#         prior_sigma = []</span>
+<span class="c1">#         for idx, g in enumerate(self.generators):</span>
+<span class="c1">#             pm = np.copy(g.prior_sigma)</span>
+<span class="c1">#             if idx != 0:</span>
+<span class="c1">#                 pm[0] = 0</span>
+<span class="c1">#             else:</span>
+<span class="c1">#                 pm[0] = (</span>
+<span class="c1">#                     np.nansum(np.asarray([g.prior_sigma[0] if g.prior_sigma[0] != np.inf</span>
+<span class="c1">#                           else 0 for g in self.generators], dtype=float) ** 2)</span>
+<span class="c1">#                     ** 0.5</span>
+<span class="c1">#                 )</span>
+<span class="c1">#             prior_sigma.append(pm)</span>
+<span class="c1">#         if (np.asarray([pm[0] for pm in prior_sigma]) == 0).all():</span>
+<span class="c1">#             prior_sigma[0][0] = np.inf</span>
+<span class="c1">#         return np.hstack(prior_sigma)</span>
+
+<span class="c1">#     # @property</span>
+<span class="c1">#     # def mu(self):</span>
+<span class="c1">#     #     mu = []</span>
+<span class="c1">#     #     for idx, g in enumerate(self.generators):</span>
+<span class="c1">#     #         pm = np.copy(g.mu)</span>
+<span class="c1">#     #         if idx != 0:</span>
+<span class="c1">#     #             pm[0] = 0</span>
+<span class="c1">#     #         mu.append(pm)</span>
+<span class="c1">#     #     return np.hstack(mu)</span>
+
+<span class="c1">#     # @property</span>
+<span class="c1">#     # def sigma(self):</span>
+<span class="c1">#     #     sigma = []</span>
+<span class="c1">#     #     for idx, g in enumerate(self.generators):</span>
+<span class="c1">#     #         pm = np.copy(g.sigma)</span>
+<span class="c1">#     #         if idx != 0:</span>
+<span class="c1">#     #             pm[0] = 0</span>
+<span class="c1">#     #         sigma.append(pm)</span>
+<span class="c1">#     #     return np.hstack(sigma)</span>
+
+<span class="c1">#     def update_priors(self):</span>
+<span class="c1">#         if self.fit_mu is None:</span>
+<span class="c1">#             raise ValueError(&quot;Can not update priors before fitting.&quot;)</span>
+<span class="c1">#         new = self.copy()</span>
+<span class="c1">#         for idx in range(len(new)):</span>
+<span class="c1">#             new[idx].prior_mu = new[idx].fit_mu.copy()</span>
+<span class="c1">#             new[idx].prior_sigma = new[idx].fit_sigma.copy()</span>
+<span class="c1">#         return new</span>
+
+<span class="c1">#     def fit(self, *args, **kwargs):</span>
+<span class="c1">#         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)</span>
+<span class="c1">#         lengths = [g.width for g in self.generators]</span>
+<span class="c1">#         mu, sigma = (</span>
+<span class="c1">#             np.array_split(self.fit_mu, np.cumsum(lengths))[:-1],</span>
+<span class="c1">#             np.array_split(self.fit_sigma, np.cumsum(lengths))[:-1],</span>
+<span class="c1">#         )</span>
+<span class="c1">#         for idx, mu0, sigma0 in zip(np.arange(len(mu)), mu, sigma):</span>
+<span class="c1">#             self[idx].fit_mu = mu0</span>
+<span class="c1">#             self[idx].fit_sigma = sigma0</span>
+
+<span class="c1">#         indices = np.cumsum([0, *[g.width for g in self.generators]])</span>
+<span class="c1">#         for idx, a, b in zip(range(len(indices) - 1), indices[:-1], indices[1:]):</span>
+<span class="c1">#             self[idx].cov = self.cov[a:b, a:b]</span>
+
+<span class="c1">#     def __len__(self):</span>
+<span class="c1">#         return len(self.generators)</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def _equation(self):</span>
+<span class="c1">#         return np.hstack([g._equation for g in self.generators])</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def arg_names(self):</span>
+<span class="c1">#         return np.unique(np.hstack([list(g.arg_names) for g in self.generators]))</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def _INIT_ATTRS(self):</span>
+<span class="c1">#         return []</span>
+
+<span class="c1">#     def save(self, filename: str):</span>
+<span class="c1">#         if not filename.endswith(&quot;.json&quot;):</span>
+<span class="c1">#             filename = filename + &quot;.json&quot;</span>
+
+<span class="c1">#         # Write to a JSON file</span>
+<span class="c1">#         with open(filename, &quot;w&quot;) as json_file:</span>
+<span class="c1">#             data_to_store = self._create_save_data()</span>
+<span class="c1">#             generators_to_store = {</span>
+<span class="c1">#                 f&quot;generator{idx+1}&quot;: g._create_save_data()</span>
+<span class="c1">#                 for idx, g in enumerate(self.generators)</span>
+<span class="c1">#             }</span>
+<span class="c1">#             data_to_store[&quot;generators&quot;] = generators_to_store</span>
+<span class="c1">#             data_to_store[&quot;metadata&quot;] = _META_DATA()</span>
+<span class="c1">#             json.dump(data_to_store, json_file, indent=4)</span>
+
+
+<span class="c1"># class StackedDependentGenerator(StackedIndependentGenerator):</span>
+
+<span class="c1">#     def __init__(self, *args, **kwargs):</span>
+<span class="c1">#         super().__init__(*args, **kwargs)</span>
+<span class="c1">#         self._prior_mu = None</span>
+<span class="c1">#         self._prior_sigma = None</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def width(self):</span>
+<span class="c1">#         return np.prod([g.width for g in self.generators])</span>
+
+<span class="c1">#     def design_matrix(self, *args, **kwargs):</span>
+<span class="c1">#         return combine_matrices(</span>
+<span class="c1">#             *[g.design_matrix(*args, **kwargs) for g in self.generators]</span>
+<span class="c1">#         )</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def _equation(self):</span>
+<span class="c1">#         return combine_equations(*[g._equation for g in self.generators])</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def arg_names(self):</span>
+<span class="c1">#         return np.unique(np.hstack([list(g.arg_names) for g in self.generators]))</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def nvectors(self):</span>
+<span class="c1">#         return len(self.arg_names)</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def width(self):</span>
+<span class="c1">#         return np.prod([g.width for g in self.generators])</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def prior_sigma(self):</span>
+<span class="c1">#         if self._prior_sigma is None:</span>
+<span class="c1">#             return combine_sigmas(*[g.prior_sigma for g in self.generators])</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             return self._prior_sigma</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def prior_mu(self):</span>
+<span class="c1">#         if self._prior_mu is None:</span>
+<span class="c1">#             return combine_mus(*[g.prior_mu for g in self.generators])</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             return self._prior_mu</span>
+
+<span class="c1">#     def fit(self, *args, **kwargs):</span>
+<span class="c1">#         self.fit_mu, self.fit_sigma = self._fit(*args, **kwargs)</span>
+
+<span class="c1">#     # @property</span>
+<span class="c1">#     # def mu(self):</span>
+<span class="c1">#     #     return self.prior_mu if self.fit_mu is None else self.fit_mu</span>
+
+<span class="c1">#     # @property</span>
+<span class="c1">#     # def sigma(self):</span>
+<span class="c1">#     #     return self.prior_sigma if self.fit_sigma is None else self.fit_sigma</span>
+
+<span class="c1">#     def __getitem__(self, key):</span>
+<span class="c1">#         raise AttributeError(</span>
+<span class="c1">#             &quot;Can not extract individual generators from a dependent stacked generator.&quot;</span>
+<span class="c1">#         )</span>
+
+<span class="c1">#     @property</span>
+<span class="c1">#     def gradient(self):</span>
+<span class="c1">#         raise AttributeError(</span>
+<span class="c1">#             &quot;Can not create a gradient for a dependent stacked generator.&quot;</span>
+<span class="c1">#         )</span>
+
+<span class="c1">#     def update_priors(self):</span>
+<span class="c1">#         if self.fit_mu is None:</span>
+<span class="c1">#             raise ValueError(&quot;Can not update priors before fitting.&quot;)</span>
+<span class="c1">#         new = self.copy()</span>
+<span class="c1">#         new._prior_mu = new.fit_mu.copy()</span>
+<span class="c1">#         new._prior_sigma = new.fit_sigma.copy()</span>
+<span class="c1">#         return new</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Christina Hedges.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
