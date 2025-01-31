@@ -6,7 +6,7 @@ from scipy import sparse
 
 from ..io import IOMixins, LatexMixins
 from ..math import MathMixins
-from ..model import Model
+from ..model import Model, Equation
 
 __all__ = [
     "Spline",
@@ -141,6 +141,23 @@ class Spline(MathMixins, SplineMixins, LatexMixins, IOMixins, Model):
             order=self.order,
             priors=priors,
         )
+
+    @property
+    def spline_equation(self):
+        eqn1 = f"\\[f(\\mathbf{{{self.x_name}}}) = \sum_{{i=0}}^{{n-1}} w_i N_{{i,k}}(\\mathbf{{{self.x_name}}}) \\]"
+        eqn2 = f"\\[N_{{i,k}}(\\mathbf{{{self.x_name}}}) = \\frac{{\\mathbf{{{self.x_name}}} - t_i}}{{t_{{i+k-1}} - t_i}} N_{{i,k-1}}(\\mathbf{{{self.x_name}}}) + \\frac{{t_{{i+k}} - \\mathbf{{{self.x_name}}}}}{{t_{{i+k}} - t_{{i+1}}}} N_{{i+1,k-1}}(\\mathbf{{{self.x_name}}})\\]"
+        eqn3 = f"""\\[N_{{i,1}}(\\mathbf{{{self.x_name}}}) =
+        \\begin{{cases}}
+        1 & \\text{{if }} t_i \leq \\mathbf{{{self.x_name}}} < t_{{i+1}} \\\\
+        0 & \\text{{otherwise}} \\\\
+        \\end{{cases}}
+        \\]"""
+        eqn4 = "\\[t = [" + " , ".join([f"{k}" for k in self.knots]) + "]\\]"
+        eqn5 = f"\\[ k = {self.order} \\]"
+        return Equation("\n".join([eqn1, eqn2, eqn3, eqn4, eqn5]))
+
+    def to_latex(self):
+        return "\n".join([self.spline_equation, self._to_latex_table()])
 
 
 class SparseSpline(Spline):

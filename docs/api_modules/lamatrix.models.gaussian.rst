@@ -13,7 +13,6 @@
       dGaussian
       dGaussian2D
       dlnGaussian
-      dlnGaussian2D
       lnGaussian
       lnGaussian2D
    

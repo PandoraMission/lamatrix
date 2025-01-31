@@ -68,6 +68,20 @@ def _sparse_ones_like(matrix):
 
 
 class Model(ABC):
+    def _validate_priors(self, priors, width=None):
+        if width is None:
+            width = self.width
+        if priors is None:
+            return DistributionsContainer.from_number(width)
+        elif isinstance(priors, (tuple, Distribution)):
+            return DistributionsContainer([priors])
+        elif isinstance(priors, (list, np.ndarray)):
+            return DistributionsContainer(priors)
+        elif isinstance(priors, DistributionsContainer):
+            return priors
+        else:
+            raise ValueError("Could not parse input `priors`.")
+
     def __init__(
         self,
         priors: List[Tuple] = None,
@@ -75,16 +89,7 @@ class Model(ABC):
     ):
         # prior (always normal, and always specfied by mean and standard deviation)
         # fit_distributions (always normal, and always specfied by mean and standard deviation)
-        if priors is None:
-            self.priors = DistributionsContainer.from_number(self.width)
-        elif isinstance(priors, (tuple, Distribution)):
-            self.priors = DistributionsContainer([priors])
-        elif isinstance(priors, (list, np.ndarray)):
-            self.priors = DistributionsContainer(priors)
-        elif isinstance(priors, DistributionsContainer):
-            self.priors = priors
-        else:
-            raise ValueError("Could not parse input `priors`.")
+        self.priors = self._validate_priors(priors)
         if not len(self.priors) == self.width:
             raise ValueError(
                 "distributions must have the number of elements as the design matrix."

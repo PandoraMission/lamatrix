@@ -16,6 +16,7 @@ lamatrix
 
    Quickstart
    tutorials/index
+   model-examples/index
    use-cases/index
    apidoc
    GetInvolved

@@ -39,11 +39,20 @@ class Distribution(tuple):
     def std(self):
         return 1e-10 if self.frozen else self[1]
 
+    def _formatted_distribution(self):
+        """Format (mean, std) based on std's significant figures."""
+        if (self.std == 0) | (self.frozen):
+            return f"({np.round(self.mean, 4)}, 0)"  # Edge case for zero std
+        if np.isfinite(self.std):
+            sig_figs = int(1 - np.floor(np.log10(self.std)))
+            return f"({np.round(self.mean, sig_figs)}, {np.round(self.std, sig_figs)})"
+        return f"({np.round(self.mean, 4)}, {self.std})"
+
     def __repr__(self):
         """Custom string representation"""
         if self.frozen:
-            return f"({self.mean}, {self.std}) [Frozen]"
-        return f"({self.mean}, {self.std})"
+            return f"{self._formatted_distribution()} [Frozen]"
+        return f"{self._formatted_distribution()}"
 
     def as_tuple(self):
         """Return the distribution as a standard tuple."""

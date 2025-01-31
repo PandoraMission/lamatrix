@@ -7,9 +7,13 @@ Tutorials
 This set of tutorials will help you get started with ``lamatrix``. Click below to learn how to fit models to data
 
 
+Basic Tutorials
+---------------
+
 .. toctree::
     :maxdepth: 1
 
-    Example1.ipynb
-    Example2.ipynb
-    Example3.ipynb
+    intro-basics.ipynb
+    intro-combining.ipynb
+    intro-ndimensions.ipynb
+    intro-priors.ipynb
