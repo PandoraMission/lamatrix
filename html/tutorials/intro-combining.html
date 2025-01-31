@@ -546,7 +546,7 @@ document.write(`
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 DistributionContainer
-        [(2.3438, 0.0034), (9.988, 0.013), (10.005, 0.014), (1.4398, 0.0099)]
+        [(2.342, 0.0034), (10.014, 0.013), (10.005, 0.014), (1.4216, 0.0099)]
 </pre></div></div>
 </div>
 <p>We can see we’ve fit the posteriors with small errors. Let’s compare to our inputs. Our input polynomial was</p>
@@ -604,7 +604,7 @@ Polynomial(x)[n, 1]
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 DistributionContainer
-        [(2.3438, 0.0034)]
+        [(2.342, 0.0034)]
 </pre></div></div>
 </div>
 <p>We can see that the first order polynomial has posteriors after our fit. This is only a first order polynomial, and so it has only one weight. The weight is very close to our input weight of 2.3459!</p>
@@ -656,7 +656,7 @@ Sinusoid(x)[n, 2]
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 DistributionContainer
-        [(9.988, 0.013), (10.005, 0.014)]
+        [(10.014, 0.013), (10.005, 0.014)]
 </pre></div></div>
 </div>
 <p>This has two weights, one for sine and one for cosine. The weights are very close to the input amplitudes!</p>
@@ -693,7 +693,7 @@ Constant()[n, 1]
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 DistributionContainer
-        [(1.4398, 0.0099)]
+        [(1.4216, 0.0099)]
 </pre></div></div>
 </div>
 <p>This is very close to our input offset term. Let’s plot the model to see how this looks</p>
