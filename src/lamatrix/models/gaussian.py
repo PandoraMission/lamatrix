@@ -1,12 +1,13 @@
 """Generator objects for Gaussian types of models"""
 
-import numpy as np
 from typing import List
 
+import numpy as np
+
+from ..distributions import Distribution, DistributionsContainer
 from ..io import IOMixins, LatexMixins
 from ..math import MathMixins
 from ..model import Model
-from ..distributions import DistributionsContainer, Distribution
 
 __all__ = [
     "Gaussian",
@@ -223,7 +224,11 @@ class dGaussian(MathMixins, Model):
 
     @property
     def _equation(self):
-        eqn = f"\\left( -w_0\\frac{{\mathbf{{{self.x_name}}} - \\mu^2}}{{2\\sigma^2}} \\right)\\frac{{1}}{{\\sqrt{{2\\pi\\sigma^2}}}} e^{{-\\frac{{\mathbf{{{self.x_name}}} - \\mu^2}}{{2\\sigma^2}}}}"
+        eqn = [
+            f"\\left( -w_0\\frac{{\mathbf{{{self.x_name}}} - \\mu^2}}{{2\\sigma^2}} \\right)"
+            f"\\frac{{1}}{{\\sqrt{{2\\pi\\sigma^2}}}}"
+            f"e^{{-\\frac{{\mathbf{{{self.x_name}}} - \\mu^2}}{{2\\sigma^2}}}}"
+        ]
         return [eqn]
 
 
@@ -293,7 +298,13 @@ class Gaussian2D(MathMixins, Model):
 
     @property
     def _equation(self):
-        eqn = f"\\frac{{1}}{{2\\pi\\sigma_x\\sigma_y\\sqrt{{1 - \\rho^2}}}} e^{{- \\frac{{1}}{{2(1-\\rho^2)}} \\left[\\frac{{(\\mathbf{{{self.x_name}}} - \\mu_x)^2}}{{2\\sigma_x^2}} + \\frac{{(\mathbf{{{self.y_name}}} - \\mu_y)^2}}{{2\\sigma_y^2}} - \\frac{{2\\rho(\\mathbf{{{self.x_name}}} - \\mu_x)(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]}}"
+        eqn = [
+            f"\\frac{{1}}{{2\\pi\\sigma_x\\sigma_y\\sqrt{{1 - \\rho^2}}}} "
+            f"e^{{- \\frac{{1}}{{2(1-\\rho^2)}} \\left[\\frac{{(\\mathbf{{{self.x_name}}} - \\mu_x)^2}}{{2\\sigma_x^2}} "
+            f"+ \\frac{{(\mathbf{{{self.y_name}}} - \\mu_y)^2}}{{2\\sigma_y^2}} "
+            f"- \\frac{{2\\rho(\\mathbf{{{self.x_name}}} - \\mu_x)"
+            f"(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]}}"
+        ]
         return [eqn]
 
     def to_gradient(self, weights=None, priors=None):
@@ -405,9 +416,24 @@ class dGaussian2D(MathMixins, Model):
 
     @property
     def _equation(self):
-        eqn0 = f"\\frac{{1}}{{2\\pi\\sigma_x\\sigma_y\\sqrt{{1 - \\rho^2}}}} e^{{- \\frac{{1}}{{2(1-\\rho^2)}} \\left[\\frac{{(\\mathbf{{{self.x_name}}} - \\mu_x)^2}}{{2\\sigma_x^2}} + \\frac{{(\mathbf{{{self.y_name}}} - \\mu_y)^2}}{{2\\sigma_y^2}} - \\frac{{2\\rho(\\mathbf{{{self.x_name}}} - \\mu_x)(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]}}"
-        dfdx0 = f"\\frac{{-w_0}}{{(1-\\rho^2)}} \\left[ \\frac{{(\\mathbf{{{self.x_name}}} - \\mu_x)}}{{\\sigma_x^2}} - \\frac{{\\rho(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]"
-        dfdy0 = f"\\frac{{-w_1}}{{(1-\\rho^2)}} \\left[ \\frac{{(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_y^2}} - \\frac{{\\rho(\\mathbf{{{self.x_name}}} - \\mu_x)}}{{\\sigma_x\\sigma_y}}\\right]"
+        eqn0 = [
+            f"\\frac{{1}}{{2\\pi\\sigma_x\\sigma_y\\sqrt{{1 - \\rho^2}}}} "
+            f"e^{{- \\frac{{1}}{{2(1-\\rho^2)}} "
+            f"\\left[\\frac{{(\\mathbf{{{self.x_name}}} - \\mu_x)^2}}{{2\\sigma_x^2}} "
+            f"+ \\frac{{(\mathbf{{{self.y_name}}} - \\mu_y)^2}}{{2\\sigma_y^2}} "
+            f"- \\frac{{2\\rho(\\mathbf{{{self.x_name}}} - \\mu_x)"
+            f"(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]}}"
+        ]
+        dfdx0 = [
+            f"\\frac{{-w_0}}{{(1-\\rho^2)}} "
+            f"\\left[ \\frac{{(\\mathbf{{{self.x_name}}} - \\mu_x)}}{{\\sigma_x^2}} "
+            f"- \\frac{{\\rho(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]"
+        ]
+        dfdy0 = [
+            f"\\frac{{-w_1}}{{(1-\\rho^2)}} "
+            f"\\left[ \\frac{{(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_y^2}} "
+            f"- \\frac{{\\rho(\\mathbf{{{self.x_name}}} - \\mu_x)}}{{\\sigma_x\\sigma_y}}\\right]"
+        ]
         return [dfdx0 + "." + eqn0, dfdy0 + "." + eqn0]
 
 
