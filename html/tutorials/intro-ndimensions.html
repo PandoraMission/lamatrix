@@ -240,7 +240,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/christinahedges/lamatrix" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+          <a href="https://github.com/pandoramission/lamatrix" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -375,7 +375,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/christinahedges/lamatrix" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+          <a href="https://github.com/pandoramission/lamatrix" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -477,7 +477,7 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.image.AxesImage at 0x7f8f209e5f10&gt;
+&lt;matplotlib.image.AxesImage at 0x7f84dc32bf10&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -532,7 +532,7 @@ JointModel
         Constant()[n, 1]
         Polynomial(x)[n, 1]
         Polynomial(y)[n, 1]
-        CrosstermModel(x, y)[n, 1]
+        CrosstermModel(y, x)[n, 1]
 </pre></div></div>
 </div>
 <p>This looks great, we’ve included a constant term, the polynomials for each dimension, and a <code class="docutils literal notranslate"><span class="pre">CrosstermModel</span></code> object which holds the cross terms between the X and Y polynomials. Let’s look at the equation</p>
@@ -549,7 +549,7 @@ JointModel
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
-<div>\[f(\mathbf{x}, \mathbf{y}) = w_{0}  + w_{1} \mathbf{x}^{1} + w_{2} \mathbf{y}^{1} + w_{3} \mathbf{y}^{1}\mathbf{x}^{1}\]</div></div>
+<div>\[f(\mathbf{y}, \mathbf{x}) = w_{0}  + w_{1} \mathbf{x}^{1} + w_{2} \mathbf{y}^{1} + w_{3} \mathbf{y}^{1}\mathbf{x}^{1}\]</div></div>
 </div>
 <p>This looks like what we expect!</p>
 <p>Note here I have included the terms in a certain order. This will impact the order of the posteriors from the fit. If you change the order of operations you will still be able to fit the data, but you should be careful to understand the order of the posterior weights.</p>
@@ -577,7 +577,7 @@ JointModel
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.image.AxesImage at 0x7f8f09c46e50&gt;
+&lt;matplotlib.image.AxesImage at 0x7f84c49d2d90&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -602,7 +602,7 @@ JointModel
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-array([ 1.3591345 ,  0.4591311 ,  2.49975538, -0.023004  ])
+array([ 1.35891126,  0.45935322,  2.49255331, -0.02237879])
 </pre></div></div>
 </div>
 <p>This is within errors of our input weights</p>
@@ -638,10 +638,10 @@ array([ 1.3591345 ,  0.4591311 ,  2.49975538, -0.023004  ])
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-array([-1.35819193,  3.04758618,  2.21329117,  2.54070399,  1.18059004,
-        1.14095085,  3.34281091,  2.34292282,  0.63194752,  2.58862647,
-        1.29913868,  0.9072222 , -0.30607653,  1.85306363,  3.36816982,
-       -0.01455227,  3.95561904,  1.12790503,  1.03842893,  1.6946055 ])
+array([-0.18413205,  1.17445347,  0.86230162,  2.06294291,  2.11575105,
+        2.42403257, -0.73040464,  1.4441065 ,  2.71934991,  0.0445405 ,
+        2.63988653, -0.01479923,  3.22968566,  3.89655736,  0.56844507,
+        0.80023191,  3.58979212,  3.84629225,  1.66775325,  4.53684707])
 </pre></div></div>
 </div>
 <p>You can combine any number of high dimensional vectors and datasets here as needed. When you fit, you must pass in data and inputs that all have the same shape.</p>
