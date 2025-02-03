@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch: 
 
 jobs:
@@ -34,12 +33,11 @@ jobs:
 
       - name: Build Documentation
         run: |
-          poetry run sphinx-build docs _build
+          poetry run sphinx-build -M html docs _build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: _build
+          publish_dir: _build/html
           publish_branch: gh-pages
-          force_orphan: true
