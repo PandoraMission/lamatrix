@@ -44,7 +44,7 @@
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="03 Feb 2025"/>
+    <meta name="docbuild:last-update" content="05 Feb 2025"/>
   </head>
   
   
@@ -501,34 +501,64 @@ document.write(`
 <div class="viewcode-block" id="Model">
 <a class="viewcode-back" href="../../api_modules/lamatrix.model.html#lamatrix.model.Model">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Model</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_priors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">priors</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class to implement the Model class, used by all model types in lamatrix.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_distributions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distributions</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns distributions that are are DistributionContainer objects or raises a value error.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">width</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span>
-        <span class="k">if</span> <span class="n">priors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">distributions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">DistributionsContainer</span><span class="o">.</span><span class="n">from_number</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">priors</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">Distribution</span><span class="p">)):</span>
-            <span class="k">return</span> <span class="n">DistributionsContainer</span><span class="p">([</span><span class="n">priors</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">priors</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-            <span class="k">return</span> <span class="n">DistributionsContainer</span><span class="p">(</span><span class="n">priors</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">priors</span><span class="p">,</span> <span class="n">DistributionsContainer</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">priors</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">distributions</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">Distribution</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">DistributionsContainer</span><span class="p">([</span><span class="n">distributions</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">distributions</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">DistributionsContainer</span><span class="p">(</span><span class="n">distributions</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">distributions</span><span class="p">,</span> <span class="n">DistributionsContainer</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">distributions</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not parse input `priors`.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not parse input distributions, check your input priors and posteriors.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_arg_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensures the input arg_names are all strings.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Argument names must be strings.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">weights_width</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Given a set of weights, will check that the widths match the expectation from the model, and will return a np.NDArray&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`weights` must be a list of numeric values with length </span><span class="si">{</span><span class="n">weights_width</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`weights` must be a list of numeric values with length </span><span class="si">{</span><span class="n">weights_width</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">==</span> <span class="n">weights_width</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`weights` must be a list of numeric values with length </span><span class="si">{</span><span class="n">weights_width</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">priors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">posteriors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="c1"># prior (always normal, and always specfied by mean and standard deviation)</span>
-        <span class="c1"># fit_distributions (always normal, and always specfied by mean and standard deviation)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">priors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_priors</span><span class="p">(</span><span class="n">priors</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization function for all models. All models must be provided with input priors and posteriors that match their width.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">priors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_distributions</span><span class="p">(</span><span class="n">priors</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">priors</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;distributions must have the number of elements as the design matrix.&quot;</span>
+                <span class="s2">&quot;priors must have the number of elements as the design matrix.&quot;</span>
             <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="n">posteriors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_distributions</span><span class="p">(</span><span class="n">posteriors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;posteriors must have the number of elements as the design matrix.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span> <span class="o">=</span> <span class="p">{</span><span class="n">arg</span><span class="p">:</span> <span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_names</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="nd">@abstractmethod</span>
@@ -544,13 +574,14 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_initialization_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Captures what attributes are required to initialize. This is useful for models that are 2D instead of 1D.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="s2">&quot;x_name&quot;</span><span class="p">,</span>
         <span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_mu_letter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Letter to represent the weight in equation representation.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Letter to represent the weight in equation representation. Default is w. For gradients of models this is usually changed to v.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;w&quot;</span>
 
     <span class="nd">@property</span>
@@ -561,7 +592,13 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">equation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">func_signature</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;\mathbf</span><span class="se">{{</span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_names</span><span class="p">])</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provides the equation for the model in latex.</span>
+
+<span class="sd">        If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">func_signature</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;\mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_names</span><span class="p">]</span>
+        <span class="p">)</span>
         <span class="n">eqn</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;\[f(</span><span class="si">{</span><span class="n">func_signature</span><span class="si">}</span><span class="s2">) = &quot;</span>
             <span class="o">+</span> <span class="s2">&quot; + &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
@@ -582,86 +619,9 @@ document.write(`
 <div class="viewcode-block" id="Model.copy">
 <a class="viewcode-back" href="../../api_modules/lamatrix.model.html#lamatrix.model.Model.copy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a deep copy of `self`.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_arg_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_names</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Argument names must be strings.&quot;</span><span class="p">)</span>
-
-    <span class="c1"># def _validate_distribution(self, distribution: Tuple):</span>
-    <span class="c1">#     &quot;&quot;&quot;Checks that a distribution is a valid input with format (mean, std).&quot;&quot;&quot;</span>
-    <span class="c1">#     # Must be a tuple</span>
-    <span class="c1">#     if not isinstance(distribution, tuple):</span>
-    <span class="c1">#         raise ValueError(&quot;distribution must be a tuple of format (mean, std)&quot;)</span>
-    <span class="c1">#     # Must be float or int</span>
-    <span class="c1">#     for value in distribution:</span>
-    <span class="c1">#         if not isinstance(value, (float, int, np.integer, np.floating)):</span>
-    <span class="c1">#             raise ValueError(&quot;Values in distribution must be numeric.&quot;)</span>
-    <span class="c1">#     # Standard deviation must be positive</span>
-    <span class="c1">#     if np.sign(distribution[1]) == -1:</span>
-    <span class="c1">#         raise ValueError(&quot;Standard deviation must be positive.&quot;)</span>
-    <span class="c1">#     return</span>
-
-    <span class="c1"># def _validate_distributions(self, distributions: List[Tuple]):</span>
-    <span class="c1">#     &quot;&quot;&quot;Checks that a list of distributions is a valid&quot;&quot;&quot;</span>
-    <span class="c1">#     if not len(distributions) == self.width:</span>
-    <span class="c1">#         raise ValueError(</span>
-    <span class="c1">#             &quot;distributions must have the number of elements as the design matrix.&quot;</span>
-    <span class="c1">#         )</span>
-    <span class="c1">#     return</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">weights_width</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`weights` must be a list of numeric values with length </span><span class="si">{</span><span class="n">weights_width</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`weights` must be a list of numeric values with length </span><span class="si">{</span><span class="n">weights_width</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">==</span> <span class="n">weights_width</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`weights` must be a list of numeric values with length </span><span class="si">{</span><span class="n">weights_width</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
-
-    <span class="c1"># def set_prior(self, index: int, distribution: Tuple) -&gt; None:</span>
-    <span class="c1">#     &quot;&quot;&quot;Sets a single prior.&quot;&quot;&quot;</span>
-    <span class="c1">#     self._validate_distribution(distribution=distribution)</span>
-    <span class="c1">#     self.prior_distributions[index] = distribution</span>
-    <span class="c1">#     return</span>
-
-    <span class="c1"># def set_priors(self, distributions: List[Tuple]) -&gt; None:</span>
-    <span class="c1">#     &quot;&quot;&quot;sets the full list of priors&quot;&quot;&quot;</span>
-    <span class="c1">#     self._validate_distributions(distributions=distributions)</span>
-    <span class="c1">#     self.prior_distributions = distributions</span>
-    <span class="c1">#     return</span>
-
-    <span class="c1"># def freeze_element(self, index: int):</span>
-    <span class="c1">#     &quot;&quot;&quot;Freezes an element of the design matrix by setting prior_sigma to zero.&quot;&quot;&quot;</span>
-    <span class="c1">#     self.set_prior(index, (self.prior_distributions[index][0], 1e-10))</span>
-
-    <span class="c1"># @property</span>
-    <span class="c1"># def prior_mean(self):</span>
-    <span class="c1">#     return np.asarray(</span>
-    <span class="c1">#         [distribution[0] for distribution in self.prior_distributions]</span>
-    <span class="c1">#     )</span>
-
-    <span class="c1"># @property</span>
-    <span class="c1"># def prior_std(self):</span>
-    <span class="c1">#     return np.asarray(</span>
-    <span class="c1">#         [distribution[1] for distribution in self.prior_distributions]</span>
-    <span class="c1">#     )</span>
-
-    <span class="c1"># @property</span>
-    <span class="c1"># def fit_mean(self):</span>
-    <span class="c1">#     return np.asarray([distribution[0] for distribution in self.fit_distributions])</span>
-
-    <span class="c1"># @property</span>
-    <span class="c1"># def fit_std(self):</span>
-    <span class="c1">#     return np.asarray([distribution[1] for distribution in self.fit_distributions])</span>
 
 <div class="viewcode-block" id="Model.design_matrix">
 <a class="viewcode-back" href="../../api_modules/lamatrix.model.html#lamatrix.model.Model.design_matrix">[docs]</a>
@@ -686,7 +646,9 @@ document.write(`
         <span class="n">mask</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit the design matrix.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit the design matrix of this model object.</span>
+
+<span class="sd">        Executing this function will update the posteriors argument to the best fit posteriors.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -696,13 +658,8 @@ document.write(`
 <span class="sd">            Errors on the input data</span>
 <span class="sd">        mask: np.ndarray, optional</span>
 <span class="sd">            Mask to apply when fitting. Values where mask is False will not be used during the fit.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        fit_distributions: List of Tuples</span>
-<span class="sd">            The best fit distributions</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">priors</span><span class="p">,</span> <span class="n">DistributionsContainer</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">priors</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">priors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">priors</span><span class="p">)</span>
@@ -820,6 +777,7 @@ document.write(`
 <div class="viewcode-block" id="Model.evaluate">
 <a class="viewcode-back" href="../../api_modules/lamatrix.model.html#lamatrix.model.Model.evaluate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Given an input set of arguments, will evaluate the model with the current best fit weights.&quot;&quot;&quot;</span>
         <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">design_matrix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span></div>
 
@@ -827,11 +785,13 @@ document.write(`
 <div class="viewcode-block" id="Model.sample">
 <a class="viewcode-back" href="../../api_modules/lamatrix.model.html#lamatrix.model.Model.sample">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.&quot;&quot;&quot;</span>
         <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">design_matrix</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span><span class="o">.</span><span class="n">sample</span><span class="p">())</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Will return the design matrix given the input arguments.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">design_matrix</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 </pre></div>

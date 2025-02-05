@@ -47,7 +47,7 @@
     <link rel="prev" title="lamatrix.models.astrophysical" href="lamatrix.models.astrophysical.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="03 Feb 2025"/>
+    <meta name="docbuild:last-update" content="05 Feb 2025"/>
   </head>
   
   
@@ -440,10 +440,10 @@ document.write(`
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lamatrix.combine.CrosstermModel" title="lamatrix.combine.CrosstermModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrosstermModel</span></code></a>(*args)</p></td>
-<td><p></p></td>
+<td><p>Initialization function for all models.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lamatrix.combine.JointModel" title="lamatrix.combine.JointModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JointModel</span></code></a>(*args)</p></td>
-<td><p></p></td>
+<td><p>Initialization function for all models.</p></td>
 </tr>
 </tbody>
 </table>
@@ -452,6 +452,7 @@ document.write(`
 <dt class="sig sig-object py" id="lamatrix.combine.CrosstermModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.combine.</span></span><span class="sig-name descname"><span class="pre">CrosstermModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/combine.html#CrosstermModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.combine.CrosstermModel" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="lamatrix.model.html#lamatrix.model.Model" title="lamatrix.model.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">IOMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LatexMixins</span></code></p>
+<p>Initialization function for all models. All models must be provided with input priors and posteriors that match their width.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.combine.CrosstermModel.arg_names">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">arg_names</span></span><a class="headerlink" href="#lamatrix.combine.CrosstermModel.arg_names" title="Link to this definition">#</a></dt>
@@ -461,7 +462,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.CrosstermModel.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.combine.CrosstermModel.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.CrosstermModel.design_matrix">
@@ -472,17 +474,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.combine.CrosstermModel.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.combine.CrosstermModel.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.CrosstermModel.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.combine.CrosstermModel.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.CrosstermModel.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/combine.html#CrosstermModel.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.combine.CrosstermModel.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -490,12 +496,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -509,7 +509,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.CrosstermModel.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.combine.CrosstermModel.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.CrosstermModel.save">
@@ -533,6 +534,7 @@ document.write(`
 <dt class="sig sig-object py" id="lamatrix.combine.JointModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.combine.</span></span><span class="sig-name descname"><span class="pre">JointModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/combine.html#JointModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.combine.JointModel" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="lamatrix.model.html#lamatrix.model.Model" title="lamatrix.model.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">IOMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LatexMixins</span></code></p>
+<p>Initialization function for all models. All models must be provided with input priors and posteriors that match their width.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.combine.JointModel.arg_names">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">arg_names</span></span><a class="headerlink" href="#lamatrix.combine.JointModel.arg_names" title="Link to this definition">#</a></dt>
@@ -542,7 +544,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.JointModel.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.combine.JointModel.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.JointModel.design_matrix">
@@ -553,17 +556,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.combine.JointModel.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.combine.JointModel.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.JointModel.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.combine.JointModel.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.JointModel.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/combine.html#JointModel.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.combine.JointModel.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -571,12 +578,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -595,7 +596,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.JointModel.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.combine.JointModel.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.combine.JointModel.save">

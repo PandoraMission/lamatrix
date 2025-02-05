@@ -47,7 +47,7 @@
     <link rel="prev" title="lamatrix.model" href="lamatrix.model.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="03 Feb 2025"/>
+    <meta name="docbuild:last-update" content="05 Feb 2025"/>
   </head>
   
   
@@ -435,30 +435,30 @@ document.write(`
                   
   <section id="module-lamatrix.models.simple">
 <span id="lamatrix-models-simple"></span><h1>lamatrix.models.simple<a class="headerlink" href="#module-lamatrix.models.simple" title="Link to this heading">#</a></h1>
-<p>Generator objects for simple types of models</p>
+<p>Generator objects for simple types of models.</p>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lamatrix.models.simple.Constant" title="lamatrix.models.simple.Constant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Constant</span></code></a>([priors, posteriors])</p></td>
-<td><p>A generator which has no variable, and whos design matrix is entirely ones.</p></td>
+<td><p>lamatrix.Model object to model constants or offsets.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lamatrix.models.simple.Fixed" title="lamatrix.models.simple.Fixed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Fixed</span></code></a>([x_name, width, priors, posteriors])</p></td>
 <td><p>A model that has fixed input vectors</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lamatrix.models.simple.Polynomial" title="lamatrix.models.simple.Polynomial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Polynomial</span></code></a>([x_name, order, priors, posteriors])</p></td>
-<td><p></p></td>
+<td><p>lamatrix.Model object to model polynomial trends.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lamatrix.models.simple.Sinusoid" title="lamatrix.models.simple.Sinusoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sinusoid</span></code></a>([x_name, nterms, priors, posteriors])</p></td>
-<td><p></p></td>
+<td><p>lamatrix.Model object to model sinusoidal trends.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lamatrix.models.simple.Step" title="lamatrix.models.simple.Step"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Step</span></code></a>([x_name, breakpoints, priors, posteriors])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lamatrix.models.simple.dPolynomial" title="lamatrix.models.simple.dPolynomial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dPolynomial</span></code></a>(weights[, x_name, order, ...])</p></td>
-<td><p></p></td>
+<td><p>lamatrix.Model object for capturing derivatives of polynomial models.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lamatrix.models.simple.dSinusoid" title="lamatrix.models.simple.dSinusoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dSinusoid</span></code></a>(weights[, x_name, nterms, priors, ...])</p></td>
-<td><p></p></td>
+<td><p>lamatrix.Model object to model the gradient of sinusoid trends.</p></td>
 </tr>
 </tbody>
 </table>
@@ -467,31 +467,47 @@ document.write(`
 <dt class="sig sig-object py" id="lamatrix.models.simple.Constant">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.models.simple.</span></span><span class="sig-name descname"><span class="pre">Constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#Constant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.Constant" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MathMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LatexMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">IOMixins</span></code>, <a class="reference internal" href="lamatrix.model.html#lamatrix.model.Model" title="lamatrix.model.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a></p>
-<p>A generator which has no variable, and whos design matrix is entirely ones.</p>
+<p>lamatrix.Model object to model constants or offsets. This model has no input variable.</p>
+<p>Initialize a Constant model.</p>
+<p>Note this model has no variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>priors</strong> (<em>optional</em>) – Prior distributions for model weights (default is None, i.e. no priors).</p></li>
+<li><p><strong>posteriors</strong> (<em>optional</em>) – Posterior distributions for model parameters (default is None, i.e. no posteriors).
+Posterior keyword is provided so that models can be loaded.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Create a constant model</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">()</span>
+</pre></div>
+</div>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Constant.arg_names">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">arg_names</span></span><a class="headerlink" href="#lamatrix.models.simple.Constant.arg_names" title="Link to this definition">#</a></dt>
-<dd><p>Returns a set of the user defined strings for all the arguments that the design matrix requires.</p>
+<dd><p>Argument names that must be input into the model.
+This is an empty dictionary for a constant model.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Constant.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Constant.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Constant.design_matrix">
 <span class="sig-name descname"><span class="pre">design_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#Constant.design_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.Constant.design_matrix" title="Link to this definition">#</a></dt>
-<dd><p>Build a 1D polynomial in x</p>
+<dd><p>Build a design matrix consisting of a single column of ones.</p>
+<p>You must pass a keyword argument to this design matrix to detect the required shape.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>{}</strong> (<em>np.ndarray</em>) – Vector to create polynomial of</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> – Design matrix with shape (len(x), self.nvectors)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>X</strong> – Design matrix with shape (len(x), self.nvectors)</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -499,17 +515,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Constant.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.simple.Constant.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Constant.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Constant.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Constant.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Constant.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -518,25 +538,21 @@ document.write(`
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
-</dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Constant.nvectors">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nvectors</span></span><a class="headerlink" href="#lamatrix.models.simple.Constant.nvectors" title="Link to this definition">#</a></dt>
-<dd><p>Returns the number of vectors required to build the object.</p>
+<dd><p>Number of vectors required to be input to create the model.
+This is zero for a constant model.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Constant.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Constant.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Constant.save">
@@ -551,7 +567,7 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Constant.width">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#lamatrix.models.simple.Constant.width" title="Link to this definition">#</a></dt>
-<dd><p>Returns the width of the design matrix once built.</p>
+<dd><p>Width of the model. This is always one for a constant model.</p>
 </dd></dl>
 
 </dd></dl>
@@ -571,7 +587,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Fixed.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Fixed.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Fixed.design_matrix">
@@ -590,17 +607,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Fixed.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.simple.Fixed.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Fixed.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Fixed.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Fixed.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Fixed.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -608,12 +629,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -627,7 +642,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Fixed.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Fixed.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Fixed.save">
@@ -649,23 +665,50 @@ document.write(`
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.models.simple.</span></span><span class="sig-name descname"><span class="pre">Polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#Polynomial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.Polynomial" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.models.simple.</span></span><span class="sig-name descname"><span class="pre">Polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lamatrix.distributions.html#lamatrix.distributions.DistributionsContainer" title="lamatrix.distributions.DistributionsContainer"><span class="pre">DistributionsContainer</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lamatrix.distributions.html#lamatrix.distributions.DistributionsContainer" title="lamatrix.distributions.DistributionsContainer"><span class="pre">DistributionsContainer</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#Polynomial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.Polynomial" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MathMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LatexMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">IOMixins</span></code>, <a class="reference internal" href="lamatrix.model.html#lamatrix.model.Model" title="lamatrix.model.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a></p>
+<p>lamatrix.Model object to model polynomial trends.</p>
+<p>Initialize a Polynomial model.</p>
+<p>Note that this model does not include a constant term. You can add one using the “Constant” model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the independent variable (default is “x”).</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – The order of the polynomial. Must be at least 1 (default is 3).</p></li>
+<li><p><strong>priors</strong> (<em>optional</em>) – Prior distributions for model weights (default is None, i.e. no priors).</p></li>
+<li><p><strong>posteriors</strong> (<em>optional</em>) – Posterior distributions for model parameters (default is None, i.e. no posteriors).
+Posterior keyword is provided so that models can be loaded.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">order</span></code> is less than 1.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">order</span></code> is not an integer.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Create a cubic polynomial model:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">x_name</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.arg_names">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">arg_names</span></span><a class="headerlink" href="#lamatrix.models.simple.Polynomial.arg_names" title="Link to this definition">#</a></dt>
-<dd><p>Returns a set of the user defined strings for all the arguments that the design matrix requires.</p>
+<dd><p>Argument names that must be input into the model.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Polynomial.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.design_matrix">
 <span class="sig-name descname"><span class="pre">design_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#Polynomial.design_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.Polynomial.design_matrix" title="Link to this definition">#</a></dt>
-<dd><p>Build a 1D polynomial in <code class="xref py py-obj docutils literal notranslate"><span class="pre">x_name</span></code>.</p>
+<dd><p>Build a 1D polynomial in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.x_name</span></code>.</p>
+<p>You must pass the keyword argument <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.x_name</span></code> to use this function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>X</strong> – Design matrix with shape (len(x), self.nvectors)</p>
@@ -679,17 +722,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.simple.Polynomial.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Polynomial.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Polynomial.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -698,25 +745,20 @@ document.write(`
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
-</dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.nvectors">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nvectors</span></span><a class="headerlink" href="#lamatrix.models.simple.Polynomial.nvectors" title="Link to this definition">#</a></dt>
-<dd><p>Returns the number of vectors required to build the object.</p>
+<dd><p>Number of vectors required to be input to create the model.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Polynomial.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.save">
@@ -725,8 +767,31 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.to_gradient">
-<span class="sig-name descname"><span class="pre">to_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#Polynomial.to_gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.Polynomial.to_gradient" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">to_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lamatrix.distributions.html#lamatrix.distributions.DistributionsContainer" title="lamatrix.distributions.DistributionsContainer"><span class="pre">DistributionsContainer</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#Polynomial.to_gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.Polynomial.to_gradient" title="Link to this definition">#</a></dt>
+<dd><p>Converts this model to the gradient of that model, assigning the posteriors of the fit as weights.</p>
+<p>If the posteriors are None, will assign the priors as weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>np.ndarray</em>) – The weights applied to the Polynomial model. These update the commponents for the design matrix of the gradient.</p></li>
+<li><p><strong>priors</strong> (<a class="reference internal" href="lamatrix.distributions.html#lamatrix.distributions.DistributionsContainer" title="lamatrix.distributions.DistributionsContainer"><em>DistributionsContainer</em></a>) – Priors to apply to the gradient model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>model</strong> – A model for the gradient of a polynomial</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lamatrix.models.simple.dPolynomial" title="lamatrix.models.simple.dPolynomial">lamatrix.models.simple.dPolynomial</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>To obtain the gradient of a fit polynomial model</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">x_name</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dmodel</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to_gradient</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.to_latex">
@@ -736,7 +801,7 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Polynomial.width">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#lamatrix.models.simple.Polynomial.width" title="Link to this definition">#</a></dt>
-<dd><p>Returns the width of the design matrix once built.</p>
+<dd><p>Width of the model. This is equivalent to the order.</p>
 </dd></dl>
 
 </dd></dl>
@@ -745,37 +810,75 @@ document.write(`
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.models.simple.</span></span><span class="sig-name descname"><span class="pre">Sinusoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nterms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#Sinusoid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.Sinusoid" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MathMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LatexMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">IOMixins</span></code>, <a class="reference internal" href="lamatrix.model.html#lamatrix.model.Model" title="lamatrix.model.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a></p>
+<p>lamatrix.Model object to model sinusoidal trends.</p>
+<p>Initialize a Sinusoid model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the independent variable (default is “x”).</p></li>
+<li><p><strong>nterms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – The number of terms in the sinusoid.</p></li>
+<li><p><strong>priors</strong> (<em>optional</em>) – Prior distributions for model weights (default is None, i.e. no priors).</p></li>
+<li><p><strong>posteriors</strong> (<em>optional</em>) – Posterior distributions for model parameters (default is None, i.e. no posteriors).
+Posterior keyword is provided so that models can be loaded.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">nterms</span></code> is less than 1.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">nterms</span></code> is not an integer.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Create a sinusoid model with nterms=3:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Sinusoid</span><span class="p">(</span><span class="n">x_name</span><span class="o">=</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="n">nterms</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.arg_names">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">arg_names</span></span><a class="headerlink" href="#lamatrix.models.simple.Sinusoid.arg_names" title="Link to this definition">#</a></dt>
-<dd><p>Returns a set of the user defined strings for all the arguments that the design matrix requires.</p>
+<dd><p>Argument names that must be input into the model.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Sinusoid.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.design_matrix">
 <span class="sig-name descname"><span class="pre">design_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#Sinusoid.design_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.Sinusoid.design_matrix" title="Link to this definition">#</a></dt>
-<dd><p>Returns a design matrix, given inputs listed in self.arg_names.</p>
+<dd><p>Build a 1D Sinusoid in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.x_name</span></code>.</p>
+<p>You must pass the keyword argument <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.x_name</span></code> to use this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> – Design matrix with shape (len(x), self.nvectors)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.simple.Sinusoid.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Sinusoid.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Sinusoid.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -784,25 +887,20 @@ document.write(`
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
-</dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.nvectors">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nvectors</span></span><a class="headerlink" href="#lamatrix.models.simple.Sinusoid.nvectors" title="Link to this definition">#</a></dt>
-<dd><p>Returns the number of vectors required to build the object.</p>
+<dd><p>Number of vectors required to be input to create the model.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Sinusoid.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.save">
@@ -812,7 +910,31 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.to_gradient">
 <span class="sig-name descname"><span class="pre">to_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#Sinusoid.to_gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.Sinusoid.to_gradient" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Converts this model to the gradient of that model, assigning the posteriors of the fit as weights.</p>
+<p>If the posteriors are None, will assign the priors as weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>np.ndarray</em>) – The weights applied to the Sinusoid model.
+These update the commponents for the design matrix of the gradient.</p></li>
+<li><p><strong>priors</strong> (<a class="reference internal" href="lamatrix.distributions.html#lamatrix.distributions.DistributionsContainer" title="lamatrix.distributions.DistributionsContainer"><em>DistributionsContainer</em></a>) – Priors to apply to the gradient model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>model</strong> – A model for the gradient of a sinusoid</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lamatrix.models.simple.dSinusoid" title="lamatrix.models.simple.dSinusoid">lamatrix.models.simple.dSinusoid</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>To obtain the gradient of a fit sinusoid model</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Sinusoid</span><span class="p">(</span><span class="n">x_name</span><span class="o">=</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="n">nterms</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dmodel</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to_gradient</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.to_latex">
@@ -822,7 +944,7 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Sinusoid.width">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#lamatrix.models.simple.Sinusoid.width" title="Link to this definition">#</a></dt>
-<dd><p>Returns the width of the design matrix once built.</p>
+<dd><p>Width of the model. This is equivalent to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">nterms</span></code> * 2 for Sinusoid models.</p>
 </dd></dl>
 
 </dd></dl>
@@ -840,7 +962,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Step.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Step.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Step.design_matrix">
@@ -859,17 +982,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Step.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.simple.Step.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Step.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Step.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Step.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Step.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -877,12 +1004,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -896,7 +1017,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Step.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.Step.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.Step.save">
@@ -918,32 +1040,53 @@ document.write(`
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dPolynomial">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.models.simple.</span></span><span class="sig-name descname"><span class="pre">dPolynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#dPolynomial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.dPolynomial" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.models.simple.</span></span><span class="sig-name descname"><span class="pre">dPolynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#dPolynomial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.dPolynomial" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MathMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LatexMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">IOMixins</span></code>, <a class="reference internal" href="lamatrix.model.html#lamatrix.model.Model" title="lamatrix.model.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a></p>
+<p>lamatrix.Model object for capturing derivatives of polynomial models.</p>
+<p>In this case, this is a special variant on a Polynomial model.</p>
+<p>Initialize a dPolynomial model.</p>
+<p>Note that this model does not include a constant term. You can add one using the “Constant” model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>npt.NDArray</em><em>,</em>) – The input weights to be applied to the input model.</p></li>
+<li><p><strong>x_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the independent variable (default is “x”).</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – The order of the polynomial. Must be at least 1 (default is 3).</p></li>
+<li><p><strong>priors</strong> (<em>optional</em>) – Prior distributions for model weights (default is None, i.e. no priors).</p></li>
+<li><p><strong>posteriors</strong> (<em>optional</em>) – Posterior distributions for model parameters (default is None, i.e. no posteriors).
+Posterior keyword is provided so that models can be loaded.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">order</span></code> is less than 1.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">order</span></code> is not an integer.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dPolynomial.arg_names">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">arg_names</span></span><a class="headerlink" href="#lamatrix.models.simple.dPolynomial.arg_names" title="Link to this definition">#</a></dt>
-<dd><p>Returns a set of the user defined strings for all the arguments that the design matrix requires.</p>
+<dd><p>Argument names that must be input into the model.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dPolynomial.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.dPolynomial.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dPolynomial.design_matrix">
 <span class="sig-name descname"><span class="pre">design_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#dPolynomial.design_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.dPolynomial.design_matrix" title="Link to this definition">#</a></dt>
-<dd><p>Build a 1D polynomial in x</p>
+<dd><p>Build the derivative of a 1D Polynomial in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.x_name</span></code>.</p>
+<p>You must pass the keyword argument <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.x_name</span></code> to use this function.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>{}</strong> (<em>np.ndarray</em>) – Vector to create polynomial of</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> – Design matrix with shape (len(x), self.nvectors)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>X</strong> – Design matrix with shape (len(x), self.nvectors)</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -951,17 +1094,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dPolynomial.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.simple.dPolynomial.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dPolynomial.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.dPolynomial.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dPolynomial.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.dPolynomial.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -970,25 +1117,20 @@ document.write(`
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
-</dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dPolynomial.nvectors">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nvectors</span></span><a class="headerlink" href="#lamatrix.models.simple.dPolynomial.nvectors" title="Link to this definition">#</a></dt>
-<dd><p>Returns the number of vectors required to build the object.</p>
+<dd><p>Number of vectors required to be input to create the model.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dPolynomial.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.dPolynomial.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dPolynomial.save">
@@ -1003,7 +1145,7 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dPolynomial.width">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#lamatrix.models.simple.dPolynomial.width" title="Link to this definition">#</a></dt>
-<dd><p>Returns the width of the design matrix once built.</p>
+<dd><p>Width of the model. This is 1 for 1D gradients.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1012,29 +1154,49 @@ document.write(`
 <dt class="sig sig-object py" id="lamatrix.models.simple.dSinusoid">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.models.simple.</span></span><span class="sig-name descname"><span class="pre">dSinusoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nterms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#dSinusoid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.dSinusoid" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MathMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LatexMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">IOMixins</span></code>, <a class="reference internal" href="lamatrix.model.html#lamatrix.model.Model" title="lamatrix.model.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a></p>
+<p>lamatrix.Model object to model the gradient of sinusoid trends.</p>
+<p>Initialize a dSinusoid model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>npt.NDArray</em><em>,</em>) – The input weights to be applied to the input model.</p></li>
+<li><p><strong>x_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the independent variable (default is “x”).</p></li>
+<li><p><strong>nterms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – The number of terms in the sinusoid.</p></li>
+<li><p><strong>priors</strong> (<em>optional</em>) – Prior distributions for model weights (default is None, i.e. no priors).</p></li>
+<li><p><strong>posteriors</strong> (<em>optional</em>) – Posterior distributions for model parameters (default is None, i.e. no posteriors).
+Posterior keyword is provided so that models can be loaded.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">nterms</span></code> is less than 1.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">nterms</span></code> is not an integer.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dSinusoid.arg_names">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">arg_names</span></span><a class="headerlink" href="#lamatrix.models.simple.dSinusoid.arg_names" title="Link to this definition">#</a></dt>
-<dd><p>Returns a set of the user defined strings for all the arguments that the design matrix requires.</p>
+<dd><p>Argument names that must be input into the model.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dSinusoid.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.dSinusoid.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dSinusoid.design_matrix">
 <span class="sig-name descname"><span class="pre">design_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/models/simple.html#dSinusoid.design_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.models.simple.dSinusoid.design_matrix" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>{}</strong> (<em>np.ndarray</em>) – Vector to create polynomial of</p>
+<dd><p>Build a gradient of a 1D sinusoid in <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.x_name</span></code>.</p>
+<p>You must pass the keyword argument <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.x_name</span></code> to use this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> – Design matrix with shape (len(x), self.nvectors)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>X</strong> – Design matrix with shape (len(x), self.nvectors)</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1042,17 +1204,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dSinusoid.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.simple.dSinusoid.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dSinusoid.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.dSinusoid.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dSinusoid.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.dSinusoid.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1061,25 +1227,20 @@ document.write(`
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
-</dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dSinusoid.nvectors">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nvectors</span></span><a class="headerlink" href="#lamatrix.models.simple.dSinusoid.nvectors" title="Link to this definition">#</a></dt>
-<dd><p>Returns the number of vectors required to build the object.</p>
+<dd><p>Number of vectors required to be input to create the model.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dSinusoid.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.simple.dSinusoid.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dSinusoid.save">
@@ -1094,7 +1255,7 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.simple.dSinusoid.width">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#lamatrix.models.simple.dSinusoid.width" title="Link to this definition">#</a></dt>
-<dd><p>Returns the width of the design matrix once built.</p>
+<dd><p>Width of the model. This is 1 for 1D gradients.</p>
 </dd></dl>
 
 </dd></dl>

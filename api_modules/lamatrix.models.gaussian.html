@@ -47,7 +47,7 @@
     <link rel="prev" title="lamatrix.models.spline" href="lamatrix.models.spline.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="03 Feb 2025"/>
+    <meta name="docbuild:last-update" content="05 Feb 2025"/>
   </head>
   
   
@@ -435,7 +435,7 @@ document.write(`
                   
   <section id="module-lamatrix.models.gaussian">
 <span id="lamatrix-models-gaussian"></span><h1>lamatrix.models.gaussian<a class="headerlink" href="#module-lamatrix.models.gaussian" title="Link to this heading">#</a></h1>
-<p>Generator objects for Gaussian types of models</p>
+<p>Model objects for Gaussian types of models</p>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
@@ -479,7 +479,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.Gaussian.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian.design_matrix">
@@ -498,17 +499,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.gaussian.Gaussian.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.Gaussian.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.Gaussian.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -516,12 +521,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -545,7 +544,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.Gaussian.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian.save">
@@ -583,7 +583,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian2D.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.Gaussian2D.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian2D.design_matrix">
@@ -602,17 +603,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian2D.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.gaussian.Gaussian2D.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian2D.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.Gaussian2D.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian2D.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.Gaussian2D.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -620,12 +625,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -649,7 +648,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian2D.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.Gaussian2D.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.Gaussian2D.to_gradient">
@@ -677,7 +677,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dGaussian.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian.design_matrix">
@@ -696,17 +697,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.gaussian.dGaussian.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dGaussian.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dGaussian.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -714,12 +719,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -743,7 +742,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dGaussian.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian.width">
@@ -766,7 +766,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian2D.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dGaussian2D.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian2D.design_matrix">
@@ -785,17 +786,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian2D.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.gaussian.dGaussian2D.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian2D.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dGaussian2D.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian2D.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dGaussian2D.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -803,12 +808,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -832,7 +831,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian2D.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dGaussian2D.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dGaussian2D.width">
@@ -855,7 +855,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dlnGaussian.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian.design_matrix">
@@ -876,17 +877,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.gaussian.dlnGaussian.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dlnGaussian.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dlnGaussian.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -894,12 +899,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -913,7 +912,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dlnGaussian.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian.width">
@@ -936,7 +936,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian2D.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dlnGaussian2D.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian2D.design_matrix">
@@ -957,17 +958,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian2D.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.gaussian.dlnGaussian2D.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian2D.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dlnGaussian2D.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian2D.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dlnGaussian2D.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -975,12 +980,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -994,7 +993,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian2D.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.dlnGaussian2D.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.dlnGaussian2D.width">
@@ -1027,7 +1027,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.lnGaussian.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian.design_matrix">
@@ -1048,17 +1049,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.gaussian.lnGaussian.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.lnGaussian.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.lnGaussian.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1066,12 +1071,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1095,7 +1094,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.lnGaussian.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian.sigma">
@@ -1143,7 +1143,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian2D.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.lnGaussian2D.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian2D.design_matrix">
@@ -1164,17 +1165,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian2D.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.gaussian.lnGaussian2D.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian2D.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.lnGaussian2D.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian2D.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.lnGaussian2D.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1182,12 +1187,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1216,7 +1215,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian2D.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.gaussian.lnGaussian2D.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.gaussian.lnGaussian2D.sigma_x">

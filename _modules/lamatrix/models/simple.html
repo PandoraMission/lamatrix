@@ -44,7 +44,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="03 Feb 2025"/>
+    <meta name="docbuild:last-update" content="05 Feb 2025"/>
   </head>
   
   
@@ -429,19 +429,21 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for lamatrix.models.simple</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Generator objects for simple types of models&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Generator objects for simple types of models.&quot;&quot;&quot;</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">sparse</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparseEfficiencyWarning</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..combine</span><span class="w"> </span><span class="kn">import</span> <span class="n">CrosstermModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..distributions</span><span class="w"> </span><span class="kn">import</span> <span class="n">DistributionsContainer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..io</span><span class="w"> </span><span class="kn">import</span> <span class="n">IOMixins</span><span class="p">,</span> <span class="n">LatexMixins</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..math</span><span class="w"> </span><span class="kn">import</span> <span class="n">MathMixins</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..combine</span><span class="w"> </span><span class="kn">import</span> <span class="n">CrosstermModel</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;Polynomial&quot;</span><span class="p">,</span>
@@ -457,15 +459,49 @@ document.write(`
 <div class="viewcode-block" id="Polynomial">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.Polynomial">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Polynomial</span><span class="p">(</span><span class="n">MathMixins</span><span class="p">,</span> <span class="n">LatexMixins</span><span class="p">,</span> <span class="n">IOMixins</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;lamatrix.Model object to model polynomial trends.&quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
         <span class="n">order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-        <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+        <span class="n">priors</span><span class="p">:</span> <span class="n">DistributionsContainer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">posteriors</span><span class="p">:</span> <span class="n">DistributionsContainer</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Model</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a Polynomial model.</span>
+
+<span class="sd">        Note that this model does not include a constant term. You can add one using the &quot;Constant&quot; model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x_name : str, optional</span>
+<span class="sd">            The name of the independent variable (default is &quot;x&quot;).</span>
+<span class="sd">        order : int, optional</span>
+<span class="sd">            The order of the polynomial. Must be at least 1 (default is 3).</span>
+<span class="sd">        priors : optional</span>
+<span class="sd">            Prior distributions for model weights (default is None, i.e. no priors).</span>
+<span class="sd">        posteriors : optional</span>
+<span class="sd">            Posterior distributions for model parameters (default is None, i.e. no posteriors).</span>
+<span class="sd">            Posterior keyword is provided so that models can be loaded.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `order` is less than 1.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `order` is not an integer.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Create a cubic polynomial model:</span>
+
+<span class="sd">        &gt;&gt;&gt; model = Polynomial(x_name=&quot;t&quot;, order=3)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">order</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must have order &gt;= 1.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">order</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`order` must be an integer.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_name</span> <span class="o">=</span> <span class="n">x_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_arg_names</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
@@ -473,18 +509,22 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Width of the model. This is equivalent to the order.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nvectors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of vectors required to be input to create the model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">arg_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Argument names that must be input into the model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_initialization_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The parameters that are required to initialize the object. This is used by the `load` function.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="s2">&quot;x_name&quot;</span><span class="p">,</span>
             <span class="s2">&quot;order&quot;</span><span class="p">,</span>
@@ -492,15 +532,19 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_equation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provides the list of equation components without the weights included, to be used by `self.equation`.&quot;&quot;&quot;</span>
         <span class="n">eqn</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;\mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="si">}</span><span class="se">}}</span><span class="s2">^</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="sa">f</span><span class="s2">&quot;\mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">^</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">eqn</span>
 
 <div class="viewcode-block" id="Polynomial.design_matrix">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.Polynomial.design_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">design_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a 1D polynomial in `x_name`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a 1D polynomial in `self.x_name`.</span>
+
+<span class="sd">        You must pass the keyword argument `self.x_name` to use this function.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -527,12 +571,43 @@ document.write(`
 
 <div class="viewcode-block" id="Polynomial.to_gradient">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.Polynomial.to_gradient">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_gradient</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">priors</span><span class="p">:</span> <span class="n">DistributionsContainer</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts this model to the gradient of that model, assigning the posteriors of the fit as weights.</span>
+
+<span class="sd">        If the posteriors are None, will assign the priors as weights.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        weights: np.ndarray</span>
+<span class="sd">            The weights applied to the Polynomial model. These update the commponents for the design matrix of the gradient.</span>
+<span class="sd">        priors: DistributionsContainer</span>
+<span class="sd">            Priors to apply to the gradient model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        model: lamatrix.models.simple.dPolynomial</span>
+<span class="sd">            A model for the gradient of a polynomial</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        To obtain the gradient of a fit polynomial model</span>
+
+<span class="sd">        &gt;&gt;&gt; model = Polynomial(x_name=&quot;t&quot;, order=3)</span>
+<span class="sd">        &gt;&gt;&gt; model.fit(t=t, data=data, errors=errors)</span>
+<span class="sd">        &gt;&gt;&gt; dmodel = model.to_gradient()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span><span class="o">.</span><span class="n">mean</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                 <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">priors</span><span class="o">.</span><span class="n">mean</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;To convert to a gradient, you must provide either posteriors from fitting data or priors.&quot;</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">dPolynomial</span><span class="p">(</span>
             <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
@@ -543,15 +618,20 @@ document.write(`
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Special case for Polynomial models when raised to powers.</span>
+
+<span class="sd">        In the polynomial case raising the model to a given power creates</span>
+<span class="sd">        duplicated components making the model degenerate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">other</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can only square `Model` objects&quot;</span><span class="p">)</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">CrosstermModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="n">prior_std_cube</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">),</span> <span class="o">-</span><span class="mi">2</span><span class="p">))</span>
         <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">set_priors</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">priors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="n">model</span><span class="o">.</span><span class="n">prior_distributions</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="k">else</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">)</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">priors</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="k">else</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1e-10</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prior_std_cube</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
             <span class="p">]</span>
         <span class="p">)</span>
@@ -562,16 +642,49 @@ document.write(`
 <div class="viewcode-block" id="dPolynomial">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.dPolynomial">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">dPolynomial</span><span class="p">(</span><span class="n">MathMixins</span><span class="p">,</span> <span class="n">LatexMixins</span><span class="p">,</span> <span class="n">IOMixins</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;lamatrix.Model object for capturing derivatives of polynomial models.</span>
+
+<span class="sd">    In this case, this is a special variant on a Polynomial model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">weights</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span>
         <span class="n">x_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
         <span class="n">order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Model</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a dPolynomial model.</span>
+
+<span class="sd">        Note that this model does not include a constant term. You can add one using the &quot;Constant&quot; model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        weights: npt.NDArray,</span>
+<span class="sd">            The input weights to be applied to the input model.</span>
+<span class="sd">        x_name : str, optional</span>
+<span class="sd">            The name of the independent variable (default is &quot;x&quot;).</span>
+<span class="sd">        order : int, optional</span>
+<span class="sd">            The order of the polynomial. Must be at least 1 (default is 3).</span>
+<span class="sd">        priors : optional</span>
+<span class="sd">            Prior distributions for model weights (default is None, i.e. no priors).</span>
+<span class="sd">        posteriors : optional</span>
+<span class="sd">            Posterior distributions for model parameters (default is None, i.e. no posteriors).</span>
+<span class="sd">            Posterior keyword is provided so that models can be loaded.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `order` is less than 1.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `order` is not an integer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">order</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must have order &gt;= 1.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must have `order` &gt;= 1.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">order</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`order` must be an integer.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_name</span> <span class="o">=</span> <span class="n">x_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_arg_names</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
@@ -581,24 +694,29 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Width of the model. This is 1 for 1D gradients.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nvectors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of vectors required to be input to create the model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">arg_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Argument names that must be input into the model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_mu_letter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Letter representing the weights of this gradient model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;v&quot;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_equation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of latex equations for each vector to describe the generation of the design matrix.&quot;&quot;&quot;</span>
         <span class="n">eqn</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">w_</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="se">}}</span><span class="s2">\mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="si">}</span><span class="se">}}</span><span class="s2">^</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">w_</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="se">}}</span><span class="s2">\mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">^</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span>
             <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">eqn</span>
@@ -606,12 +724,9 @@ document.write(`
 <div class="viewcode-block" id="dPolynomial.design_matrix">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.dPolynomial.design_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">design_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a 1D polynomial in x</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the derivative of a 1D Polynomial in `self.x_name`.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        {} : np.ndarray</span>
-<span class="sd">            Vector to create polynomial of</span>
+<span class="sd">        You must pass the keyword argument `self.x_name` to use this function.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -645,13 +760,48 @@ document.write(`
 <div class="viewcode-block" id="Sinusoid">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.Sinusoid">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Sinusoid</span><span class="p">(</span><span class="n">MathMixins</span><span class="p">,</span> <span class="n">LatexMixins</span><span class="p">,</span> <span class="n">IOMixins</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;lamatrix.Model object to model sinusoidal trends.&quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
         <span class="n">nterms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Model</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a Sinusoid model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x_name : str, optional</span>
+<span class="sd">            The name of the independent variable (default is &quot;x&quot;).</span>
+<span class="sd">        nterms : int, optional</span>
+<span class="sd">            The number of terms in the sinusoid.</span>
+<span class="sd">        priors : optional</span>
+<span class="sd">            Prior distributions for model weights (default is None, i.e. no priors).</span>
+<span class="sd">        posteriors : optional</span>
+<span class="sd">            Posterior distributions for model parameters (default is None, i.e. no posteriors).</span>
+<span class="sd">            Posterior keyword is provided so that models can be loaded.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `nterms` is less than 1.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `nterms` is not an integer.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Create a sinusoid model with nterms=3:</span>
+
+<span class="sd">        &gt;&gt;&gt; model = Sinusoid(x_name=&quot;phi&quot;, nterms=3)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">nterms</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must have nterms &gt;= 1.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">nterms</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`nterms` must be an integer.&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">x_name</span> <span class="o">=</span> <span class="n">x_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_arg_names</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nterms</span> <span class="o">=</span> <span class="n">nterms</span>
@@ -659,26 +809,31 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Width of the model. This is equivalent to the `nterms` * 2 for Sinusoid models.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nterms</span> <span class="o">*</span> <span class="mi">2</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nvectors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of vectors required to be input to create the model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">arg_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Argument names that must be input into the model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_equation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of latex equations for each vector to describe the generation of the design matrix.&quot;&quot;&quot;</span>
+
         <span class="k">def</span><span class="w"> </span><span class="nf">frq</span><span class="p">(</span><span class="n">term</span><span class="p">):</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">term</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">term</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="p">[</span>
-                    <span class="sa">f</span><span class="s2">&quot;\sin(</span><span class="si">{</span><span class="n">frq</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="si">}</span><span class="se">\\</span><span class="s2">mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="si">}</span><span class="se">}}</span><span class="s2">)&quot;</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s2">&quot;\cos(</span><span class="si">{</span><span class="n">frq</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="si">}</span><span class="se">\\</span><span class="s2">mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="si">}</span><span class="se">}}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;\sin(</span><span class="si">{</span><span class="n">frq</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="si">}</span><span class="se">\\</span><span class="s2">mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;\cos(</span><span class="si">{</span><span class="n">frq</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="si">}</span><span class="se">\\</span><span class="s2">mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">)&quot;</span><span class="p">,</span>
                 <span class="p">]</span>
                 <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nterms</span><span class="p">)</span>
             <span class="p">]</span>
@@ -687,6 +842,15 @@ document.write(`
 <div class="viewcode-block" id="Sinusoid.design_matrix">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.Sinusoid.design_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">design_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a 1D Sinusoid in `self.x_name`.</span>
+
+<span class="sd">        You must pass the keyword argument `self.x_name` to use this function.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        X : np.ndarray</span>
+<span class="sd">            Design matrix with shape (len(x), self.nvectors)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_names</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">arg_names</span><span class="si">}</span><span class="s2"> to be passed.&quot;</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">)</span>
@@ -713,12 +877,43 @@ document.write(`
 <div class="viewcode-block" id="Sinusoid.to_gradient">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.Sinusoid.to_gradient">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts this model to the gradient of that model, assigning the posteriors of the fit as weights.</span>
+
+<span class="sd">        If the posteriors are None, will assign the priors as weights.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        weights: np.ndarray</span>
+<span class="sd">            The weights applied to the Sinusoid model.</span>
+<span class="sd">            These update the commponents for the design matrix of the gradient.</span>
+<span class="sd">        priors: DistributionsContainer</span>
+<span class="sd">            Priors to apply to the gradient model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        model: lamatrix.models.simple.dSinusoid</span>
+<span class="sd">            A model for the gradient of a sinusoid</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        To obtain the gradient of a fit sinusoid model</span>
+
+<span class="sd">        &gt;&gt;&gt; model = Sinusoid(x_name=&quot;phi&quot;, nterms=3)</span>
+<span class="sd">        &gt;&gt;&gt; model.fit(phi=phi, data=data, errors=errors)</span>
+<span class="sd">        &gt;&gt;&gt; dmodel = model.to_gradient()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span><span class="o">.</span><span class="n">mean</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                 <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">priors</span><span class="o">.</span><span class="n">mean</span>
             <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;To convert to a gradient, you must provide either posteriors from fitting data or priors.&quot;</span>
+            <span class="p">)</span>
+
         <span class="k">return</span> <span class="n">dSinusoid</span><span class="p">(</span>
             <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
             <span class="n">x_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">,</span>
@@ -732,6 +927,8 @@ document.write(`
 <div class="viewcode-block" id="dSinusoid">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.dSinusoid">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">dSinusoid</span><span class="p">(</span><span class="n">MathMixins</span><span class="p">,</span> <span class="n">LatexMixins</span><span class="p">,</span> <span class="n">IOMixins</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;lamatrix.Model object to model the gradient of sinusoid trends.&quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span>
@@ -739,7 +936,36 @@ document.write(`
         <span class="n">nterms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Model</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a dSinusoid model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        weights: npt.NDArray,</span>
+<span class="sd">            The input weights to be applied to the input model.</span>
+<span class="sd">        x_name : str, optional</span>
+<span class="sd">            The name of the independent variable (default is &quot;x&quot;).</span>
+<span class="sd">        nterms : int, optional</span>
+<span class="sd">            The number of terms in the sinusoid.</span>
+<span class="sd">        priors : optional</span>
+<span class="sd">            Prior distributions for model weights (default is None, i.e. no priors).</span>
+<span class="sd">        posteriors : optional</span>
+<span class="sd">            Posterior distributions for model parameters (default is None, i.e. no posteriors).</span>
+<span class="sd">            Posterior keyword is provided so that models can be loaded.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `nterms` is less than 1.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `nterms` is not an integer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">nterms</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must have `nterms` &gt;= 1.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">nterms</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`nterms` must be an integer.&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">x_name</span> <span class="o">=</span> <span class="n">x_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_arg_names</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nterms</span> <span class="o">=</span> <span class="n">nterms</span>
@@ -749,30 +975,36 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Width of the model. This is 1 for 1D gradients.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nvectors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of vectors required to be input to create the model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">arg_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Argument names that must be input into the model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_mu_letter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Letter representing the weights of this gradient model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;v&quot;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_equation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provides the list of equation components without the weights included, to be used by `self.equation`.&quot;&quot;&quot;</span>
+
         <span class="k">def</span><span class="w"> </span><span class="nf">frq</span><span class="p">(</span><span class="n">term</span><span class="p">):</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">term</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">term</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="p">[</span>
-                    <span class="sa">f</span><span class="s2">&quot;w_</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="si">}</span><span class="se">}}</span><span class="s2">\cos(</span><span class="si">{</span><span class="n">frq</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="si">}</span><span class="se">\\</span><span class="s2">mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="si">}</span><span class="se">}}</span><span class="s2">)&quot;</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s2">&quot;w_</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="se">}}</span><span class="s2">(-\sin(</span><span class="si">{</span><span class="n">frq</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="si">}</span><span class="se">\\</span><span class="s2">mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="si">}</span><span class="se">}}</span><span class="s2">))&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;w_</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="si">}</span><span class="se">}}</span><span class="s2">\cos(</span><span class="si">{</span><span class="n">frq</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="si">}</span><span class="se">\\</span><span class="s2">mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;w_</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="se">}}</span><span class="s2">(-\sin(</span><span class="si">{</span><span class="n">frq</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="si">}</span><span class="se">\\</span><span class="s2">mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">))&quot;</span><span class="p">,</span>
                 <span class="p">]</span>
                 <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nterms</span><span class="p">)</span>
             <span class="p">],</span>
@@ -781,12 +1013,9 @@ document.write(`
 <div class="viewcode-block" id="dSinusoid.design_matrix">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.dSinusoid.design_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">design_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a gradient of a 1D sinusoid in `self.x_name`.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        {} : np.ndarray</span>
-<span class="sd">            Vector to create polynomial of</span>
+<span class="sd">        You must pass the keyword argument `self.x_name` to use this function.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -817,56 +1046,62 @@ document.write(`
 </div>
 
 
-        <span class="c1"># shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]</span>
-        <span class="c1"># return np.asarray(</span>
-        <span class="c1">#     [</span>
-        <span class="c1">#         *[</span>
-        <span class="c1">#             [w1 * np.cos(x * (idx + 1)), -w2 * np.sin(x * (idx + 1))]</span>
-        <span class="c1">#             for idx, w1, w2 in zip(</span>
-        <span class="c1">#                 range(self.nterms),</span>
-        <span class="c1">#                 self.weights[::2],</span>
-        <span class="c1">#                 self.weights[1::2],</span>
-        <span class="c1">#             )</span>
-        <span class="c1">#         ],</span>
-        <span class="c1">#     ]</span>
-        <span class="c1"># ).transpose(shape_a).sum(axis=1)[:, None]</span>
-
 
 <div class="viewcode-block" id="Constant">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.Constant">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Constant</span><span class="p">(</span><span class="n">MathMixins</span><span class="p">,</span> <span class="n">LatexMixins</span><span class="p">,</span> <span class="n">IOMixins</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A generator which has no variable, and whos design matrix is entirely ones.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;lamatrix.Model object to model constants or offsets. This model has no input variable.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a Constant model.</span>
+
+<span class="sd">        Note this model has no variable.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        priors : optional</span>
+<span class="sd">            Prior distributions for model weights (default is None, i.e. no priors).</span>
+<span class="sd">        posteriors : optional</span>
+<span class="sd">            Posterior distributions for model parameters (default is None, i.e. no posteriors).</span>
+<span class="sd">            Posterior keyword is provided so that models can be loaded.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Create a constant model</span>
+
+<span class="sd">        &gt;&gt;&gt; model = Constant()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">,</span> <span class="n">posteriors</span><span class="o">=</span><span class="n">posteriors</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Width of the model. This is always one for a constant model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nvectors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of vectors required to be input to create the model.</span>
+<span class="sd">        This is zero for a constant model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">arg_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Argument names that must be input into the model.</span>
+<span class="sd">        This is an empty dictionary for a constant model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_equation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of latex equations for each vector to describe the generation of the design matrix.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Constant.design_matrix">
 <a class="viewcode-back" href="../../../api_modules/lamatrix.models.simple.html#lamatrix.models.simple.Constant.design_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">design_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a 1D polynomial in x</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a design matrix consisting of a single column of ones.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        {} : np.ndarray</span>
-<span class="sd">            Vector to create polynomial of</span>
+<span class="sd">        You must pass a keyword argument to this design matrix to detect the required shape.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -884,16 +1119,6 @@ document.write(`
     <span class="k">def</span><span class="w"> </span><span class="nf">_initialization_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[]</span></div>
 
-
-    <span class="c1"># @property</span>
-    <span class="c1"># def gradient(self):</span>
-    <span class="c1">#     return dPolynomial1DGenerator(</span>
-    <span class="c1">#         weights=self._mu,</span>
-    <span class="c1">#         x_name=self.x_name,</span>
-    <span class="c1">#         order=self.order,</span>
-    <span class="c1">#         data_shape=self.data_shape,</span>
-    <span class="c1">#         offset_prior=(self._mu[1], self._sigma[1]),</span>
-    <span class="c1">#     )</span>
 
 
 <div class="viewcode-block" id="Step">
@@ -936,7 +1161,7 @@ document.write(`
     <span class="k">def</span><span class="w"> </span><span class="nf">_equation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="s2">&quot;-\infty&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">breakpoints</span><span class="p">,</span> <span class="s2">&quot;\infty&quot;</span><span class="p">])</span>
         <span class="n">eqn</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;\mathbb</span><span class="se">{{</span><span class="s2">I</span><span class="se">}}</span><span class="s2">_</span><span class="se">{{</span><span class="s2">[</span><span class="se">{{</span><span class="si">{</span><span class="n">bounds</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">, </span><span class="se">{{</span><span class="si">{</span><span class="n">bounds</span><span class="p">[</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">]</span><span class="se">}}</span><span class="s2">(\mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="si">}</span><span class="se">}}</span><span class="s2">)&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;\mathbb</span><span class="se">{{</span><span class="s2">I</span><span class="se">}}</span><span class="s2">_</span><span class="se">{{</span><span class="s2">[</span><span class="se">{{</span><span class="si">{</span><span class="n">bounds</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">, </span><span class="se">{{</span><span class="si">{</span><span class="n">bounds</span><span class="p">[</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">]</span><span class="se">}}</span><span class="s2">(\mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">)&quot;</span>
             <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">eqn</span>
@@ -1026,7 +1251,10 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_equation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">eqn</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;\mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="si">}</span><span class="se">}}</span><span class="s2">_</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)]</span>
+        <span class="n">eqn</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">&quot;\mathbf</span><span class="se">{{</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_name</span><span class="p">]</span><span class="si">}</span><span class="se">}}</span><span class="s2">_</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="k">return</span> <span class="n">eqn</span>
 
 <div class="viewcode-block" id="Fixed.design_matrix">

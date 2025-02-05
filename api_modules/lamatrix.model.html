@@ -47,7 +47,7 @@
     <link rel="prev" title="lamatrix.distributions" href="lamatrix.distributions.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="03 Feb 2025"/>
+    <meta name="docbuild:last-update" content="05 Feb 2025"/>
   </head>
   
   
@@ -443,7 +443,7 @@ document.write(`
 <td><p>Class for holding equations so we can have an HTML repr in Jupyter.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lamatrix.model.Model" title="lamatrix.model.Model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Model</span></code></a>([priors, posteriors])</p></td>
-<td><p></p></td>
+<td><p>Abstract base class to implement the Model class, used by all model types in lamatrix.</p></td>
 </tr>
 </tbody>
 </table>
@@ -452,6 +452,8 @@ document.write(`
 <dt class="sig sig-object py" id="lamatrix.model.Model">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.model.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/model.html#Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.model.Model" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Abstract base class to implement the Model class, used by all model types in lamatrix.</p>
+<p>Initialization function for all models. All models must be provided with input priors and posteriors that match their width.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.model.Model.arg_names">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">arg_names</span></span><a class="headerlink" href="#lamatrix.model.Model.arg_names" title="Link to this definition">#</a></dt>
@@ -461,7 +463,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.model.Model.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/model.html#Model.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.model.Model.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.model.Model.design_matrix">
@@ -472,17 +475,21 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.model.Model.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.model.Model.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.model.Model.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/model.html#Model.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.model.Model.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.model.Model.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/model.html#Model.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.model.Model.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -490,12 +497,6 @@ document.write(`
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -509,7 +510,8 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.model.Model.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/model.html#Model.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.model.Model.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.model.Model.width">

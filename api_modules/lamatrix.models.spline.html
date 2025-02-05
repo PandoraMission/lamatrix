@@ -47,7 +47,7 @@
     <link rel="prev" title="lamatrix.models.simple" href="lamatrix.models.simple.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="03 Feb 2025"/>
+    <meta name="docbuild:last-update" content="05 Feb 2025"/>
   </head>
   
   
@@ -489,7 +489,8 @@ x : position where the derivative is evaluated</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.SparseSpline.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.SparseSpline.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.SparseSpline.design_matrix">
@@ -511,17 +512,21 @@ x : position where the derivative is evaluated</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.spline.SparseSpline.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.spline.SparseSpline.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.SparseSpline.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.SparseSpline.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.SparseSpline.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.SparseSpline.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -529,12 +534,6 @@ x : position where the derivative is evaluated</p>
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -548,7 +547,8 @@ x : position where the derivative is evaluated</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.SparseSpline.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.SparseSpline.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.SparseSpline.save">
@@ -611,7 +611,8 @@ x : position where the derivative is evaluated</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.Spline.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.Spline.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.Spline.design_matrix">
@@ -633,17 +634,21 @@ x : position where the derivative is evaluated</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.spline.Spline.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.spline.Spline.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.Spline.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.Spline.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.Spline.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.Spline.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -651,12 +656,6 @@ x : position where the derivative is evaluated</p>
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -670,7 +669,8 @@ x : position where the derivative is evaluated</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.Spline.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.Spline.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.Spline.save">
@@ -733,7 +733,8 @@ x : position where the derivative is evaluated</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSparseSpline.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.dSparseSpline.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSparseSpline.design_matrix">
@@ -744,17 +745,21 @@ x : position where the derivative is evaluated</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSparseSpline.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.spline.dSparseSpline.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSparseSpline.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.dSparseSpline.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSparseSpline.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.dSparseSpline.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -762,12 +767,6 @@ x : position where the derivative is evaluated</p>
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -781,7 +780,8 @@ x : position where the derivative is evaluated</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSparseSpline.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.dSparseSpline.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSparseSpline.width">
@@ -824,7 +824,8 @@ x : position where the derivative is evaluated</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSpline.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.dSpline.copy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a deep copy of <code class="xref py py-obj docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSpline.design_matrix">
@@ -835,17 +836,21 @@ x : position where the derivative is evaluated</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSpline.equation">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">equation</span></span><a class="headerlink" href="#lamatrix.models.spline.dSpline.equation" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Provides the equation for the model in latex.</p>
+<p>If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSpline.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.dSpline.evaluate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with the current best fit weights.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSpline.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.2)"><span class="pre">dtype</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.dSpline.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the design matrix.</p>
+<dd><p>Fit the design matrix of this model object.</p>
+<p>Executing this function will update the posteriors argument to the best fit posteriors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -853,12 +858,6 @@ x : position where the derivative is evaluated</p>
 <li><p><strong>errors</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Errors on the input data</p></li>
 <li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Mask to apply when fitting. Values where mask is False will not be used during the fit.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fit_distributions</strong> – The best fit distributions</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Tuples</p>
 </dd>
 </dl>
 </dd></dl>
@@ -872,7 +871,8 @@ x : position where the derivative is evaluated</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSpline.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lamatrix.models.spline.dSpline.sample" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="lamatrix.models.spline.dSpline.width">
