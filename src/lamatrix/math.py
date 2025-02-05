@@ -2,6 +2,7 @@ import numpy as np
 
 from .combine import CrosstermModel, JointModel
 from .model import Model
+from .distributions import DistributionsContainer
 
 __all__ = ["MathMixins"]
 
@@ -39,9 +40,9 @@ class MathMixins:
             raise ValueError("Can only square `Model` objects")
         model = CrosstermModel(self, self)
         prior_std_cube = np.tril(np.ones(self.width, bool))
-        model.set_priors(
+        model.priors = DistributionsContainer(
             [
-                model.prior_distributions[idx] if i else (0, 1e-10)
+                model.priors[idx] if i else (0, 1e-10)
                 for idx, i in enumerate(prior_std_cube.ravel())
             ]
         )

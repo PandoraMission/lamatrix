@@ -1,16 +1,18 @@
-"""Generator objects for simple types of models"""
+"""Generator objects for simple types of models."""
 
 import warnings
 from typing import List
 
 import numpy as np
+import numpy.typing as npt
 from scipy import sparse
 from scipy.sparse import SparseEfficiencyWarning
 
-from ..combine import CrosstermModel
+from ..distributions import DistributionsContainer
 from ..io import IOMixins, LatexMixins
 from ..math import MathMixins
 from ..model import Model
+from ..combine import CrosstermModel
 
 __all__ = [
     "Polynomial",
@@ -24,15 +26,49 @@ __all__ = [
 
 
 class Polynomial(MathMixins, LatexMixins, IOMixins, Model):
+    """lamatrix.Model object to model polynomial trends."""
+
     def __init__(
         self,
         x_name: str = "x",
         order: int = 3,
-        priors=None,
-        posteriors=None,
-    ):
+        priors: DistributionsContainer = None,
+        posteriors: DistributionsContainer = None,
+    ) -> Model:
+        """
+        Initialize a Polynomial model.
+
+        Note that this model does not include a constant term. You can add one using the "Constant" model.
+
+        Parameters
+        ----------
+        x_name : str, optional
+            The name of the independent variable (default is "x").
+        order : int, optional
+            The order of the polynomial. Must be at least 1 (default is 3).
+        priors : optional
+            Prior distributions for model weights (default is None, i.e. no priors).
+        posteriors : optional
+            Posterior distributions for model parameters (default is None, i.e. no posteriors).
+            Posterior keyword is provided so that models can be loaded.
+
+        Raises
+        ------
+        ValueError
+            If `order` is less than 1.
+        ValueError
+            If `order` is not an integer.
+
+        Examples
+        --------
+        Create a cubic polynomial model:
+
+        >>> model = Polynomial(x_name="t", order=3)
+        """
         if order < 1:
             raise ValueError("Must have order >= 1.")
+        if not np.issubdtype(type(order), np.integer):
+            raise ValueError("`order` must be an integer.")
         self.x_name = x_name
         self._validate_arg_names()
         self.order = order
@@ -40,18 +76,22 @@ class Polynomial(MathMixins, LatexMixins, IOMixins, Model):
 
     @property
     def width(self):
+        """Width of the model. This is equivalent to the order."""
         return self.order
 
     @property
     def nvectors(self):
+        """Number of vectors required to be input to create the model."""
         return 1
 
     @property
     def arg_names(self):
+        """Argument names that must be input into the model."""
         return {self.x_name}
 
     @property
     def _initialization_attributes(self):
+        """The parameters that are required to initialize the object. This is used by the `load` function."""
         return [
             "x_name",
             "order",
@@ -59,13 +99,17 @@ class Polynomial(MathMixins, LatexMixins, IOMixins, Model):
 
     @property
     def _equation(self):
+        """Provides the list of equation components without the weights included, to be used by `self.equation`."""
         eqn = [
-            f"\mathbf{{{self.x_name}}}^{{{idx}}}" for idx in range(1, self.order + 1)
+            f"\mathbf{{{self.latex_aliases[self.x_name]}}}^{{{idx}}}"
+            for idx in range(1, self.order + 1)
         ]
         return eqn
 
     def design_matrix(self, **kwargs):
-        """Build a 1D polynomial in `x_name`.
+        """Build a 1D polynomial in `self.x_name`.
+
+        You must pass the keyword argument `self.x_name` to use this function.
 
         Returns
         -------
@@ -89,12 +133,43 @@ class Polynomial(MathMixins, LatexMixins, IOMixins, Model):
                 shape_a
             )
 
-    def to_gradient(self, weights=None, priors=None):
+    def to_gradient(
+        self, weights: npt.NDArray = None, priors: DistributionsContainer = None
+    ):
+        """Converts this model to the gradient of that model, assigning the posteriors of the fit as weights.
+
+        If the posteriors are None, will assign the priors as weights.
+
+        Parameters
+        ----------
+        weights: np.ndarray
+            The weights applied to the Polynomial model. These update the commponents for the design matrix of the gradient.
+        priors: DistributionsContainer
+            Priors to apply to the gradient model.
+
+        Returns
+        -------
+        model: lamatrix.models.simple.dPolynomial
+            A model for the gradient of a polynomial
+
+        Example
+        -------
+
+        To obtain the gradient of a fit polynomial model
+
+        >>> model = Polynomial(x_name="t", order=3)
+        >>> model.fit(t=t, data=data, errors=errors)
+        >>> dmodel = model.to_gradient()
+        """
         if weights is None:
             weights = (
                 self.posteriors.mean
                 if self.posteriors is not None
                 else self.priors.mean
+            )
+        else:
+            raise ValueError(
+                "To convert to a gradient, you must provide either posteriors from fitting data or priors."
             )
         return dPolynomial(
             weights=weights[1:],
@@ -104,15 +179,20 @@ class Polynomial(MathMixins, LatexMixins, IOMixins, Model):
         )
 
     def __pow__(self, other):
+        """Special case for Polynomial models when raised to powers.
+
+        In the polynomial case raising the model to a given power creates
+        duplicated components making the model degenerate.
+        """
         if other != 2:
             raise ValueError("Can only square `Model` objects")
         model = CrosstermModel(self, self)
         prior_std_cube = (
             np.tril(np.ones(self.width)) * (1 - np.tril(np.ones(self.width), -2))
         ).astype(bool)
-        model.set_priors(
+        model.priors = DistributionsContainer(
             [
-                model.prior_distributions[idx] if i else (0, 1e-10)
+                model.priors[idx] if i else (0, 1e-10)
                 for idx, i in enumerate(prior_std_cube.ravel())
             ]
         )
@@ -120,16 +200,49 @@ class Polynomial(MathMixins, LatexMixins, IOMixins, Model):
 
 
 class dPolynomial(MathMixins, LatexMixins, IOMixins, Model):
+    """lamatrix.Model object for capturing derivatives of polynomial models.
+
+    In this case, this is a special variant on a Polynomial model.
+    """
+
     def __init__(
         self,
-        weights: List,
+        weights: npt.NDArray,
         x_name: str = "x",
         order: int = 3,
         priors=None,
         posteriors=None,
-    ):
+    ) -> Model:
+        """
+        Initialize a dPolynomial model.
+
+        Note that this model does not include a constant term. You can add one using the "Constant" model.
+
+        Parameters
+        ----------
+        weights: npt.NDArray,
+            The input weights to be applied to the input model.
+        x_name : str, optional
+            The name of the independent variable (default is "x").
+        order : int, optional
+            The order of the polynomial. Must be at least 1 (default is 3).
+        priors : optional
+            Prior distributions for model weights (default is None, i.e. no priors).
+        posteriors : optional
+            Posterior distributions for model parameters (default is None, i.e. no posteriors).
+            Posterior keyword is provided so that models can be loaded.
+
+        Raises
+        ------
+        ValueError
+            If `order` is less than 1.
+        ValueError
+            If `order` is not an integer.
+        """
         if order < 1:
-            raise ValueError("Must have order >= 1.")
+            raise ValueError("Must have `order` >= 1.")
+        if not np.issubdtype(type(order), np.integer):
+            raise ValueError("`order` must be an integer.")
         self.x_name = x_name
         self._validate_arg_names()
         self.order = order
@@ -139,35 +252,37 @@ class dPolynomial(MathMixins, LatexMixins, IOMixins, Model):
 
     @property
     def width(self):
+        """Width of the model. This is 1 for 1D gradients."""
         return 1
 
     @property
     def nvectors(self):
+        """Number of vectors required to be input to create the model."""
         return 1
 
     @property
     def arg_names(self):
+        """Argument names that must be input into the model."""
         return {self.x_name}
 
     @property
     def _mu_letter(self):
+        """Letter representing the weights of this gradient model."""
         return "v"
 
     @property
     def _equation(self):
+        """Returns a list of latex equations for each vector to describe the generation of the design matrix."""
         eqn = [
-            f"{idx + 1 if idx != 0 else ''}w_{{{idx}}}\mathbf{{{self.x_name}}}^{{{idx}}}"
+            f"{idx + 1 if idx != 0 else ''}w_{{{idx}}}\mathbf{{{self.latex_aliases[self.x_name]}}}^{{{idx}}}"
             for idx in range(self.order + 1)
         ]
         return eqn
 
     def design_matrix(self, **kwargs):
-        """Build a 1D polynomial in x
+        """Build the derivative of a 1D Polynomial in `self.x_name`.
 
-        Parameters
-        ----------
-        {} : np.ndarray
-            Vector to create polynomial of
+        You must pass the keyword argument `self.x_name` to use this function.
 
         Returns
         -------
@@ -197,13 +312,48 @@ class dPolynomial(MathMixins, LatexMixins, IOMixins, Model):
 
 
 class Sinusoid(MathMixins, LatexMixins, IOMixins, Model):
+    """lamatrix.Model object to model sinusoidal trends."""
+
     def __init__(
         self,
         x_name: str = "x",
         nterms: int = 1,
         priors=None,
         posteriors=None,
-    ):
+    ) -> Model:
+        """
+        Initialize a Sinusoid model.
+
+        Parameters
+        ----------
+        x_name : str, optional
+            The name of the independent variable (default is "x").
+        nterms : int, optional
+            The number of terms in the sinusoid.
+        priors : optional
+            Prior distributions for model weights (default is None, i.e. no priors).
+        posteriors : optional
+            Posterior distributions for model parameters (default is None, i.e. no posteriors).
+            Posterior keyword is provided so that models can be loaded.
+
+        Raises
+        ------
+        ValueError
+            If `nterms` is less than 1.
+        ValueError
+            If `nterms` is not an integer.
+
+        Examples
+        --------
+        Create a sinusoid model with nterms=3:
+
+        >>> model = Sinusoid(x_name="phi", nterms=3)
+        """
+        if nterms < 1:
+            raise ValueError("Must have nterms >= 1.")
+        if not np.issubdtype(type(nterms), np.integer):
+            raise ValueError("`nterms` must be an integer.")
+
         self.x_name = x_name
         self._validate_arg_names()
         self.nterms = nterms
@@ -211,32 +361,46 @@ class Sinusoid(MathMixins, LatexMixins, IOMixins, Model):
 
     @property
     def width(self):
+        """Width of the model. This is equivalent to the `nterms` * 2 for Sinusoid models."""
         return self.nterms * 2
 
     @property
     def nvectors(self):
+        """Number of vectors required to be input to create the model."""
         return 1
 
     @property
     def arg_names(self):
+        """Argument names that must be input into the model."""
         return {self.x_name}
 
     @property
     def _equation(self):
+        """Returns a list of latex equations for each vector to describe the generation of the design matrix."""
+
         def frq(term):
             return f"{term + 1}" if term > 0 else ""
 
         return np.hstack(
             [
                 [
-                    f"\sin({frq(idx)}\\mathbf{{{self.x_name}}})",
-                    f"\cos({frq(idx)}\\mathbf{{{self.x_name}}})",
+                    f"\sin({frq(idx)}\\mathbf{{{self.latex_aliases[self.x_name]}}})",
+                    f"\cos({frq(idx)}\\mathbf{{{self.latex_aliases[self.x_name]}}})",
                 ]
                 for idx in range(self.nterms)
             ]
         )
 
     def design_matrix(self, **kwargs):
+        """Build a 1D Sinusoid in `self.x_name`.
+
+        You must pass the keyword argument `self.x_name` to use this function.
+
+        Returns
+        -------
+        X : np.ndarray
+            Design matrix with shape (len(x), self.nvectors)
+        """
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
@@ -260,12 +424,43 @@ class Sinusoid(MathMixins, LatexMixins, IOMixins, Model):
             return X.transpose(shape_a)
 
     def to_gradient(self, weights=None, priors=None):
+        """Converts this model to the gradient of that model, assigning the posteriors of the fit as weights.
+
+        If the posteriors are None, will assign the priors as weights.
+
+        Parameters
+        ----------
+        weights: np.ndarray
+            The weights applied to the Sinusoid model.
+            These update the commponents for the design matrix of the gradient.
+        priors: DistributionsContainer
+            Priors to apply to the gradient model.
+
+        Returns
+        -------
+        model: lamatrix.models.simple.dSinusoid
+            A model for the gradient of a sinusoid
+
+        Example
+        -------
+
+        To obtain the gradient of a fit sinusoid model
+
+        >>> model = Sinusoid(x_name="phi", nterms=3)
+        >>> model.fit(phi=phi, data=data, errors=errors)
+        >>> dmodel = model.to_gradient()
+        """
         if weights is None:
             weights = (
                 self.posteriors.mean
                 if self.posteriors is not None
                 else self.priors.mean
             )
+        else:
+            raise ValueError(
+                "To convert to a gradient, you must provide either posteriors from fitting data or priors."
+            )
+
         return dSinusoid(
             weights=weights,
             x_name=self.x_name,
@@ -275,6 +470,8 @@ class Sinusoid(MathMixins, LatexMixins, IOMixins, Model):
 
 
 class dSinusoid(MathMixins, LatexMixins, IOMixins, Model):
+    """lamatrix.Model object to model the gradient of sinusoid trends."""
+
     def __init__(
         self,
         weights: List,
@@ -282,7 +479,36 @@ class dSinusoid(MathMixins, LatexMixins, IOMixins, Model):
         nterms: int = 1,
         priors=None,
         posteriors=None,
-    ):
+    ) -> Model:
+        """
+        Initialize a dSinusoid model.
+
+        Parameters
+        ----------
+        weights: npt.NDArray,
+            The input weights to be applied to the input model.
+        x_name : str, optional
+            The name of the independent variable (default is "x").
+        nterms : int, optional
+            The number of terms in the sinusoid.
+        priors : optional
+            Prior distributions for model weights (default is None, i.e. no priors).
+        posteriors : optional
+            Posterior distributions for model parameters (default is None, i.e. no posteriors).
+            Posterior keyword is provided so that models can be loaded.
+
+        Raises
+        ------
+        ValueError
+            If `nterms` is less than 1.
+        ValueError
+            If `nterms` is not an integer.
+        """
+        if nterms < 1:
+            raise ValueError("Must have `nterms` >= 1.")
+        if not np.issubdtype(type(nterms), np.integer):
+            raise ValueError("`nterms` must be an integer.")
+
         self.x_name = x_name
         self._validate_arg_names()
         self.nterms = nterms
@@ -292,42 +518,45 @@ class dSinusoid(MathMixins, LatexMixins, IOMixins, Model):
 
     @property
     def width(self):
+        """Width of the model. This is 1 for 1D gradients."""
         return 1
 
     @property
     def nvectors(self):
+        """Number of vectors required to be input to create the model."""
         return 1
 
     @property
     def arg_names(self):
+        """Argument names that must be input into the model."""
         return {self.x_name}
 
     @property
     def _mu_letter(self):
+        """Letter representing the weights of this gradient model."""
         return "v"
 
     @property
     def _equation(self):
+        """Provides the list of equation components without the weights included, to be used by `self.equation`."""
+
         def frq(term):
             return f"{term + 1}" if term > 0 else ""
 
         return np.hstack(
             [
                 [
-                    f"w_{{{idx * 2}}}\cos({frq(idx)}\\mathbf{{{self.x_name}}})",
-                    f"w_{{{idx * 2 + 1}}}(-\sin({frq(idx)}\\mathbf{{{self.x_name}}}))",
+                    f"w_{{{idx * 2}}}\cos({frq(idx)}\\mathbf{{{self.latex_aliases[self.x_name]}}})",
+                    f"w_{{{idx * 2 + 1}}}(-\sin({frq(idx)}\\mathbf{{{self.latex_aliases[self.x_name]}}}))",
                 ]
                 for idx in range(self.nterms)
             ],
         )
 
     def design_matrix(self, **kwargs):
-        """
+        """Build a gradient of a 1D sinusoid in `self.x_name`.
 
-        Parameters
-        ----------
-        {} : np.ndarray
-            Vector to create polynomial of
+        You must pass the keyword argument `self.x_name` to use this function.
 
         Returns
         -------
@@ -356,52 +585,58 @@ class dSinusoid(MathMixins, LatexMixins, IOMixins, Model):
             X = X[((R * self.nterms + C).T).ravel()]
             return np.expand_dims(X.transpose(shape_a).dot(self.weights), axis=x.ndim)
 
-        # shape_a = [*np.arange(1, x.ndim + 1).astype(int), 0]
-        # return np.asarray(
-        #     [
-        #         *[
-        #             [w1 * np.cos(x * (idx + 1)), -w2 * np.sin(x * (idx + 1))]
-        #             for idx, w1, w2 in zip(
-        #                 range(self.nterms),
-        #                 self.weights[::2],
-        #                 self.weights[1::2],
-        #             )
-        #         ],
-        #     ]
-        # ).transpose(shape_a).sum(axis=1)[:, None]
-
 
 class Constant(MathMixins, LatexMixins, IOMixins, Model):
-    """
-    A generator which has no variable, and whos design matrix is entirely ones.
-    """
+    """lamatrix.Model object to model constants or offsets. This model has no input variable."""
 
     def __init__(self, priors=None, posteriors=None):
+        """
+        Initialize a Constant model.
+
+        Note this model has no variable.
+
+        Parameters
+        ----------
+        priors : optional
+            Prior distributions for model weights (default is None, i.e. no priors).
+        posteriors : optional
+            Posterior distributions for model parameters (default is None, i.e. no posteriors).
+            Posterior keyword is provided so that models can be loaded.
+
+        Examples
+        --------
+        Create a constant model
+
+        >>> model = Constant()
+        """
         super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def width(self):
+        """Width of the model. This is always one for a constant model."""
         return 1
 
     @property
     def nvectors(self):
+        """Number of vectors required to be input to create the model.
+        This is zero for a constant model."""
         return 0
 
     @property
     def arg_names(self):
+        """Argument names that must be input into the model.
+        This is an empty dictionary for a constant model."""
         return {}
 
     @property
     def _equation(self):
+        """Returns a list of latex equations for each vector to describe the generation of the design matrix."""
         return [""]
 
     def design_matrix(self, **kwargs):
-        """Build a 1D polynomial in x
+        """Build a design matrix consisting of a single column of ones.
 
-        Parameters
-        ----------
-        {} : np.ndarray
-            Vector to create polynomial of
+        You must pass a keyword argument to this design matrix to detect the required shape.
 
         Returns
         -------
@@ -417,16 +652,6 @@ class Constant(MathMixins, LatexMixins, IOMixins, Model):
     @property
     def _initialization_attributes(self):
         return []
-
-    # @property
-    # def gradient(self):
-    #     return dPolynomial1DGenerator(
-    #         weights=self._mu,
-    #         x_name=self.x_name,
-    #         order=self.order,
-    #         data_shape=self.data_shape,
-    #         offset_prior=(self._mu[1], self._sigma[1]),
-    #     )
 
 
 class Step(MathMixins, LatexMixins, IOMixins, Model):
@@ -467,7 +692,7 @@ class Step(MathMixins, LatexMixins, IOMixins, Model):
     def _equation(self):
         bounds = np.hstack(["-\infty", self.breakpoints, "\infty"])
         eqn = [
-            f"\mathbb{{I}}_{{[{{{bounds[idx]}}}, {{{bounds[idx + 1]}}}]}}(\mathbf{{{self.x_name}}})"
+            f"\mathbb{{I}}_{{[{{{bounds[idx]}}}, {{{bounds[idx + 1]}}}]}}(\mathbf{{{self.latex_aliases[self.x_name]}}})"
             for idx in range(0, self.width)
         ]
         return eqn
@@ -551,7 +776,10 @@ class Fixed(MathMixins, LatexMixins, IOMixins, Model):
 
     @property
     def _equation(self):
-        eqn = [f"\mathbf{{{self.x_name}}}_{{{idx}}}" for idx in range(0, self.width)]
+        eqn = [
+            f"\mathbf{{{self.latex_aliases[self.x_name]}}}_{{{idx}}}"
+            for idx in range(0, self.width)
+        ]
         return eqn
 
     def design_matrix(self, **kwargs):

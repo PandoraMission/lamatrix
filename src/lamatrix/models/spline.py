@@ -101,7 +101,7 @@ class Spline(MathMixins, SplineMixins, LatexMixins, IOMixins, Model):
     @property
     def _equation(self):
         return [
-            f"N_{{{idx}, {{{self.order}}}}}(\\mathbf{{{self.x_name}}})"
+            f"N_{{{idx}, {{{self.order}}}}}(\\mathbf{{{self.latex_aliases[self.x_name]}}})"
             for idx in np.arange(1, self.width)
         ]
 
@@ -144,16 +144,16 @@ class Spline(MathMixins, SplineMixins, LatexMixins, IOMixins, Model):
 
     @property
     def spline_equation(self):
-        eqn1 = f"\\[f(\\mathbf{{{self.x_name}}}) = \sum_{{i=0}}^{{n-1}} w_i N_{{i,k}}(\\mathbf{{{self.x_name}}}) \\]"
+        eqn1 = f"\\[f(\\mathbf{{{self.latex_aliases[self.x_name]}}}) = \sum_{{i=0}}^{{n-1}} w_i N_{{i,k}}(\\mathbf{{{self.latex_aliases[self.x_name]}}}) \\]"
         eqn2 = (
-            f"\\[N_{{i,k}}(\\mathbf{{{self.x_name}}})"
-            f"= \\frac{{\\mathbf{{{self.x_name}}} - t_i}}{{t_{{i+k-1}} - t_i}} N_{{i,k-1}}(\\mathbf{{{self.x_name}}}) "
-            f"+ \\frac{{t_{{i+k}} - \\mathbf{{{self.x_name}}}}}{{t_{{i+k}} - t_{{i+1}}}}"
-            f" N_{{i+1,k-1}}(\\mathbf{{{self.x_name}}})\\]"
+            f"\\[N_{{i,k}}(\\mathbf{{{self.latex_aliases[self.x_name]}}})"
+            f"= \\frac{{\\mathbf{{{self.latex_aliases[self.x_name]}}} - t_i}}{{t_{{i+k-1}} - t_i}} N_{{i,k-1}}(\\mathbf{{{self.latex_aliases[self.x_name]}}}) "
+            f"+ \\frac{{t_{{i+k}} - \\mathbf{{{self.latex_aliases[self.x_name]}}}}}{{t_{{i+k}} - t_{{i+1}}}}"
+            f" N_{{i+1,k-1}}(\\mathbf{{{self.latex_aliases[self.x_name]}}})\\]"
         )
-        eqn3 = f"""\\[N_{{i,1}}(\\mathbf{{{self.x_name}}}) =
+        eqn3 = f"""\\[N_{{i,1}}(\\mathbf{{{self.latex_aliases[self.x_name]}}}) =
         \\begin{{cases}}
-        1 & \\text{{if }} t_i \leq \\mathbf{{{self.x_name}}} < t_{{i+1}} \\\\
+        1 & \\text{{if }} t_i \leq \\mathbf{{{self.latex_aliases[self.x_name]}}} < t_{{i+1}} \\\\
         0 & \\text{{otherwise}} \\\\
         \\end{{cases}}
         \\]"""
@@ -260,8 +260,8 @@ class dSpline(MathMixins, SplineMixins, Model):
     def _equation(self):
         return [
             f"\\frac{{\\partial \\left( \\sum_{{i=0}}^{{{len(self.knots) - self.order - 2}}}"
-            f" w_{{i}} N_{{i,{self.order}}}(\\mathbf{{{self.x_name}}})\\right)}}"
-            f"{{\\partial \mathbf{{{self.x_name}}}}}",
+            f" w_{{i}} N_{{i,{self.order}}}(\\mathbf{{{self.latex_aliases[self.x_name]}}})\\right)}}"
+            f"{{\\partial \mathbf{{{self.latex_aliases[self.x_name]}}}}}",
         ]
 
     @property

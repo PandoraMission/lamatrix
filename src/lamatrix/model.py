@@ -68,34 +68,64 @@ def _sparse_ones_like(matrix):
 
 
 class Model(ABC):
-    def _validate_priors(self, priors, width=None):
+    """Abstract base class to implement the Model class, used by all model types in lamatrix."""
+
+    def _validate_distributions(self, distributions, width=None):
+        """Returns distributions that are are DistributionContainer objects or raises a value error."""
         if width is None:
             width = self.width
-        if priors is None:
+        if distributions is None:
             return DistributionsContainer.from_number(width)
-        elif isinstance(priors, (tuple, Distribution)):
-            return DistributionsContainer([priors])
-        elif isinstance(priors, (list, np.ndarray)):
-            return DistributionsContainer(priors)
-        elif isinstance(priors, DistributionsContainer):
-            return priors
+        elif isinstance(distributions, (tuple, Distribution)):
+            return DistributionsContainer([distributions])
+        elif isinstance(distributions, (list, np.ndarray)):
+            return DistributionsContainer(distributions)
+        elif isinstance(distributions, DistributionsContainer):
+            return distributions
         else:
-            raise ValueError("Could not parse input `priors`.")
+            raise ValueError(
+                "Could not parse input distributions, check your input priors and posteriors."
+            )
+
+    def _validate_arg_names(self):
+        """Ensures the input arg_names are all strings."""
+        for arg in self.arg_names:
+            if not isinstance(arg, str):
+                raise ValueError("Argument names must be strings.")
+
+    def _validate_weights(self, weights, weights_width):
+        """Given a set of weights, will check that the widths match the expectation from the model, and will return a np.NDArray"""
+        if not isinstance(weights, (list, np.ndarray)):
+            raise ValueError(
+                f"`weights` must be a list of numeric values with length {weights_width}."
+            )
+        if not isinstance(weights[0], (float, int, np.integer, np.number)):
+            raise ValueError(
+                f"`weights` must be a list of numeric values with length {weights_width}."
+            )
+        if not len(weights) == weights_width:
+            raise ValueError(
+                f"`weights` must be a list of numeric values with length {weights_width}."
+            )
+        return np.asarray(weights)
 
     def __init__(
         self,
         priors: List[Tuple] = None,
         posteriors: List[Tuple] = None,
     ):
-        # prior (always normal, and always specfied by mean and standard deviation)
-        # fit_distributions (always normal, and always specfied by mean and standard deviation)
-        self.priors = self._validate_priors(priors)
+        """Initialization function for all models. All models must be provided with input priors and posteriors that match their width."""
+        self.priors = self._validate_distributions(priors)
         if not len(self.priors) == self.width:
             raise ValueError(
-                "distributions must have the number of elements as the design matrix."
+                "priors must have the number of elements as the design matrix."
             )
-
-        self.posteriors = posteriors
+        self.posteriors = self._validate_distributions(posteriors)
+        if not len(self.posteriors) == self.width:
+            raise ValueError(
+                "posteriors must have the number of elements as the design matrix."
+            )
+        self.latex_aliases = {arg: arg for arg in self.arg_names}
 
     @property
     @abstractmethod
@@ -111,13 +141,14 @@ class Model(ABC):
 
     @property
     def _initialization_attributes(self):
+        """Captures what attributes are required to initialize. This is useful for models that are 2D instead of 1D."""
         return [
             "x_name",
         ]
 
     @property
     def _mu_letter(self):
-        """Letter to represent the weight in equation representation."""
+        """Letter to represent the weight in equation representation. Default is w. For gradients of models this is usually changed to v."""
         return "w"
 
     @property
@@ -128,7 +159,13 @@ class Model(ABC):
 
     @property
     def equation(self):
-        func_signature = ", ".join([f"\mathbf{{{a}}}" for a in self.arg_names])
+        """Provides the equation for the model in latex.
+
+        If accessed within a jupyter instance will return the equation in displayed latex, otherwise will return the equation in raw latex.
+        """
+        func_signature = ", ".join(
+            [f"\mathbf{{{self.latex_aliases[a]}}}" for a in self.arg_names]
+        )
         eqn = (
             f"\[f({func_signature}) = "
             + " + ".join(
@@ -147,85 +184,8 @@ class Model(ABC):
         )
 
     def copy(self):
+        """Returns a deep copy of `self`."""
         return deepcopy(self)
-
-    def _validate_arg_names(self):
-        for arg in self.arg_names:
-            if not isinstance(arg, str):
-                raise ValueError("Argument names must be strings.")
-
-    # def _validate_distribution(self, distribution: Tuple):
-    #     """Checks that a distribution is a valid input with format (mean, std)."""
-    #     # Must be a tuple
-    #     if not isinstance(distribution, tuple):
-    #         raise ValueError("distribution must be a tuple of format (mean, std)")
-    #     # Must be float or int
-    #     for value in distribution:
-    #         if not isinstance(value, (float, int, np.integer, np.floating)):
-    #             raise ValueError("Values in distribution must be numeric.")
-    #     # Standard deviation must be positive
-    #     if np.sign(distribution[1]) == -1:
-    #         raise ValueError("Standard deviation must be positive.")
-    #     return
-
-    # def _validate_distributions(self, distributions: List[Tuple]):
-    #     """Checks that a list of distributions is a valid"""
-    #     if not len(distributions) == self.width:
-    #         raise ValueError(
-    #             "distributions must have the number of elements as the design matrix."
-    #         )
-    #     return
-
-    def _validate_weights(self, weights, weights_width):
-        if not isinstance(weights, (list, np.ndarray)):
-            raise ValueError(
-                f"`weights` must be a list of numeric values with length {weights_width}."
-            )
-        if not isinstance(weights[0], (float, int, np.integer, np.number)):
-            raise ValueError(
-                f"`weights` must be a list of numeric values with length {weights_width}."
-            )
-        if not len(weights) == weights_width:
-            raise ValueError(
-                f"`weights` must be a list of numeric values with length {weights_width}."
-            )
-        return np.asarray(weights)
-
-    # def set_prior(self, index: int, distribution: Tuple) -> None:
-    #     """Sets a single prior."""
-    #     self._validate_distribution(distribution=distribution)
-    #     self.prior_distributions[index] = distribution
-    #     return
-
-    # def set_priors(self, distributions: List[Tuple]) -> None:
-    #     """sets the full list of priors"""
-    #     self._validate_distributions(distributions=distributions)
-    #     self.prior_distributions = distributions
-    #     return
-
-    # def freeze_element(self, index: int):
-    #     """Freezes an element of the design matrix by setting prior_sigma to zero."""
-    #     self.set_prior(index, (self.prior_distributions[index][0], 1e-10))
-
-    # @property
-    # def prior_mean(self):
-    #     return np.asarray(
-    #         [distribution[0] for distribution in self.prior_distributions]
-    #     )
-
-    # @property
-    # def prior_std(self):
-    #     return np.asarray(
-    #         [distribution[1] for distribution in self.prior_distributions]
-    #     )
-
-    # @property
-    # def fit_mean(self):
-    #     return np.asarray([distribution[0] for distribution in self.fit_distributions])
-
-    # @property
-    # def fit_std(self):
-    #     return np.asarray([distribution[1] for distribution in self.fit_distributions])
 
     @abstractmethod
     def design_matrix(self):
@@ -245,7 +205,9 @@ class Model(ABC):
         mask: npt.NDArray = None,
         **kwargs,
     ):
-        """Fit the design matrix.
+        """Fit the design matrix of this model object.
+
+        Executing this function will update the posteriors argument to the best fit posteriors.
 
         Parameters
         ----------
@@ -255,13 +217,8 @@ class Model(ABC):
             Errors on the input data
         mask: np.ndarray, optional
             Mask to apply when fitting. Values where mask is False will not be used during the fit.
-
-        Returns
-        -------
-        fit_distributions: List of Tuples
-            The best fit distributions
-
         """
+
         if not isinstance(self.priors, DistributionsContainer):
             if isinstance(self.priors, tuple):
                 self.priors = DistributionsContainer(self.priors)
@@ -376,12 +333,15 @@ class Model(ABC):
         return
 
     def evaluate(self, **kwargs):
+        """Given an input set of arguments, will evaluate the model with the current best fit weights."""
         X = self.design_matrix(**kwargs)
         return X.dot(self.posteriors.mean)
 
     def sample(self, **kwargs):
+        """Given an input set of arguments, will evaluate the model with a sample of the best fit weights drawn from the posteriors."""
         X = self.design_matrix(**kwargs)
         return X.dot(self.posteriors.sample())
 
     def __call__(self, *args, **kwargs):
+        """Will return the design matrix given the input arguments."""
         return self.design_matrix(*args, **kwargs)

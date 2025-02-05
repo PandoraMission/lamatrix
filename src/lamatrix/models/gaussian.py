@@ -1,4 +1,4 @@
-"""Generator objects for Gaussian types of models"""
+"""Model objects for Gaussian types of models"""
 
 from typing import List
 
@@ -83,7 +83,7 @@ class Gaussian(MathMixins, LatexMixins, IOMixins, Model):
 
     @property
     def _equation(self):
-        eqn = f"\\frac{{1}}{{\\sqrt{{2\\pi\\sigma^2}}}} e^{{-\\frac{{\mathbf{{{self.x_name}}} - \\mu^2}}{{2\\sigma^2}}}}"
+        eqn = f"\\frac{{1}}{{\\sqrt{{2\\pi\\sigma^2}}}} e^{{-\\frac{{\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu^2}}{{2\\sigma^2}}}}"
         return [eqn]
 
     def to_gradient(self, weights=None, priors=None):
@@ -119,6 +119,15 @@ class dGaussian(MathMixins, Model):
         self._weight_width = self.width
         self.weights = self._validate_weights(weights, self._weight_width)
         super().__init__(priors=priors, posteriors=posteriors)
+
+    @property
+    def _initialization_attributes(self):
+        return [
+            "weights",
+            "x_name",
+            "sigma",
+            "mu",
+        ]
 
     @property
     def width(self):
@@ -166,9 +175,9 @@ class dGaussian(MathMixins, Model):
     @property
     def _equation(self):
         eqn = (
-            f"\\left( -w_0\\frac{{\mathbf{{{self.x_name}}} - \\mu^2}}{{2\\sigma^2}} \\right)"
+            f"\\left( -w_0\\frac{{\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu^2}}{{2\\sigma^2}} \\right)"
             f"\\frac{{1}}{{\\sqrt{{2\\pi\\sigma^2}}}}"
-            f"e^{{-\\frac{{\mathbf{{{self.x_name}}} - \\mu^2}}{{2\\sigma^2}}}}"
+            f"e^{{-\\frac{{\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu^2}}{{2\\sigma^2}}}}"
         )
         return [eqn]
 
@@ -192,6 +201,10 @@ class Gaussian2D(MathMixins, Model):
         self.mu_x, self.mu_y = mu_x, mu_y
         self.rho = rho
         super().__init__(priors=priors)
+
+    @property
+    def _initialization_attributes(self):
+        return ["x_name", "y_name", "sigma_x", "mu_x", "sigma_y", "mu_y", "rho"]
 
     @property
     def width(self):
@@ -241,10 +254,10 @@ class Gaussian2D(MathMixins, Model):
     def _equation(self):
         eqn = (
             f"\\frac{{1}}{{2\\pi\\sigma_x\\sigma_y\\sqrt{{1 - \\rho^2}}}} "
-            f"e^{{- \\frac{{1}}{{2(1-\\rho^2)}} \\left[\\frac{{(\\mathbf{{{self.x_name}}} - \\mu_x)^2}}{{2\\sigma_x^2}} "
-            f"+ \\frac{{(\mathbf{{{self.y_name}}} - \\mu_y)^2}}{{2\\sigma_y^2}} "
-            f"- \\frac{{2\\rho(\\mathbf{{{self.x_name}}} - \\mu_x)"
-            f"(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]}}"
+            f"e^{{- \\frac{{1}}{{2(1-\\rho^2)}} \\left[\\frac{{(\\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu_x)^2}}{{2\\sigma_x^2}} "
+            f"+ \\frac{{(\mathbf{{{self.latex_aliases[self.y_name]}}} - \\mu_y)^2}}{{2\\sigma_y^2}} "
+            f"- \\frac{{2\\rho(\\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu_x)"
+            f"(\\mathbf{{{self.latex_aliases[self.y_name]}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]}}"
         )
         return [eqn]
 
@@ -290,6 +303,19 @@ class dGaussian2D(MathMixins, Model):
         self._weight_width = self.width
         self.weights = self._validate_weights(weights, self._weight_width)
         super().__init__(priors=priors)
+
+    @property
+    def _initialization_attributes(self):
+        return [
+            "weights",
+            "x_name",
+            "y_name",
+            "sigma_x",
+            "mu_x",
+            "sigma_y",
+            "mu_y",
+            "rho",
+        ]
 
     @property
     def width(self):
@@ -360,20 +386,20 @@ class dGaussian2D(MathMixins, Model):
         eqn0 = (
             f"\\frac{{1}}{{2\\pi\\sigma_x\\sigma_y\\sqrt{{1 - \\rho^2}}}} "
             f"e^{{- \\frac{{1}}{{2(1-\\rho^2)}} "
-            f"\\left[\\frac{{(\\mathbf{{{self.x_name}}} - \\mu_x)^2}}{{2\\sigma_x^2}} "
-            f"+ \\frac{{(\mathbf{{{self.y_name}}} - \\mu_y)^2}}{{2\\sigma_y^2}} "
-            f"- \\frac{{2\\rho(\\mathbf{{{self.x_name}}} - \\mu_x)"
-            f"(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]}}"
+            f"\\left[\\frac{{(\\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu_x)^2}}{{2\\sigma_x^2}} "
+            f"+ \\frac{{(\mathbf{{{self.latex_aliases[self.y_name]}}} - \\mu_y)^2}}{{2\\sigma_y^2}} "
+            f"- \\frac{{2\\rho(\\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu_x)"
+            f"(\\mathbf{{{self.latex_aliases[self.y_name]}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]}}"
         )
         dfdx0 = (
             f"\\frac{{-w_0}}{{(1-\\rho^2)}} "
-            f"\\left[ \\frac{{(\\mathbf{{{self.x_name}}} - \\mu_x)}}{{\\sigma_x^2}} "
-            f"- \\frac{{\\rho(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]"
+            f"\\left[ \\frac{{(\\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu_x)}}{{\\sigma_x^2}} "
+            f"- \\frac{{\\rho(\\mathbf{{{self.latex_aliases[self.y_name]}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]"
         )
         dfdy0 = (
             f"\\frac{{-w_1}}{{(1-\\rho^2)}} "
-            f"\\left[ \\frac{{(\\mathbf{{{self.y_name}}} - \\mu_y)}}{{\\sigma_y^2}} "
-            f"- \\frac{{\\rho(\\mathbf{{{self.x_name}}} - \\mu_x)}}{{\\sigma_x\\sigma_y}}\\right]"
+            f"\\left[ \\frac{{(\\mathbf{{{self.latex_aliases[self.y_name]}}} - \\mu_y)}}{{\\sigma_y^2}} "
+            f"- \\frac{{\\rho(\\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu_x)}}{{\\sigma_x\\sigma_y}}\\right]"
         )
         return [dfdx0 + "." + eqn0, dfdy0 + "." + eqn0]
 
@@ -398,9 +424,9 @@ class lnGaussian(MathMixins, Model):
                 raise ValueError(
                     "Specify either priors on sigma or priors on coefficients."
                 )
-            prior_sigma = self._validate_priors(prior_sigma)[0]
-            prior_A = self._validate_priors(prior_A)[0]
-            prior_mu = self._validate_priors(prior_mu)[0]
+            prior_sigma = self._validate_distributions(prior_sigma)[0]
+            prior_A = self._validate_distributions(prior_A)[0]
+            prior_mu = self._validate_distributions(prior_mu)[0]
             self.priors = self.gaussian_parameters_to_coefficients(
                 DistributionsContainer([prior_A, prior_mu, prior_sigma])
             )
@@ -479,6 +505,10 @@ class lnGaussian(MathMixins, Model):
                 + (dc_dmu * mu_err) ** 2
             )
             return DistributionsContainer([(a, a_err), (b, b_err), (c, c_err)])
+
+    @property
+    def _initialization_attributes(self):
+        return ["x_name", "mu", "sigma"]
 
     @property
     def width(self):
@@ -575,6 +605,10 @@ class dlnGaussian(MathMixins, Model):
         super().__init__(priors=priors)
 
     @property
+    def _initialization_attributes(self):
+        return ["x_name", "mu", "sigma"]
+
+    @property
     def width(self):
         return 1
 
@@ -614,7 +648,7 @@ class dlnGaussian(MathMixins, Model):
     @property
     def _equation(self):
         return [
-            f"\\left( \\frac{{-\\mathbf{{{self.x_name}}}}}{{\\sigma^2}} + \\frac{{\\mu}}{{\\sigma^2}} \\right)"
+            f"\\left( \\frac{{-\\mathbf{{{self.latex_aliases[self.x_name]}}}}}{{\\sigma^2}} + \\frac{{\\mu}}{{\\sigma^2}} \\right)"
         ]
 
 
@@ -647,11 +681,11 @@ class lnGaussian2D(MathMixins, Model):
                 raise ValueError(
                     "Specify either priors on sigma or priors on coefficients."
                 )
-            prior_sigma_x = self._validate_priors(prior_sigma_x)[0]
-            prior_mu_x = self._validate_priors(prior_mu_x)[0]
-            prior_sigma_y = self._validate_priors(prior_sigma_y)[0]
-            prior_mu_y = self._validate_priors(prior_mu_y)[0]
-            prior_A = self._validate_priors(prior_A)[0]
+            prior_sigma_x = self._validate_distributions(prior_sigma_x)[0]
+            prior_mu_x = self._validate_distributions(prior_mu_x)[0]
+            prior_sigma_y = self._validate_distributions(prior_sigma_y)[0]
+            prior_mu_y = self._validate_distributions(prior_mu_y)[0]
+            prior_A = self._validate_distributions(prior_A)[0]
             self.priors = self.gaussian_parameters_to_coefficients(
                 DistributionsContainer(
                     [prior_A, prior_mu_x, prior_sigma_x, prior_mu_y, prior_sigma_y]
@@ -792,6 +826,10 @@ class lnGaussian2D(MathMixins, Model):
             )
 
     @property
+    def _initialization_attributes(self):
+        return ["x_name", "y_name"]
+
+    @property
     def width(self):
         return 5
 
@@ -923,6 +961,10 @@ class dlnGaussian2D(MathMixins, Model):
         super().__init__(priors=priors)
 
     @property
+    def _initialization_attributes(self):
+        return ["x_name", "y_name", "sigma_x", "mu_x", "sigma_y", "mu_y"]
+
+    @property
     def width(self):
         return 2
 
@@ -966,6 +1008,6 @@ class dlnGaussian2D(MathMixins, Model):
     @property
     def _equation(self):
         return [
-            f"\\left( \\frac{{-\\mathbf{{{self.x_name}}}}}{{\\sigma_x^2}} + \\frac{{\\mu_x}}{{\\sigma_x^2}} \\right)",
-            f"\\left( \\frac{{-\\mathbf{{{self.y_name}}}}}{{\\sigma_y^2}} + \\frac{{\\mu_y}}{{\\sigma_y^2}} \\right)",
+            f"\\left( \\frac{{-\\mathbf{{{self.latex_aliases[self.x_name]}}}}}{{\\sigma_x^2}} + \\frac{{\\mu_x}}{{\\sigma_x^2}} \\right)",
+            f"\\left( \\frac{{-\\mathbf{{{self.latex_aliases[self.y_name]}}}}}{{\\sigma_y^2}} + \\frac{{\\mu_y}}{{\\sigma_y^2}} \\right)",
         ]
