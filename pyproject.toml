@@ -12,6 +12,10 @@ numpy = "^1.26.4"
 rich = "^13.7.1"
 scipy = ">=1.3"
 
+# Optional dependencies
+sparse3d = { version = ">1.0.0", optional = true }
+astropy = {version = ">=5.0.0", optional = true}
+
 [tool.poetry.group.dev]
 optional = true
 
@@ -31,6 +35,10 @@ pydata-sphinx-theme = "^0.15.4"
 sphinx-autobuild = "^2024.10.3"
 flake8 = "^7.1.1"
 astropy = ">=5.0.0"
+
+[tool.poetry.extras]
+ffi = ["sparse3d", "astropy"]  # Install with pip install tool[viz]
+
 
 [build-system]
 requires = ["poetry-core"]

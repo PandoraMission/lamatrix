@@ -49,6 +49,7 @@ class JointModel(Model, IOMixins, LatexMixins):
         self.widths = [g.width for g in self.models]
         # self.priors = DistributionsContainer([p for g in self.models for p in g.priors])
         self.posteriors = DistributionsContainer.from_number(np.sum(self.widths))
+        self.latex_aliases = {arg: arg for arg in self.arg_names}
 
     def __getitem__(self, key):
         if isinstance(key, slice):
@@ -226,6 +227,8 @@ class CrosstermModel(Model, IOMixins, LatexMixins):
         self.priors = DistributionsContainer(
             [Distribution(m, s) for m, s in zip(prior_mean, prior_std)]
         )
+        self.latex_aliases = {arg: arg for arg in self.arg_names}
+
         # self._validate_distributions(prior_distributions)
         # self.prior_distributions = prior_distributions
 

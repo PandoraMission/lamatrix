@@ -1,14 +1,26 @@
 """Implements a special case of a lnGaussian2D that fits for SIP polynomials"""
 
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
+import numpy.typing as npt
 
 from ..distributions import Distribution, DistributionsContainer
 from ..io import IOMixins, LatexMixins
 from ..math import MathMixins
 from ..model import Model
 from lamatrix import Polynomial, Constant
+
+try:
+    from astropy.wcs import Sip as astropySIP
+except ImportError as e:
+    raise ImportError(
+        "The 'sip' module requires astropy. Install it with:\n\n"
+        "    pip install lamatrix[ffi]\n\n"
+        "or if using Poetry:\n\n"
+        "    poetry install --extras 'ffi'\n"
+    ) from e
+
 
 __all__ = [
     "SIP",
@@ -278,24 +290,59 @@ class SIP(MathMixins, Model):
 
     @property
     def _equation(self):
+        def process_str(var, idx):
+            if idx == 0:
+                return ""
+            elif idx == 1:
+                return f"{var}"
+            else:
+                return f"{var}^{idx}"
+
         P_str = [
-            f"\\mathbf{{{self.latex_aliases[self.y_name]}}}^{idx}"
-            + f"\\mathbf{{{self.latex_aliases[self.x_name]}}}^{jdx}"
+            process_str(f"\\mathbf{{{self.latex_aliases[self.y_name]}}}", idx)
+            + process_str(f"\\mathbf{{{self.latex_aliases[self.x_name]}}}", jdx)
             for idx in range(self.order + 1)
             for jdx in range(self.order + 1)
+        ]
+        P2_power = np.ravel(
+            [i + np.arange(self.order + 1) for i in np.arange(self.order + 1)]
+        )
+        mask = (
+            np.diag(np.ones(self.order + 1, bool))
+            + np.diag(np.ones(self.order + 1, bool), -1)[1:, 1:]
+        ).ravel()
+        P2_power = P2_power[mask][1:]
+        P2_str = [
+            *[
+                process_str(f"\\mathbf{{{self.latex_aliases[self.x_name]}}}", power)
+                for power in P2_power
+            ],
+            *[
+                process_str(f"\\mathbf{{{self.latex_aliases[self.y_name]}}}", power)
+                for power in P2_power
+            ],
+            *[
+                process_str(f"\\mathbf{{{self.latex_aliases[self.y_name]}}}", idx)
+                + process_str(f"\\mathbf{{{self.latex_aliases[self.x_name]}}}", jdx)
+                for idx in np.arange(1, self.order + 1)
+                for jdx in np.arange(1, self.order + 1)
+            ],
         ]
 
         return [
             f"\\mathbf{{{self.latex_aliases[self.dx_name]}}}^2",
             f"\\mathbf{{{self.latex_aliases[self.dy_name]}}}^2",
             *[
-                f"\\mathbf{{{self.latex_aliases[self.dx_name]}}} . (" + s + ")"
+                f"\\mathbf{{{self.latex_aliases[self.dx_name]}}}"
+                + (s if s != "" else "")
                 for s in P_str
             ],
             *[
-                f"\\mathbf{{{self.latex_aliases[self.dy_name]}}} . (" + s + ")" + s
+                f"\\mathbf{{{self.latex_aliases[self.dy_name]}}}"
+                + (s if s != "" else "")
                 for s in P_str
             ],
+            *P2_str,
             "",
         ]
 
@@ -372,6 +419,61 @@ class SIP(MathMixins, Model):
         )
         poly.posteriors = DistributionsContainer([(m, s) for m, s in zip(mean, std)])
         return poly
+
+    def to_astropySip(self, imshape: Tuple, crpix: Tuple):
+        """
+        Returns an astropy sip object with the best fit distortion coefficients.
+
+        Parameters
+        ----------
+        row: np.ndarray
+            The row positions of the
+
+        """
+        if self.posteriors is None:
+            raise ValueError("Posteriors are `None`.")
+        iR, iC = np.mgrid[: imshape[0], : imshape[1]]
+        fp_col, fp_row = iC - crpix[1], iR - crpix[0]
+        pix_col, pix_row = (
+            self.mu_y_to_Polynomial().evaluate(r=iR, c=iC) + iC,
+            self.mu_x_to_Polynomial().evaluate(r=iR, c=iC) + iR,
+        )
+
+        A = np.asarray(
+            [
+                fp_row.ravel() ** idx * fp_col.ravel() ** jdx
+                for idx in range(self.order + 1)
+                for jdx in range(self.order + 1)
+            ]
+        ).T
+
+        col_fp_to_pix = np.linalg.solve(
+            A.T.dot(A), A.T.dot(pix_col.ravel() - fp_col.ravel() - crpix[1])
+        ).reshape((self.order + 1, self.order + 1))
+        row_fp_to_pix = np.linalg.solve(
+            A.T.dot(A), A.T.dot(pix_row.ravel() - fp_row.ravel() - crpix[0])
+        ).reshape((self.order + 1, self.order + 1))
+
+        A = np.asarray(
+            [
+                (pix_row.ravel() - crpix[0]) ** idx
+                * (pix_col.ravel() - crpix[1]) ** jdx
+                for idx in range(self.order + 1)
+                for jdx in range(self.order + 1)
+            ]
+        ).T
+
+        col_pix_to_fp = np.linalg.solve(
+            A.T.dot(A), A.T.dot(fp_col.ravel() - pix_col.ravel() + crpix[1])
+        ).reshape((self.order + 1, self.order + 1))
+        row_pix_to_fp = np.linalg.solve(
+            A.T.dot(A), A.T.dot(fp_row.ravel() - pix_row.ravel() + crpix[0])
+        ).reshape((self.order + 1, self.order + 1))
+
+        csip = astropySIP(
+            col_pix_to_fp, row_pix_to_fp, col_fp_to_pix, row_fp_to_pix, crpix
+        )
+        return csip
 
 
 def get_sip_matrices(x, y, order=1):
