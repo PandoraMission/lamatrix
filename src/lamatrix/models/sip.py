@@ -426,8 +426,9 @@ class SIP(MathMixins, Model):
 
         Parameters
         ----------
-        row: np.ndarray
-            The row positions of the
+        imshape: Tuple
+            The shape of the image to create the WCS for
+        crpix: Tuple
 
         """
         if self.posteriors is None:
