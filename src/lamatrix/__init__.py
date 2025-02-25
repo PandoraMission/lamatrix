@@ -54,8 +54,8 @@ from .model import *  # noqa: E402, F401, F403
 from .models.astrophysical import *  # noqa: E402, F401, F403
 from .models.gaussian import *  # noqa: E402, F401, F403
 from .models.simple import *  # noqa: E402, F401, F403
-from .models.spline import *  # noqa: E402, F401, F403
 from .models.sip import *  # noqa: E402, F401, F403
+from .models.spline import *  # noqa: E402, F401, F403
 
 
 def _load_from_dict(dict):

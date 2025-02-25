@@ -1,8 +1,8 @@
 import numpy as np
 
 from .combine import CrosstermModel, JointModel
-from .model import Model
 from .distributions import DistributionsContainer
+from .model import Model
 
 __all__ = ["MathMixins"]
 

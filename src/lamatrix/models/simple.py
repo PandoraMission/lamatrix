@@ -8,11 +8,11 @@ import numpy.typing as npt
 from scipy import sparse
 from scipy.sparse import SparseEfficiencyWarning
 
+from ..combine import CrosstermModel
 from ..distributions import DistributionsContainer
 from ..io import IOMixins, LatexMixins
 from ..math import MathMixins
 from ..model import Model
-from ..combine import CrosstermModel
 
 __all__ = [
     "Polynomial",

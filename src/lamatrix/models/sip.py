@@ -1,15 +1,14 @@
 """Implements a special case of a lnGaussian2D that fits for SIP polynomials"""
 
-from typing import List, Tuple
+from typing import Tuple
 
 import numpy as np
-import numpy.typing as npt
+
+from lamatrix import Constant, Polynomial
 
 from ..distributions import Distribution, DistributionsContainer
-from ..io import IOMixins, LatexMixins
 from ..math import MathMixins
 from ..model import Model
-from lamatrix import Polynomial, Constant
 
 try:
     from astropy.wcs import Sip as astropySIP

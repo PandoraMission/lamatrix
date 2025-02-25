@@ -144,10 +144,14 @@ class Spline(MathMixins, SplineMixins, LatexMixins, IOMixins, Model):
 
     @property
     def spline_equation(self):
-        eqn1 = f"\\[f(\\mathbf{{{self.latex_aliases[self.x_name]}}}) = \sum_{{i=0}}^{{n-1}} w_i N_{{i,k}}(\\mathbf{{{self.latex_aliases[self.x_name]}}}) \\]"
+        eqn1 = (
+            f"\\[f(\\mathbf{{{self.latex_aliases[self.x_name]}}}) = \sum_{{i=0}}^{{n-1}} w_i "
+            f"N_{{i,k}}(\\mathbf{{{self.latex_aliases[self.x_name]}}}) \\]"
+        )
         eqn2 = (
             f"\\[N_{{i,k}}(\\mathbf{{{self.latex_aliases[self.x_name]}}})"
-            f"= \\frac{{\\mathbf{{{self.latex_aliases[self.x_name]}}} - t_i}}{{t_{{i+k-1}} - t_i}} N_{{i,k-1}}(\\mathbf{{{self.latex_aliases[self.x_name]}}}) "
+            f"= \\frac{{\\mathbf{{{self.latex_aliases[self.x_name]}}} - t_i}}{{t_{{i+k-1}} - t_i}} "
+            f"N_{{i,k-1}}(\\mathbf{{{self.latex_aliases[self.x_name]}}}) "
             f"+ \\frac{{t_{{i+k}} - \\mathbf{{{self.latex_aliases[self.x_name]}}}}}{{t_{{i+k}} - t_{{i+1}}}}"
             f" N_{{i+1,k-1}}(\\mathbf{{{self.latex_aliases[self.x_name]}}})\\]"
         )

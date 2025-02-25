@@ -83,7 +83,10 @@ class Gaussian(MathMixins, LatexMixins, IOMixins, Model):
 
     @property
     def _equation(self):
-        eqn = f"\\frac{{1}}{{\\sqrt{{2\\pi\\sigma^2}}}} e^{{-\\frac{{\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu^2}}{{2\\sigma^2}}}}"
+        eqn = (
+            f"\\frac{{1}}{{\\sqrt{{2\\pi\\sigma^2}}}} "
+            f"e^{{-\\frac{{\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu^2}}{{2\\sigma^2}}}}"
+        )
         return [eqn]
 
     def to_gradient(self, weights=None, priors=None):
@@ -254,7 +257,8 @@ class Gaussian2D(MathMixins, Model):
     def _equation(self):
         eqn = (
             f"\\frac{{1}}{{2\\pi\\sigma_x\\sigma_y\\sqrt{{1 - \\rho^2}}}} "
-            f"e^{{- \\frac{{1}}{{2(1-\\rho^2)}} \\left[\\frac{{(\\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu_x)^2}}{{2\\sigma_x^2}} "
+            f"e^{{- \\frac{{1}}{{2(1-\\rho^2)}} "
+            f"\\left[\\frac{{(\\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu_x)^2}}{{2\\sigma_x^2}} "
             f"+ \\frac{{(\mathbf{{{self.latex_aliases[self.y_name]}}} - \\mu_y)^2}}{{2\\sigma_y^2}} "
             f"- \\frac{{2\\rho(\\mathbf{{{self.latex_aliases[self.x_name]}}} - \\mu_x)"
             f"(\\mathbf{{{self.latex_aliases[self.y_name]}}} - \\mu_y)}}{{\\sigma_x\\sigma_y}}\\right]}}"
