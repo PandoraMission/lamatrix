@@ -44,7 +44,7 @@
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="25 Feb 2025"/>
+    <meta name="docbuild:last-update" content="08 Aug 2025"/>
   </head>
   
   
@@ -480,8 +480,21 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can only combine `Model` objects.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">p</span>
+                <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="p">(</span>
+                        <span class="n">g</span><span class="o">.</span><span class="n">posteriors</span>
+                        <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">posteriors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                        <span class="k">else</span> <span class="n">DistributionsContainer</span><span class="o">.</span><span class="n">from_number</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
         <span class="c1"># self.priors = DistributionsContainer([p for g in self.models for p in g.priors])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="o">.</span><span class="n">from_number</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widths</span><span class="p">))</span>
+        <span class="c1"># self.posteriors = DistributionsContainer.from_number(np.sum(self.widths))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span> <span class="o">=</span> <span class="p">{</span><span class="n">arg</span><span class="p">:</span> <span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_names</span><span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
@@ -526,6 +539,20 @@ document.write(`
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">priors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DistributionsContainer</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">priors</span><span class="p">])</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def posteriors(self):</span>
+    <span class="c1">#     return DistributionsContainer(</span>
+    <span class="c1">#         [</span>
+    <span class="c1">#             p</span>
+    <span class="c1">#             for g in self.models</span>
+    <span class="c1">#             for p in [</span>
+    <span class="c1">#                 g.posteriors</span>
+    <span class="c1">#                 if g.posteriors is not None</span>
+    <span class="c1">#                 else DistributionsContainer.from_number(g.width)</span>
+    <span class="c1">#             ][0]</span>
+    <span class="c1">#         ]</span>
+    <span class="c1">#     )</span>
 
     <span class="c1"># @property</span>
     <span class="c1"># def prior_mean(self):</span>

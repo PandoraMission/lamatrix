@@ -44,7 +44,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="25 Feb 2025"/>
+    <meta name="docbuild:last-update" content="08 Aug 2025"/>
   </head>
   
   
@@ -639,6 +639,7 @@ document.write(`
         <span class="n">x_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
         <span class="n">y_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
         <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sigma_x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">sigma_y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">mu_x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -651,7 +652,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">sigma_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma_y</span> <span class="o">=</span> <span class="n">sigma_x</span><span class="p">,</span> <span class="n">sigma_y</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mu_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu_y</span> <span class="o">=</span> <span class="n">mu_x</span><span class="p">,</span> <span class="n">mu_y</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">,</span> <span class="n">posteriors</span><span class="o">=</span><span class="n">posteriors</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_initialization_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -749,6 +750,7 @@ document.write(`
         <span class="n">x_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
         <span class="n">y_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
         <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sigma_x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">sigma_y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">mu_x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -763,7 +765,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weight_width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_width</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">,</span> <span class="n">posteriors</span><span class="o">=</span><span class="n">posteriors</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_initialization_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -877,6 +879,7 @@ document.write(`
         <span class="n">x_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
         <span class="c1"># mu: float = 0,</span>
         <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">prior_A</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">prior_mu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">prior_sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -885,7 +888,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_arg_names</span><span class="p">()</span>
 
         <span class="c1"># self.mu = mu</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">,</span> <span class="n">posteriors</span><span class="o">=</span><span class="n">posteriors</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([(</span><span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">prior_A</span><span class="p">,</span> <span class="n">prior_mu</span><span class="p">,</span> <span class="n">prior_sigma</span><span class="p">]]):</span>
             <span class="k">if</span> <span class="n">priors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1082,12 +1085,13 @@ document.write(`
         <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">x_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
         <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_name</span> <span class="o">=</span> <span class="n">x_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_arg_names</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="n">mu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">,</span> <span class="n">posteriors</span><span class="o">=</span><span class="n">posteriors</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_initialization_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1150,6 +1154,7 @@ document.write(`
         <span class="n">y_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
         <span class="c1"># mu: float = 0,</span>
         <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">prior_A</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">prior_mu_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">prior_sigma_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1161,7 +1166,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_arg_names</span><span class="p">()</span>
 
         <span class="c1"># self.mu = mu</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">,</span> <span class="n">posteriors</span><span class="o">=</span><span class="n">posteriors</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="p">(</span><span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
@@ -1459,6 +1464,7 @@ document.write(`
         <span class="n">x_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
         <span class="n">y_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
         <span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_name</span> <span class="o">=</span> <span class="n">x_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y_name</span> <span class="o">=</span> <span class="n">y_name</span>
@@ -1467,7 +1473,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">sigma_x</span> <span class="o">=</span> <span class="n">sigma_x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mu_y</span> <span class="o">=</span> <span class="n">mu_y</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sigma_y</span> <span class="o">=</span> <span class="n">sigma_y</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">,</span> <span class="n">posteriors</span><span class="o">=</span><span class="n">posteriors</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_initialization_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

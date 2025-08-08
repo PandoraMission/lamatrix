@@ -50,7 +50,7 @@
     <link rel="prev" title="Introduction to lamatrix: Getting started." href="intro-basics.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="25 Feb 2025"/>
+    <meta name="docbuild:last-update" content="08 Aug 2025"/>
   </head>
   
   
@@ -546,7 +546,7 @@ document.write(`
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 DistributionContainer
-        [(2.3463193097113657, 0.0033742918992579743), (10.001522438740151, 0.013415420328184536), (9.996551854989713, 0.014367095236277903), (1.4328212982450736, 0.009878894336436291)]
+        [(2.346, 0.0034), (10.009, 0.013), (9.999, 0.014), (1.4437, 0.0099)]
 </pre></div></div>
 </div>
 <p>We can see we’ve fit the posteriors with small errors. Let’s compare to our inputs. Our input polynomial was</p>
@@ -604,10 +604,10 @@ Polynomial(x)[n, 1]
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 DistributionContainer
-        [(2.3463193097113657, 0.0033742918992579743)]
+        [(2.346, 0.0034)]
 </pre></div></div>
 </div>
-<p>We can see that the first order polynomial has posteriors after our fit. This is only a first order polynomial, and so it has only one weight. The weight is very close to our input weight of 2.3459!</p>
+<p>We can see that the first order polynomial has posteriors after our fit. This is only a first order polynomial, and so it has only one weight. The weight is very close to our input weight of 2.346!</p>
 <p>The polynomial we used was <span class="math notranslate nohighlight">\(10.sin(x) + 10.cos(x)\)</span>. Let’s look at the posteriors.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
@@ -656,7 +656,7 @@ Sinusoid(x)[n, 2]
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 DistributionContainer
-        [(10.001522438740151, 0.013415420328184536), (9.996551854989713, 0.014367095236277903)]
+        [(10.009, 0.013), (9.999, 0.014)]
 </pre></div></div>
 </div>
 <p>This has two weights, one for sine and one for cosine. The weights are very close to the input amplitudes!</p>
@@ -693,7 +693,7 @@ Constant()[n, 1]
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 DistributionContainer
-        [(1.4328212982450736, 0.009878894336436291)]
+        [(1.4437, 0.0099)]
 </pre></div></div>
 </div>
 <p>This is very close to our input offset term. Let’s plot the model to see how this looks</p>
