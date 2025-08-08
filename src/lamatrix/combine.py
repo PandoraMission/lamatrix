@@ -47,8 +47,21 @@ class JointModel(Model, IOMixins, LatexMixins):
             raise ValueError("Can only combine `Model` objects.")
         self.models = [a.copy() for a in args]
         self.widths = [g.width for g in self.models]
+        self.posteriors = DistributionsContainer(
+            [
+                p
+                for g in self.models
+                for p in [
+                    (
+                        g.posteriors
+                        if g.posteriors is not None
+                        else DistributionsContainer.from_number(g.width)
+                    )
+                ][0]
+            ]
+        )
         # self.priors = DistributionsContainer([p for g in self.models for p in g.priors])
-        self.posteriors = DistributionsContainer.from_number(np.sum(self.widths))
+        # self.posteriors = DistributionsContainer.from_number(np.sum(self.widths))
         self.latex_aliases = {arg: arg for arg in self.arg_names}
 
     def __getitem__(self, key):
@@ -93,6 +106,20 @@ class JointModel(Model, IOMixins, LatexMixins):
     @property
     def priors(self):
         return DistributionsContainer([p for g in self.models for p in g.priors])
+
+    # @property
+    # def posteriors(self):
+    #     return DistributionsContainer(
+    #         [
+    #             p
+    #             for g in self.models
+    #             for p in [
+    #                 g.posteriors
+    #                 if g.posteriors is not None
+    #                 else DistributionsContainer.from_number(g.width)
+    #             ][0]
+    #         ]
+    #     )
 
     # @property
     # def prior_mean(self):

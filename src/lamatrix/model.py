@@ -321,11 +321,17 @@ class Model(ABC):
             sigma_w_inv = X[mask].T.dot(X[mask] / errors[mask][:, None] ** 2) + np.diag(
                 1 / self.priors.std**2
             )
-            self.cov = np.linalg.inv(sigma_w_inv)
+            try:
+                self.cov = np.linalg.inv(sigma_w_inv)
+            except np.linalg.LinAlgError:
+                self.cov = np.linalg.pinv(sigma_w_inv)
             B = X[mask].T.dot(data[mask] / errors[mask] ** 2) + np.nan_to_num(
                 self.priors.mean / self.priors.std**2
             )
-            fit_mean = np.linalg.solve(sigma_w_inv, B)
+            try:
+                fit_mean = np.linalg.solve(sigma_w_inv, B)
+            except np.linalg.LinAlgError:
+                fit_mean = np.linalg.lstsq(sigma_w_inv, B, rcond=None)[0]
             fit_std = self.cov.diagonal() ** 0.5
         self.posteriors = DistributionsContainer(
             [Distribution(m, s) for m, s in zip(fit_mean, fit_std)]

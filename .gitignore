@@ -1,5 +1,6 @@
 sandbox/
 docs/use-cases/data
+paper/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

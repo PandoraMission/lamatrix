@@ -4,7 +4,7 @@ from typing import Tuple
 
 import numpy as np
 
-from lamatrix import Constant, Polynomial
+from lamatrix import Constant, Polynomial, Sinusoid
 
 from ..distributions import Distribution, DistributionsContainer
 from ..math import MathMixins
@@ -21,9 +21,7 @@ except ImportError as e:
     ) from e
 
 
-__all__ = [
-    "SIP",
-]
+__all__ = ["SIP", "SIP1D", "AstrometryFitter"]
 
 
 class SIP(MathMixins, Model):
@@ -37,9 +35,10 @@ class SIP(MathMixins, Model):
         dy_name: str = "dy",
         order: int = 1,
         priors=None,
-        prior_A=None,
-        prior_sigma_x=None,
-        prior_sigma_y=None,
+        posteriors=None,
+        prior_A=(1, np.inf),
+        prior_sigma_x=(1, np.inf),
+        prior_sigma_y=(1, np.inf),
         prior_mu_x=None,
         prior_mu_y=None,
     ):
@@ -50,7 +49,10 @@ class SIP(MathMixins, Model):
         self.order = order
         self._validate_arg_names()
 
-        super().__init__(priors=priors)
+        super().__init__(
+            priors=priors,
+            posteriors=posteriors,
+        )
         if np.any(
             [
                 (p is not None)
@@ -61,15 +63,29 @@ class SIP(MathMixins, Model):
                 raise ValueError(
                     "Specify either priors on sigma or priors on coefficients."
                 )
-            prior_sigma_x = self._validate_distributions(prior_sigma_x)[0]
-            prior_mu_x = self._validate_distributions(prior_mu_x)[0]
-            prior_sigma_y = self._validate_distributions(prior_sigma_y)[0]
-            prior_mu_y = self._validate_distributions(prior_mu_y)[0]
-            prior_A = self._validate_distributions(prior_A)[0]
+            prior_sigma_x = self._validate_distributions(prior_sigma_x, width=1)
+            prior_mu_x = self._validate_distributions(prior_mu_x, width=self.P_width)
+            prior_sigma_y = self._validate_distributions(prior_sigma_y, width=1)
+            prior_mu_y = self._validate_distributions(prior_mu_y, width=self.P_width)
+            prior_A = self._validate_distributions(prior_A, width=1)
             self.priors = self.gaussian_parameters_to_coefficients(
                 DistributionsContainer(
-                    [prior_A, prior_sigma_x, prior_sigma_y, prior_mu_x, prior_mu_y]
+                    [
+                        *[d.as_tuple() for d in prior_A],
+                        *[d.as_tuple() for d in prior_sigma_x],
+                        *[d.as_tuple() for d in prior_sigma_y],
+                        *[d.as_tuple() for d in prior_mu_x],
+                        *[d.as_tuple() for d in prior_mu_y],
+                    ]
                 )
+            )
+            self.priors = DistributionsContainer(
+                [
+                    *self.priors,
+                    *DistributionsContainer.from_number(
+                        self.width - (3 + 2 * self.P_width)
+                    ),
+                ]
             )
 
     @property
@@ -82,6 +98,10 @@ class SIP(MathMixins, Model):
             - 1
         ) + (self.order**2)
         return 3 + (2 * (self.order + 1) ** 2) + nsquare
+
+    @property
+    def P_width(self):
+        return (self.order + 1) ** 2
 
     @property
     def nvectors(self):
@@ -102,7 +122,6 @@ class SIP(MathMixins, Model):
         ]
 
     def gaussian_parameters_to_coefficients(self, distributions):
-        P_width = (self.order + 1) ** 2
         A = distributions[0]
         if isinstance(A, tuple):
             A, A_err = A
@@ -113,7 +132,7 @@ class SIP(MathMixins, Model):
         if isinstance(sigma_y, tuple):
             sigma_y, sigma_y_err = sigma_y
 
-        mu_x = distributions[3 : 3 + P_width]
+        mu_x = distributions[3 : 3 + self.P_width]
         if isinstance(mu_x[0], tuple):
             mu_x, mu_x_err = (
                 DistributionsContainer(mu_x).mean,
@@ -121,7 +140,7 @@ class SIP(MathMixins, Model):
             )
         else:
             mu_x = np.asarray(mu_x)
-        mu_y = distributions[3 + P_width : 3 + P_width * 2]
+        mu_y = distributions[3 + self.P_width : 3 + self.P_width * 2]
         if isinstance(mu_y[0], tuple):
             mu_y, mu_y_err = (
                 DistributionsContainer(mu_y).mean,
@@ -145,28 +164,50 @@ class SIP(MathMixins, Model):
         if isinstance(distributions[0], (int, float)):
             return [a_x, a_y, b_x, b_y, c]
         elif isinstance(distributions[0], tuple):
-            a_x_err = (1 / sigma_x**3) * sigma_x_err
-            b_x_err = np.sqrt(
-                (1 / sigma_x**2 * mu_x_err) ** 2
-                + (-2 * mu_x / sigma_x**3 * sigma_x_err) ** 2
-            )
-            a_y_err = (1 / sigma_y**3) * sigma_y_err
-            b_y_err = np.sqrt(
-                (1 / sigma_y**2 * mu_y_err) ** 2
-                + (-2 * mu_y / sigma_y**3 * sigma_y_err) ** 2
-            )
-            dc_dA = 1 / A
-            dc_dsigma_x = -1 / sigma_x - mu_x[0] ** 2 / sigma_x**3
-            dc_dsigma_y = -1 / sigma_y - mu_y[0] ** 2 / sigma_y**3
-            dc_dmu_x = -mu_x[0] / sigma_x**2
-            dc_dmu_y = -mu_y[0] / sigma_y**2
-            c_err = np.sqrt(
-                (dc_dA * A_err) ** 2
-                + (dc_dsigma_x * sigma_x_err) ** 2
-                + (dc_dmu_x * mu_x_err[0]) ** 2
-                + (dc_dsigma_y * sigma_y_err) ** 2
-                + (dc_dmu_y * mu_y_err[0]) ** 2
-            )
+            if sigma_x_err != np.inf:
+                a_x_err = (1 / sigma_x**3) * sigma_x_err
+            else:
+                a_x_err = np.inf
+            if (sigma_x_err != np.inf) & (np.all(mu_x_err != np.inf)):
+                b_x_err = np.sqrt(
+                    (1 / sigma_x**2 * mu_x_err) ** 2
+                    + (-2 * mu_x / sigma_x**3 * sigma_x_err) ** 2
+                )
+            else:
+                b_x_err = np.asarray([np.inf] * len(mu_x_err))
+            if sigma_y_err != np.inf:
+                a_y_err = (1 / sigma_y**3) * sigma_y_err
+            else:
+                a_y_err = np.inf
+            if (sigma_y_err != np.inf) & (np.all(mu_y_err != np.inf)):
+                b_y_err = np.sqrt(
+                    (1 / sigma_y**2 * mu_y_err) ** 2
+                    + (-2 * mu_y / sigma_y**3 * sigma_y_err) ** 2
+                )
+            else:
+                b_y_err = np.asarray([np.inf] * len(mu_y_err))
+
+            if (
+                (sigma_x_err != np.inf)
+                & (np.all(mu_x_err != np.inf))
+                & (sigma_y_err != np.inf)
+                & (np.all(mu_y_err != np.inf))
+                & (A_err != np.inf)
+            ):
+                dc_dA = 1 / A
+                dc_dsigma_x = -1 / sigma_x - mu_x[0] ** 2 / sigma_x**3
+                dc_dsigma_y = -1 / sigma_y - mu_y[0] ** 2 / sigma_y**3
+                dc_dmu_x = -mu_x[0] / sigma_x**2
+                dc_dmu_y = -mu_y[0] / sigma_y**2
+                c_err = np.sqrt(
+                    (dc_dA * A_err) ** 2
+                    + (dc_dsigma_x * sigma_x_err) ** 2
+                    + (dc_dmu_x * mu_x_err[0]) ** 2
+                    + (dc_dsigma_y * sigma_y_err) ** 2
+                    + (dc_dmu_y * mu_y_err[0]) ** 2
+                )
+            else:
+                c_err = np.inf
             return DistributionsContainer(
                 [
                     (a_x, a_x_err),
@@ -178,14 +219,13 @@ class SIP(MathMixins, Model):
             )
 
     def coefficients_to_gaussian_parameters(self, distributions):
-        P_width = (self.order + 1) ** 2
         a_x = distributions[0]
         if isinstance(a_x, tuple):
             a_x, a_x_err = a_x
         a_y = distributions[1]
         if isinstance(a_y, tuple):
             a_y, a_y_err = a_y
-        b_x = distributions[2 : 2 + P_width]
+        b_x = distributions[2 : 2 + self.P_width]
         if isinstance(b_x[0], tuple):
             b_x, b_x_err = (
                 DistributionsContainer(b_x).mean,
@@ -193,7 +233,7 @@ class SIP(MathMixins, Model):
             )
         else:
             b_x = np.asarray(b_x)
-        b_y = distributions[2 + P_width : 2 + P_width * 2]
+        b_y = distributions[2 + self.P_width : 2 + self.P_width * 2]
         if isinstance(b_y[0], tuple):
             b_y, b_y_err = (
                 DistributionsContainer(b_y).mean,
@@ -222,29 +262,53 @@ class SIP(MathMixins, Model):
             return A, sigma_x, sigma_y, mu_x, mu_y
 
         elif isinstance(distributions[0], tuple):
-            sigma_x_err = (1 / (4 * sigma_x * a_x**2)) * a_x_err
-            mu_x_err = np.sqrt(
-                (b_x / (2 * a_x**2) * a_x_err) ** 2 + (-1 / (2 * a_x) * b_x_err) ** 2
-            )
+            if a_x_err != np.inf:
+                sigma_x_err = (1 / (4 * sigma_x * a_x**2)) * a_x_err
+            else:
+                sigma_x_err = np.inf
+            if (a_x_err != np.inf) & (np.all(b_x_err != np.inf)):
+                mu_x_err = np.sqrt(
+                    (b_x / (2 * a_x**2) * a_x_err) ** 2
+                    + (-1 / (2 * a_x) * b_x_err) ** 2
+                )
+            else:
+                mu_x_err = np.asarray([np.inf] * len(b_x_err))
 
-            sigma_y_err = (1 / (4 * sigma_y * a_y**2)) * a_y_err
-            mu_y_err = np.sqrt(
-                (b_y / (2 * a_y**2) * a_y_err) ** 2 + (-1 / (2 * a_y) * b_y_err) ** 2
-            )
+            if a_y_err != np.inf:
+                sigma_y_err = (1 / (4 * sigma_y * a_y**2)) * a_y_err
+            else:
+                sigma_y_err = np.inf
 
-            dA_dc = A
-            dA_dsigma_x = A * (1 / sigma_x + mu_x[0] ** 2 / sigma_x**3)
-            dA_dmu_x = A * (mu_x[0] / sigma_x**2)
-            dA_dsigma_y = A * (1 / sigma_y + mu_y[0] ** 2 / sigma_y**3)
-            dA_dmu_y = A * (mu_y[0] / sigma_y**2)
+            if (a_y_err != np.inf) & (np.all(b_y_err != np.inf)):
+                mu_y_err = np.sqrt(
+                    (b_y / (2 * a_y**2) * a_y_err) ** 2
+                    + (-1 / (2 * a_y) * b_y_err) ** 2
+                )
+            else:
+                mu_y_err = np.asarray([np.inf] * len(b_y_err))
 
-            A_err = np.sqrt(
-                (dA_dc * c_err) ** 2
-                + (dA_dsigma_x * sigma_x_err) ** 2
-                + (dA_dmu_x * mu_x_err[0]) ** 2
-                + (dA_dsigma_y * sigma_y_err) ** 2
-                + (dA_dmu_y * mu_y_err[0]) ** 2
-            )
+            if (
+                (a_x_err != np.inf)
+                & (np.all(b_x_err != np.inf))
+                & (a_y_err != np.inf)
+                & (np.all(b_y_err != np.inf))
+                & (c_err != np.inf)
+            ):
+                dA_dc = A
+                dA_dsigma_x = A * (1 / sigma_x + mu_x[0] ** 2 / sigma_x**3)
+                dA_dmu_x = A * (mu_x[0] / sigma_x**2)
+                dA_dsigma_y = A * (1 / sigma_y + mu_y[0] ** 2 / sigma_y**3)
+                dA_dmu_y = A * (mu_y[0] / sigma_y**2)
+
+                A_err = np.sqrt(
+                    (dA_dc * c_err) ** 2
+                    + (dA_dsigma_x * sigma_x_err) ** 2
+                    + (dA_dmu_x * mu_x_err[0]) ** 2
+                    + (dA_dsigma_y * sigma_y_err) ** 2
+                    + (dA_dmu_y * mu_y_err[0]) ** 2
+                )
+            else:
+                A_err = np.inf
             return DistributionsContainer(
                 [
                     (A, A_err),
@@ -355,11 +419,14 @@ class SIP(MathMixins, Model):
 
     @property
     def mu_x(self):
-        P_width = (self.order + 1) ** 2
         return DistributionsContainer(
-            self.coefficients_to_gaussian_parameters(self.posteriors)[3 : 3 + P_width]
+            self.coefficients_to_gaussian_parameters(self.posteriors)[
+                3 : 3 + self.P_width
+            ]
             if self.posteriors is not None
-            else self.coefficients_to_gaussian_parameters(self.priors)[3 : 3 + P_width]
+            else self.coefficients_to_gaussian_parameters(self.priors)[
+                3 : 3 + self.P_width
+            ]
         )
 
     @property
@@ -372,14 +439,13 @@ class SIP(MathMixins, Model):
 
     @property
     def mu_y(self):
-        P_width = (self.order + 1) ** 2
         return DistributionsContainer(
             self.coefficients_to_gaussian_parameters(self.posteriors)[
-                3 + P_width : 3 + 2 * P_width
+                3 + self.P_width : 3 + 2 * self.P_width
             ]
             if self.posteriors is not None
             else self.coefficients_to_gaussian_parameters(self.priors)[
-                3 + P_width : 3 + 2 * P_width
+                3 + self.P_width : 3 + 2 * self.P_width
             ]
         )
 
@@ -391,7 +457,7 @@ class SIP(MathMixins, Model):
             else self.coefficients_to_gaussian_parameters(self.priors)[0]
         )
 
-    def mu_x_to_Polynomial(self):
+    def mu_x_to_Model(self):
         """Convert the best fit mu_x values to an lamatrix.model.Polynomial object"""
         poly = (Constant() + Polynomial(self.x_name, order=self.order)) * (
             Constant() + Polynomial(self.y_name, order=self.order)
@@ -405,7 +471,7 @@ class SIP(MathMixins, Model):
         poly.posteriors = DistributionsContainer([(m, s) for m, s in zip(mean, std)])
         return poly
 
-    def mu_y_to_Polynomial(self):
+    def mu_y_to_Model(self):
         """Convert the best fit mu_x values to an lamatrix.model.Polynomial object"""
         poly = (Constant() + Polynomial(self.x_name, order=self.order)) * (
             Constant() + Polynomial(self.y_name, order=self.order)
@@ -435,8 +501,8 @@ class SIP(MathMixins, Model):
         iR, iC = np.mgrid[: imshape[0], : imshape[1]]
         fp_col, fp_row = iC - crpix[1], iR - crpix[0]
         pix_col, pix_row = (
-            self.mu_y_to_Polynomial().evaluate(r=iR, c=iC) + iC,
-            self.mu_x_to_Polynomial().evaluate(r=iR, c=iC) + iR,
+            self.mu_y_to_Model().evaluate(r=iR, c=iC) + iC,
+            self.mu_x_to_Model().evaluate(r=iR, c=iC) + iR,
         )
 
         A = np.asarray(
@@ -533,3 +599,241 @@ def get_sip_matrices(x, y, order=1):
         ]
     ).transpose(shape_a)
     return P, P2
+
+
+class SIP1D(SIP):
+    """Special case of a SIP which is only one dimensional"""
+
+    def __init__(
+        self,
+        t_name: str = "t",
+        dx_name: str = "dx",
+        dy_name: str = "dy",
+        order: int = 1,
+        priors=None,
+        posteriors=None,
+        prior_A=(1, np.inf),
+        prior_sigma_x=(1, np.inf),
+        prior_sigma_y=(1, np.inf),
+        prior_mu_x=None,
+        prior_mu_y=None,
+    ):
+        self.t_name = t_name
+        self.dx_name = dx_name
+        self.dy_name = dy_name
+        self._validate_arg_names()
+
+        super().__init__(
+            priors=priors,
+            posteriors=posteriors,
+            order=order,
+            prior_A=prior_A,
+            prior_sigma_x=prior_sigma_x,
+            prior_sigma_y=prior_sigma_y,
+            prior_mu_x=prior_mu_x,
+            prior_mu_y=prior_mu_y,
+        )
+
+    @property
+    def width(self):
+        return 3 + ((self.order + 1) * 2) + ((self.order) * 2)
+
+    @property
+    def P_width(self):
+        return self.order + 1
+
+    @property
+    def nvectors(self):
+        return 3
+
+    @property
+    def arg_names(self):
+        return {self.t_name, self.dx_name, self.dy_name}
+
+    @property
+    def _initialization_attributes(self):
+        return [
+            "t_name",
+            "dx_name",
+            "dy_name",
+            "order",
+        ]
+
+    @property
+    def _equation(self):
+        return ""
+
+    def design_matrix(self, **kwargs):
+        """Build a design matrix for SIP model.
+
+        Returns
+        -------
+        X : np.ndarray
+            Design matrix with shape (len(x), self.nvectors)
+        """
+
+        if not self.arg_names.issubset(set(kwargs.keys())):
+            raise ValueError(f"Expected {self.arg_names} to be passed.")
+        t = kwargs.get(self.t_name)
+        dx = kwargs.get(self.dx_name)
+        dy = kwargs.get(self.dy_name)
+        ndim = t.ndim
+        shape_a = [*np.arange(1, ndim + 1).astype(int), 0]
+        shape_b = [ndim, *np.arange(0, ndim)]
+
+        p = Constant() + Polynomial("t", order=self.order)
+        P = p.design_matrix(t=t)
+        p2 = Polynomial("t", order=self.order * 2)
+        P2 = p2.design_matrix(t=t)
+
+        X = np.vstack(
+            [
+                np.expand_dims(dx, axis=ndim).transpose(shape_b) ** 2,
+                np.expand_dims(dy, axis=ndim).transpose(shape_b) ** 2,
+                (np.expand_dims(dx, axis=ndim) * P).transpose(shape_b),
+                (np.expand_dims(dy, axis=ndim) * P).transpose(shape_b),
+                P2.transpose(shape_b),
+                np.ones((*t.shape, 1)).transpose(shape_b),
+            ]
+        ).transpose(shape_a)
+        return X
+
+    def mu_x_to_Model(self):
+        """Convert the best fit mu_x values to an lamatrix.model.Polynomial object"""
+        poly = Constant(posteriors=self.mu_x[0], priors=self.priors[3]) + Polynomial(
+            self.t_name,
+            order=self.order,
+            priors=self.priors[3 + 1 : 3 + self.P_width],
+            posteriors=self.mu_x[1:],
+        )
+        return poly
+
+    def mu_y_to_Model(self):
+        """Convert the best fit mu_x values to an lamatrix.model.Polynomial object"""
+        poly = Constant(
+            posteriors=self.mu_y[0], priors=self.priors[3 + self.P_width]
+        ) + Polynomial(
+            self.t_name,
+            order=self.order,
+            priors=self.priors[3 + self.P_width + 1 : 3 + 2 * self.P_width],
+            posteriors=self.mu_y[1:],
+        )
+        return poly
+
+
+class AstrometryFitter(SIP):
+    """Special case of a SIP which fits astrometry..."""
+
+    def __init__(
+        self,
+        t_name: str = "phi",
+        dx_name: str = "dx",
+        dy_name: str = "dy",
+        order: int = 1,
+        priors=None,
+        posteriors=None,
+        prior_A=(1, np.inf),
+        prior_sigma_x=(1, np.inf),
+        prior_sigma_y=(1, np.inf),
+        prior_mu_x=None,
+        prior_mu_y=None,
+    ):
+        self.t_name = t_name
+        self.dx_name = dx_name
+        self.dy_name = dy_name
+        self._validate_arg_names()
+
+        super().__init__(
+            priors=priors,
+            posteriors=posteriors,
+            order=order,
+            prior_A=prior_A,
+            prior_sigma_x=prior_sigma_x,
+            prior_sigma_y=prior_sigma_y,
+            prior_mu_x=prior_mu_x,
+            prior_mu_y=prior_mu_y,
+        )
+
+    @property
+    def width(self):
+        return 3 + ((self.order * 2) * 2) + ((self.order * 2) * 2)
+
+    @property
+    def P_width(self):
+        return self.order * 2
+
+    @property
+    def nvectors(self):
+        return 3
+
+    @property
+    def arg_names(self):
+        return {self.t_name, self.dx_name, self.dy_name}
+
+    @property
+    def _initialization_attributes(self):
+        return [
+            "t_name",
+            "dx_name",
+            "dy_name",
+            "order",
+        ]
+
+    @property
+    def _equation(self):
+        return ""
+
+    def design_matrix(self, **kwargs):
+        """Build a design matrix for SIP model.
+
+        Returns
+        -------
+        X : np.ndarray
+            Design matrix with shape (len(x), self.nvectors)
+        """
+
+        if not self.arg_names.issubset(set(kwargs.keys())):
+            raise ValueError(f"Expected {self.arg_names} to be passed.")
+        t = kwargs.get(self.t_name)
+        dx = kwargs.get(self.dx_name)
+        dy = kwargs.get(self.dy_name)
+        ndim = t.ndim
+        shape_a = [*np.arange(1, ndim + 1).astype(int), 0]
+        shape_b = [ndim, *np.arange(0, ndim)]
+
+        p = Sinusoid("t", nterms=self.order)
+        P = p.design_matrix(t=t)
+        p2 = p**2
+        P2 = p2.design_matrix(t=t)
+
+        X = np.vstack(
+            [
+                np.expand_dims(dx, axis=ndim).transpose(shape_b) ** 2,
+                np.expand_dims(dy, axis=ndim).transpose(shape_b) ** 2,
+                (np.expand_dims(dx, axis=ndim) * P).transpose(shape_b),
+                (np.expand_dims(dy, axis=ndim) * P).transpose(shape_b),
+                P2.transpose(shape_b),
+                np.ones((*t.shape, 1)).transpose(shape_b),
+            ]
+        ).transpose(shape_a)
+        return X
+
+    def mu_x_to_Model(self):
+        """Convert the best fit mu_x values to an lamatrix.model.Polynomial object"""
+        sinusoid = Sinusoid(
+            self.t_name,
+            nterms=self.order,
+            priors=self.priors[2 : 2 + self.P_width],
+            posteriors=self.mu_x,
+        )
+        return sinusoid
+
+    def mu_y_to_Model(self):
+        """Convert the best fit mu_x values to an lamatrix.model.Polynomial object"""
+        sinusoid = Sinusoid(
+            self.t_name,
+            nterms=self.order,
+            priors=self.priors[2 + self.P_width : 2 + 2 * self.P_width],
+            posteriors=self.mu_y,
+        )
+        return sinusoid

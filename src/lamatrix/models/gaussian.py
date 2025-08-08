@@ -191,6 +191,7 @@ class Gaussian2D(MathMixins, Model):
         x_name: str = "x",
         y_name: str = "y",
         priors=None,
+        posteriors=None,
         sigma_x=1,
         sigma_y=1,
         mu_x=0,
@@ -203,7 +204,7 @@ class Gaussian2D(MathMixins, Model):
         self.sigma_x, self.sigma_y = sigma_x, sigma_y
         self.mu_x, self.mu_y = mu_x, mu_y
         self.rho = rho
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def _initialization_attributes(self):
@@ -292,6 +293,7 @@ class dGaussian2D(MathMixins, Model):
         x_name: str = "x",
         y_name: str = "y",
         priors=None,
+        posteriors=None,
         sigma_x=1,
         sigma_y=1,
         mu_x=0,
@@ -306,7 +308,7 @@ class dGaussian2D(MathMixins, Model):
         self.rho = rho
         self._weight_width = self.width
         self.weights = self._validate_weights(weights, self._weight_width)
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def _initialization_attributes(self):
@@ -414,6 +416,7 @@ class lnGaussian(MathMixins, Model):
         x_name: str = "x",
         # mu: float = 0,
         priors=None,
+        posteriors=None,
         prior_A=None,
         prior_mu=None,
         prior_sigma=None,
@@ -422,7 +425,7 @@ class lnGaussian(MathMixins, Model):
         self._validate_arg_names()
 
         # self.mu = mu
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
         if np.any([(p is not None) for p in [prior_A, prior_mu, prior_sigma]]):
             if priors is not None:
                 raise ValueError(
@@ -601,12 +604,13 @@ class dlnGaussian(MathMixins, Model):
         sigma: float,
         x_name: str = "x",
         priors=None,
+        posteriors=None,
     ):
         self.x_name = x_name
         self._validate_arg_names()
         self.mu = mu
         self.sigma = sigma
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def _initialization_attributes(self):
@@ -663,6 +667,7 @@ class lnGaussian2D(MathMixins, Model):
         y_name: str = "y",
         # mu: float = 0,
         priors=None,
+        posteriors=None,
         prior_A=None,
         prior_mu_x=None,
         prior_sigma_x=None,
@@ -674,7 +679,7 @@ class lnGaussian2D(MathMixins, Model):
         self._validate_arg_names()
 
         # self.mu = mu
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
         if np.any(
             [
                 (p is not None)
@@ -954,6 +959,7 @@ class dlnGaussian2D(MathMixins, Model):
         x_name: str = "x",
         y_name: str = "y",
         priors=None,
+        posteriors=None,
     ):
         self.x_name = x_name
         self.y_name = y_name
@@ -962,7 +968,7 @@ class dlnGaussian2D(MathMixins, Model):
         self.sigma_x = sigma_x
         self.mu_y = mu_y
         self.sigma_y = sigma_y
-        super().__init__(priors=priors)
+        super().__init__(priors=priors, posteriors=posteriors)
 
     @property
     def _initialization_attributes(self):
