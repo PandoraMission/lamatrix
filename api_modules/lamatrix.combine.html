@@ -47,7 +47,7 @@
     <link rel="prev" title="lamatrix.models.astrophysical" href="lamatrix.models.astrophysical.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="08 Aug 2025"/>
+    <meta name="docbuild:last-update" content="16 Sep 2025"/>
   </head>
   
   
@@ -439,10 +439,10 @@ document.write(`
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lamatrix.combine.CrosstermModel" title="lamatrix.combine.CrosstermModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrosstermModel</span></code></a>(*args)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lamatrix.combine.CrosstermModel" title="lamatrix.combine.CrosstermModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrosstermModel</span></code></a>(*args[, posteriors])</p></td>
 <td><p>Initialization function for all models.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lamatrix.combine.JointModel" title="lamatrix.combine.JointModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JointModel</span></code></a>(*args)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lamatrix.combine.JointModel" title="lamatrix.combine.JointModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JointModel</span></code></a>(*args[, posteriors])</p></td>
 <td><p>Initialization function for all models.</p></td>
 </tr>
 </tbody>
@@ -450,7 +450,7 @@ document.write(`
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="lamatrix.combine.CrosstermModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.combine.</span></span><span class="sig-name descname"><span class="pre">CrosstermModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/combine.html#CrosstermModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.combine.CrosstermModel" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.combine.</span></span><span class="sig-name descname"><span class="pre">CrosstermModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/combine.html#CrosstermModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.combine.CrosstermModel" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="lamatrix.model.html#lamatrix.model.Model" title="lamatrix.model.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">IOMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LatexMixins</span></code></p>
 <p>Initialization function for all models. All models must be provided with input priors and posteriors that match their width.</p>
 <dl class="py property">
@@ -532,7 +532,7 @@ document.write(`
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lamatrix.combine.JointModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.combine.</span></span><span class="sig-name descname"><span class="pre">JointModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/combine.html#JointModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.combine.JointModel" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lamatrix.combine.</span></span><span class="sig-name descname"><span class="pre">JointModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posteriors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lamatrix/combine.html#JointModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lamatrix.combine.JointModel" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="lamatrix.model.html#lamatrix.model.Model" title="lamatrix.model.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">IOMixins</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LatexMixins</span></code></p>
 <p>Initialization function for all models. All models must be provided with input priors and posteriors that match their width.</p>
 <dl class="py property">

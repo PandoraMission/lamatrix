@@ -5,7 +5,9 @@
    "id": "ed73287e-2270-4fde-b11f-2a8cf5a61d74",
    "metadata": {},
    "source": [
-    "## Spline"
+    "## Spline\n",
+    "\n",
+    "`lamatrix` provides a Spline model which can be used to capture smoothly varying trends in time. B-Splines are useful because they are flexible, linear, and simple to fit. They are defined by the user by setting the widths of \"knots\", which tunes the scale of the variability."
    ]
   },
   {
@@ -114,14 +116,6 @@
     "ax.plot(x, sample, c='k')\n",
     "ax.set(xlabel='$x$', ylabel='$y$', title='Spline model sample');"
    ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "034fe297-6b67-4d98-ba80-4e02cfa91942",
-   "metadata": {},
-   "outputs": [],
-   "source": []
   }
  ],
  "metadata": {

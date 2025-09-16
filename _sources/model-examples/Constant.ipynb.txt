@@ -18,7 +18,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 4,
+   "execution_count": 1,
    "id": "ae5d5c89-f880-4c50-9a53-bc4171ec3086",
    "metadata": {},
    "outputs": [],
@@ -33,7 +33,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 5,
+   "execution_count": 2,
    "id": "3241dc64-c209-4971-8a2c-f036d0324b47",
    "metadata": {},
    "outputs": [
@@ -46,7 +46,7 @@
        "'\\\\[f() = w_{0} \\\\]'"
       ]
      },
-     "execution_count": 5,
+     "execution_count": 2,
      "metadata": {},
      "output_type": "execute_result"
     }
@@ -54,14 +54,6 @@
    "source": [
     "Constant().equation"
    ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "d100b342-9f43-4277-aad2-aa1eb431a776",
-   "metadata": {},
-   "outputs": [],
-   "source": []
   }
  ],
  "metadata": {

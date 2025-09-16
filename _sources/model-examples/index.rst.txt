@@ -19,4 +19,4 @@ These notebooks provide information on each model type within ``lamatrix``. Clic
     Gaussian2D.ipynb    
     lnGaussian.ipynb
     lnGaussian2D.ipynb
-    
+    SIP.ipynb

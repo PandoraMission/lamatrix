@@ -44,7 +44,7 @@
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="08 Aug 2025"/>
+    <meta name="docbuild:last-update" content="16 Sep 2025"/>
   </head>
   
   
@@ -474,25 +474,33 @@ document.write(`
 <div class="viewcode-block" id="JointModel">
 <a class="viewcode-back" href="../../api_modules/lamatrix.combine.html#lamatrix.combine.JointModel">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">JointModel</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="n">IOMixins</span><span class="p">,</span> <span class="n">LatexMixins</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># Check that every arg is a generator</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">Model</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can only combine `Model` objects.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">p</span>
-                <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span>
-                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span>
-                    <span class="p">(</span>
-                        <span class="n">g</span><span class="o">.</span><span class="n">posteriors</span>
-                        <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">posteriors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                        <span class="k">else</span> <span class="n">DistributionsContainer</span><span class="o">.</span><span class="n">from_number</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
-                    <span class="p">)</span>
-                <span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">posteriors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">p</span>
+                    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span>
+                        <span class="p">(</span>
+                            <span class="n">g</span><span class="o">.</span><span class="n">posteriors</span>
+                            <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">posteriors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                            <span class="k">else</span> <span class="n">DistributionsContainer</span><span class="o">.</span><span class="n">from_number</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_distributions</span><span class="p">(</span><span class="n">posteriors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;posteriors must have the number of elements as the design matrix.&quot;</span>
+                <span class="p">)</span>
+
         <span class="c1"># self.priors = DistributionsContainer([p for g in self.models for p in g.priors])</span>
         <span class="c1"># self.posteriors = DistributionsContainer.from_number(np.sum(self.widths))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latex_aliases</span> <span class="o">=</span> <span class="p">{</span><span class="n">arg</span><span class="p">:</span> <span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_names</span><span class="p">}</span>
@@ -652,13 +660,21 @@ document.write(`
 <div class="viewcode-block" id="CrosstermModel">
 <a class="viewcode-back" href="../../api_modules/lamatrix.combine.html#lamatrix.combine.CrosstermModel">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CrosstermModel</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="n">IOMixins</span><span class="p">,</span> <span class="n">LatexMixins</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">posteriors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># Check that every arg is a generator</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">Model</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can only combine `Model` objects.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="o">.</span><span class="n">from_number</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widths</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">posteriors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="n">DistributionsContainer</span><span class="o">.</span><span class="n">from_number</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widths</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_distributions</span><span class="p">(</span><span class="n">posteriors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posteriors</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;posteriors must have the number of elements as the design matrix.&quot;</span>
+                <span class="p">)</span>
         <span class="n">prior_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="n">means</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">means</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>

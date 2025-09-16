@@ -14,6 +14,8 @@ Basic Tutorials
     :maxdepth: 1
 
     intro-basics.ipynb
+    intro-priors.ipynb
     intro-combining.ipynb
     intro-ndimensions.ipynb
-    intro-priors.ipynb
+    intro-gradients.ipynb
+    intro-sparse.ipynb
