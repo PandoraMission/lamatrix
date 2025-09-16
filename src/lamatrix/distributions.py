@@ -91,7 +91,7 @@ class DistributionsContainer:
     @staticmethod
     def from_number(number_of_distributions: int):
         """Make a set of empty distributions with a given length"""
-        return DistributionsContainer([(0, np.inf)] * number_of_distributions)
+        return DistributionsContainer([(0, np.inf)] * int(number_of_distributions))
 
     def __len__(self):
         return self._length

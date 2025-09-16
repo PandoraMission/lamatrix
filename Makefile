@@ -25,9 +25,8 @@ release:
 	git tag -a "v$$(poetry version -s)" -m "Release v$$(poetry version -s)"
 	git push origin main --tags
 
-# Serve docs
-serve:
-	poetry run mkdocs serve
+builddocs:
+	poetry run sphinx-build -M html docs _build
 
-deploy:
-	poetry run mkdocs gh-deploy --force
+servedocs: 
+	poetry run python -m http.server --directory _build/html 8000

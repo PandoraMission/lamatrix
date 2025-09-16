@@ -206,10 +206,12 @@ class SparseSpline(Spline):
             raise ValueError(
                 f"Can only fit sparse matrices in one dimension, {self.x_name} has shape {x.shape}."
             )
-        k = x.nonzero()[0]
+        if not isinstance(x, np.ndarray):
+            raise ValueError(f"Must input dense vectors for `{self.x_name}`.")
+
         X = sparse.lil_matrix((self.width, x.shape[0]))
         for i in range(self.width):
-            X[i, k] = self.bspline_basis(k=self.order, i=i, t=self.knots, x=x.data)
+            X[i, :] = self.bspline_basis(k=self.order, i=i, t=self.knots, x=x)
         return X.T.tocsr()
 
     def to_gradient(self, weights=None, priors=None):
@@ -264,12 +266,16 @@ class dSpline(MathMixins, SplineMixins, Model):
     def _equation(self):
         return [
             f"\\frac{{\\partial \\left( \\sum_{{i=0}}^{{{len(self.knots) - self.order - 2}}}"
-            f" w_{{i}} N_{{i,{self.order}}}(\\mathbf{{{self.latex_aliases[self.x_name]}}})\\right)}}"
+            f" {{{self._dmu_letter}}}_{{i}} N_{{i,{self.order}}}(\\mathbf{{{self.latex_aliases[self.x_name]}}})\\right)}}"
             f"{{\\partial \mathbf{{{self.latex_aliases[self.x_name]}}}}}",
         ]
 
     @property
     def _mu_letter(self):
+        return "w"
+
+    @property
+    def _dmu_letter(self):
         return "v"
 
     def design_matrix(self, **kwargs):
@@ -311,10 +317,12 @@ class dSparseSpline(dSpline):
             raise ValueError(
                 f"Can only fit sparse matrices with shape (n, 1), {self.x_name} has shape {x.shape}."
             )
-        k = x.nonzero()[0]
+        if not isinstance(x, np.ndarray):
+            raise ValueError(f"Must input dense vectors for `{self.x_name}`.")
+
         X = sparse.lil_matrix((len(self.weights), x.shape[0]))
         for i in range(len(self.weights)):
-            X[i, k] = self.bspline_basis_derivative(
-                k=self.order, i=i, t=self.knots, x=x.data
+            X[i, :] = self.bspline_basis_derivative(
+                k=self.order, i=i, t=self.knots, x=x
             )
         return sparse.csr_matrix(X.T.dot(self.weights)).T

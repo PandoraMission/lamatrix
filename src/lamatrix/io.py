@@ -99,13 +99,7 @@ class IOMixins:
         return data_to_store
 
     def save(self, filename: str):
-        data_to_store = self._create_save_data()
-        if hasattr(self, "models"):
-            models_to_store = {
-                f"model{idx + 1}": m._create_save_data()
-                for idx, m in enumerate(self.models)
-            }
-            data_to_store["models"] = models_to_store
+        data_to_store = to_save_tree(self)
         data_to_store["metadata"] = _META_DATA()
         if not filename.endswith(".json"):
             filename = filename + ".json"
@@ -113,3 +107,34 @@ class IOMixins:
         # Write to a JSON file
         with open(filename, "w") as json_file:
             json.dump(data_to_store, json_file, indent=4)
+
+
+def to_save_tree(obj, *, _seen=None):
+    """Return a dict of obj._create_save_data() plus any nested models."""
+    if _seen is None:
+        _seen = set()
+
+    oid = id(obj)
+    if oid in _seen:
+        # Prevent infinite loops on cyclic/shared graphs
+        return {"$ref": oid}
+    _seen.add(oid)
+
+    data = obj._create_save_data()
+
+    # If there are nested models, recurse.
+    models = getattr(obj, "models", None)
+    if models:
+        # Support list/tuple, or dict of models
+        if isinstance(models, dict):
+            data["models"] = {
+                k: to_save_tree(v, _seen=_seen) for k, v in models.items()
+            }
+        else:
+            # keep your existing naming: model1, model2, ...
+            data["models"] = {
+                f"model{i + 1}": to_save_tree(m, _seen=_seen)
+                for i, m in enumerate(models)
+            }
+
+    return data

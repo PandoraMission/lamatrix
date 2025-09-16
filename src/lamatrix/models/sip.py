@@ -501,8 +501,8 @@ class SIP(MathMixins, Model):
         iR, iC = np.mgrid[: imshape[0], : imshape[1]]
         fp_col, fp_row = iC - crpix[1], iR - crpix[0]
         pix_col, pix_row = (
-            self.mu_y_to_Model().evaluate(r=iR, c=iC) + iC,
-            self.mu_x_to_Model().evaluate(r=iR, c=iC) + iR,
+            self.mu_y_to_Model().evaluate(**{self.x_name: iR, self.y_name: iC}) + iC,
+            self.mu_x_to_Model().evaluate(**{self.x_name: iR, self.y_name: iC}) + iR,
         )
 
         A = np.asarray(

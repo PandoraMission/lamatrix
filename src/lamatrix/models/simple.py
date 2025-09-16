@@ -268,13 +268,18 @@ class dPolynomial(MathMixins, LatexMixins, IOMixins, Model):
     @property
     def _mu_letter(self):
         """Letter representing the weights of this gradient model."""
+        return "w"
+
+    @property
+    def _dmu_letter(self):
+        """Letter representing the weights of this gradient model."""
         return "v"
 
     @property
     def _equation(self):
         """Returns a list of latex equations for each vector to describe the generation of the design matrix."""
         eqn = [
-            f"{idx + 1 if idx != 0 else ''}w_{{{idx}}}\mathbf{{{self.latex_aliases[self.x_name]}}}^{{{idx}}}"
+            f"{idx + 1 if idx != 0 else ''}{{{self._dmu_letter}}}_{{{idx}}}\mathbf{{{self.latex_aliases[self.x_name]}}}^{{{idx}}}"
             for idx in range(self.order + 1)
         ]
         return eqn
@@ -534,6 +539,11 @@ class dSinusoid(MathMixins, LatexMixins, IOMixins, Model):
     @property
     def _mu_letter(self):
         """Letter representing the weights of this gradient model."""
+        return "w"
+
+    @property
+    def _dmu_letter(self):
+        """Letter representing the weights of this gradient model."""
         return "v"
 
     @property
@@ -546,8 +556,8 @@ class dSinusoid(MathMixins, LatexMixins, IOMixins, Model):
         return np.hstack(
             [
                 [
-                    f"w_{{{idx * 2}}}\cos({frq(idx)}\\mathbf{{{self.latex_aliases[self.x_name]}}})",
-                    f"w_{{{idx * 2 + 1}}}(-\sin({frq(idx)}\\mathbf{{{self.latex_aliases[self.x_name]}}}))",
+                    f"\\left({{{self._dmu_letter}}}_{{{idx * 2}}}\cos({frq(idx)}\\mathbf{{{self.latex_aliases[self.x_name]}}}) ",
+                    " {{{self._dmu_letter}}}_{{{idx * 2 + 1}}}\sin({frq(idx)}\\mathbf{{{self.latex_aliases[self.x_name]}}})\\right)",
                 ]
                 for idx in range(self.nterms)
             ],

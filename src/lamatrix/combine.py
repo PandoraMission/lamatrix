@@ -41,25 +41,33 @@ def _combine_equations(*equations):
 
 
 class JointModel(Model, IOMixins, LatexMixins):
-    def __init__(self, *args):
+    def __init__(self, *args, posteriors=None):
         # Check that every arg is a generator
         if not np.all([isinstance(a, Model) for a in args]):
             raise ValueError("Can only combine `Model` objects.")
         self.models = [a.copy() for a in args]
         self.widths = [g.width for g in self.models]
-        self.posteriors = DistributionsContainer(
-            [
-                p
-                for g in self.models
-                for p in [
-                    (
-                        g.posteriors
-                        if g.posteriors is not None
-                        else DistributionsContainer.from_number(g.width)
-                    )
-                ][0]
-            ]
-        )
+        if posteriors is None:
+            self.posteriors = DistributionsContainer(
+                [
+                    p
+                    for g in self.models
+                    for p in [
+                        (
+                            g.posteriors
+                            if g.posteriors is not None
+                            else DistributionsContainer.from_number(g.width)
+                        )
+                    ][0]
+                ]
+            )
+        else:
+            self.posteriors = self._validate_distributions(posteriors)
+            if not len(self.posteriors) == self.width:
+                raise ValueError(
+                    "posteriors must have the number of elements as the design matrix."
+                )
+
         # self.priors = DistributionsContainer([p for g in self.models for p in g.priors])
         # self.posteriors = DistributionsContainer.from_number(np.sum(self.widths))
         self.latex_aliases = {arg: arg for arg in self.arg_names}
@@ -210,13 +218,21 @@ class JointModel(Model, IOMixins, LatexMixins):
 
 
 class CrosstermModel(Model, IOMixins, LatexMixins):
-    def __init__(self, *args):
+    def __init__(self, *args, posteriors=None):
         # Check that every arg is a generator
         if not np.all([isinstance(a, Model) for a in args]):
             raise ValueError("Can only combine `Model` objects.")
         self.models = [a.copy() for a in args]
         self.widths = [g.width for g in self.models]
-        self.posteriors = DistributionsContainer.from_number(np.prod(self.widths))
+
+        if posteriors is None:
+            self.posteriors = DistributionsContainer.from_number(np.prod(self.widths))
+        else:
+            self.posteriors = self._validate_distributions(posteriors)
+            if not len(self.posteriors) == self.width:
+                raise ValueError(
+                    "posteriors must have the number of elements as the design matrix."
+                )
         prior_mean = np.asarray(
             [
                 means[0] * means[1]
