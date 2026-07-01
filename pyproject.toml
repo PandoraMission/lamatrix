@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lamatrix"
-version = "1.0.1"
+version = "1.0.2"
 description = ""
 authors = ["Christina Hedges <christina.l.hedges@nasa.gov>"]
 readme = "README.rst"
@@ -8,8 +8,8 @@ packages = [{include = "lamatrix", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-numpy = "^1.26.4"
-rich = "^13.7.1"
+numpy = ">1.26.4"
+rich = ">13.7.1"
 scipy = ">=1.3"
 
 # Optional dependencies
