@@ -35,21 +35,16 @@ sphinx_automodapi = "^0.17.0"
 pydata-sphinx-theme = "^0.15.4"
 sphinx-autobuild = "^2024.10.3"
 flake8 = "^7.1.1"
-astropy = ">=5.0.0"
 jupyter-contrib-nbextensions = "^0.7.0"
 nbconvert = "^7.16.6"
 notebook = "6.5.6"
-batman-package = "^2.5.2"
-seaborn = "^0.13.2"
 pytest-cov = "^6.1.1"
-
-
-[tool.poetry.group.ffi.dependencies]
-gaiaoffline = "^1.0.3"
+gaiaoffline = { version = "^1.0.3", optional = true }
+astropy = { version = ">1.0.0", optional = true }
+sparse3d = { version = ">=1.2.11", optional = true }
 
 [tool.poetry.extras]
-ffi = ["sparse3d", "astropy", "lkspacecraft"]  # Install with pip install tool[viz]
-
+ffi = ["sparse3d", "astropy", "gaiaoffline"]  # Install with pip install tool[viz]
 
 [build-system]
 requires = ["poetry-core"]
