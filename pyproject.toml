@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lamatrix"
-version = "1.0.2"
+version = "1.0.3"
 description = ""
 authors = ["Christina Hedges <christina.l.hedges@nasa.gov>"]
 readme = "README.rst"

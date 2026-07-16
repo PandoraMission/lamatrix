@@ -313,7 +313,7 @@ class dSparseSpline(dSpline):
         if not self.arg_names.issubset(set(kwargs.keys())):
             raise ValueError(f"Expected {self.arg_names} to be passed.")
         x = kwargs.get(self.x_name)
-        if not x.shape[1] == 1:
+        if not x.ndim == 1:
             raise ValueError(
                 f"Can only fit sparse matrices with shape (n, 1), {self.x_name} has shape {x.shape}."
             )
